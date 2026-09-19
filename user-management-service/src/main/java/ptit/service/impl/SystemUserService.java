@@ -3,11 +3,12 @@ package ptit.service.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import ptit.entity.SystemUser;
 import ptit.proxy.EmployeeClient;
 import ptit.repository.SystemUserRepository;
-import ptit.service.ISystemUserService;
+import ptit.service.ISystemUser;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -18,7 +19,7 @@ import java.util.List;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class SystemUserService implements ISystemUserService {
+public class SystemUserService implements ISystemUser {
 
     private final SystemUserRepository systemUserRepository;
     private final EmployeeClient employeeClient;
@@ -31,6 +32,10 @@ public class SystemUserService implements ISystemUserService {
             log.error(result);
             return result;
         }
+        List<SystemUser> systemUsers = systemUserRepository.findAllByUserName(systemUser.getUserName());
+        if (!CollectionUtils.isEmpty(systemUsers))
+            return "KHÔNG THÀNH CÔNG. USER ĐÃ TỒN TẠI";
+        systemUser.setId(null);
         return saveSystemUser(systemUser);
     }
 
@@ -46,10 +51,11 @@ public class SystemUserService implements ISystemUserService {
             return "KHÔNG THÀNH CÔNG. THÔNG TIN ID KHÔNG HỢP LỆ";
         SystemUser systemUserSaved = systemUserRepository.findById(systemUser.getId()).orElse(null);
         if (systemUserSaved == null) {
-            result = "KHÔNG THÀNH CÔNG. MÃ ID KHÔNG TỒN TẠI";
+            result = "KHÔNG THÀNH CÔNG. USER KHÔNG TỒN TẠI";
             log.error(result);
             return result;
         }
+        systemUser.setUserName(systemUserSaved.getUserName());
         return saveSystemUser(systemUser);
     }
 

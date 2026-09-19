@@ -6,23 +6,22 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 @Data
-@Document(collection = "model")
-public class Model {
+@Document(collection = "question")
+public class Question {
 
     @Id
     private String id;
 
+    @Field("question_code")
+    private String questionCode;
+
+    @Field("question_name")
+    private String questionName;
+
     @Field("model_code")
     private String modelCode;
 
-    @Field("model_name")
-    private String modelName;
-
-    @Field("model_level")
-    private Integer modelLevel;
-
-    private List<Question> questions;
+    private String questionAnswer;
 }

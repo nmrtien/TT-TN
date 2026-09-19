@@ -4,7 +4,7 @@ import ptit.entity.SystemUser;
 
 import java.util.List;
 
-public interface ISystemUserService {
+public interface ISystemUser {
 
     String create(SystemUser salary);
 

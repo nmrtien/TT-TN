@@ -5,8 +5,8 @@ import ptit.entity.Model;
 
 import java.util.List;
 
-public interface SalaryRepository extends MongoRepository<Model, String> {
+public interface ModelRepository extends MongoRepository<Model, String> {
 
-    List<Model> findByMaNhanVien(String maNhanVien);
+    List<Model> findAllByOrderByModelNameDesc();
 
 }

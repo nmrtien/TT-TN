@@ -1,4 +1,4 @@
-package ptit.entity;
+package dto;
 
 import lombok.Data;
 import org.springframework.data.annotation.Id;
@@ -6,11 +6,10 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 @Data
-@Document(collection = "model")
-public class Model {
+@Document(collection = "Salary")
+public class ModelDTO {
 
     @Id
     private String id;
@@ -19,10 +18,16 @@ public class Model {
     private String modelCode;
 
     @Field("model_name")
-    private String modelName;
+    private String model_Name;
 
-    @Field("model_level")
-    private Integer modelLevel;
+    @Field("month_of_salary")
+    private String monthOfSalary;
 
-    private List<Question> questions;
+    @Field("year_of_salary")
+    private String yearOfSalary;
+
+    @Field("salary_type")
+    private String salaryType; // SALARY/BONUS
+
+    private BigDecimal totalSalary;
 }

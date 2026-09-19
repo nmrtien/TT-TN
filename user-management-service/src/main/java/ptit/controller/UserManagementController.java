@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ptit.entity.SystemUser;
-import ptit.service.ISystemUserService;
+import ptit.service.ISystemUser;
 
 import java.util.List;
 
@@ -13,7 +13,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserManagementController {
 
-    private final ISystemUserService systemUserService;
+    private final ISystemUser systemUserService;
 
 
     // 1. Tạo mới SystemUser

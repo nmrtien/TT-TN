@@ -3,7 +3,8 @@ package ptit.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ptit.service.ISalary;
+import ptit.entity.Model;
+import ptit.service.IModel;
 
 import java.util.List;
 
@@ -12,14 +13,14 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ModelController {
 
-    private final ISalary salaryService;
+    private final IModel modelService;
 
 
-    // 1. Tạo mới SystemUser
+    // 1. Tạo mới Model
     @PostMapping
-    public ResponseEntity<Object> create(@RequestBody SystemUser systemUser) {
+    public ResponseEntity<Object> create(@RequestBody Model model) {
         try {
-            String response = systemUserService.create(systemUser);
+            String response = modelService.create(model);
             if (response.contains("KHÔNG THÀNH CÔNG"))
                 return ResponseEntity.badRequest().body(response);
 
@@ -30,11 +31,11 @@ public class ModelController {
     }
 
 
-    // 2. Cập nhật SystemUser
+    // 2. Cập nhật Model
     @PutMapping
-    public ResponseEntity<Object> update(@RequestBody SystemUser systemUser) {
+    public ResponseEntity<Object> update(@RequestBody Model model) {
         try {
-            String response = systemUserService.update(systemUser);
+            String response = modelService.update(model);
             if (response.contains("KHÔNG THÀNH CÔNG"))
                 return ResponseEntity.badRequest().body(response);
 
@@ -45,11 +46,11 @@ public class ModelController {
     }
 
 
-    // 3. Hiển thị chi tiet SystemUser theo id
+    // 3. Hiển thị chi tiet Model theo id
     @GetMapping("/{id}")
     public ResponseEntity<Object> detail(@PathVariable String id) {
         try {
-            SystemUser response = systemUserService.detail(id);
+            Model response = modelService.detail(id);
             return ResponseEntity.ok().body(response);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Error: " + e.getMessage());
@@ -57,11 +58,11 @@ public class ModelController {
     }
 
 
-    // 4. Hiển thị danh sách SystemUser
+    // 4. Hiển thị danh sách Model
     @GetMapping()
     public ResponseEntity<Object> list() {
         try {
-            List<SystemUser> response = systemUserService.list();
+            List<Model> response = modelService.list();
             return ResponseEntity.ok().body(response);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Error: " + e.getMessage());
