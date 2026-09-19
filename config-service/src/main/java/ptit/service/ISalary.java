@@ -1,15 +1,15 @@
 package ptit.service;
 
-import ptit.entity.Salary;
+import ptit.entity.Model;
 
 import java.util.List;
 
 public interface ISalary {
 
-    String createSalary(Salary salary);
+    String createSalary(Model salary);
 
-    String updateSalary(Salary salary);
+    String updateSalary(Model salary);
 
-    List<Salary> reportSalary(String maNV);
+    List<Model> reportSalary(String maNV);
 
 }

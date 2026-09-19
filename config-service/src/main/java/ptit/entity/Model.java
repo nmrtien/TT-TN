@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 
 @Data
 @Document(collection = "Salary")
-public class Salary {
+public class Model {
 
     @Id
     private String id;

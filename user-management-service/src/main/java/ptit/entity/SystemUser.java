@@ -5,6 +5,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import ptit.dto.ActiveStatus;
+import ptit.dto.RoleGroup;
 
 @Data
 @Document(collection = "system_user")
@@ -30,6 +31,9 @@ public class SystemUser {
 
     @Field("position")
     private String position;
+
+    @Field("role_group")
+    private RoleGroup roleGroup;
 
     @Field("status")
     private ActiveStatus status;

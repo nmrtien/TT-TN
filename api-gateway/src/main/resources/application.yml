@@ -17,7 +17,7 @@ spring:
         - id: config-service
           uri: http://localhost:8082 # Port HTTP của Config Service
           predicates:
-            - Path=/config/**
+            - Path=/configs/**
           filters:
             - StripPrefix=1
 
@@ -43,7 +43,7 @@ springdoc:
       - name: User Service
         url: /users/v3/api-docs
       - name: Config Service
-        url: /config/v3/api-docs
+        url: /configs/v3/api-docs
       - name: Scoring Service
         url: /scoring/v3/api-docs
       - name: Notification Service

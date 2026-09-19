@@ -3,24 +3,23 @@ package ptit.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ptit.entity.Salary;
 import ptit.service.ISalary;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/salary")
+@RequestMapping("/api/v1/configs")
 @RequiredArgsConstructor
-public class SalaryController {
+public class ModelController {
 
     private final ISalary salaryService;
 
-    // 1. Tạo mới Salary
+
+    // 1. Tạo mới SystemUser
     @PostMapping
-    public ResponseEntity<Object> createSalary(@RequestBody Salary salary) {
-
+    public ResponseEntity<Object> create(@RequestBody SystemUser systemUser) {
         try {
-            String response = salaryService.createSalary(salary);
+            String response = systemUserService.create(systemUser);
             if (response.contains("KHÔNG THÀNH CÔNG"))
                 return ResponseEntity.badRequest().body(response);
 
@@ -30,12 +29,12 @@ public class SalaryController {
         }
     }
 
-    // 2. Cập nhật Salary
+
+    // 2. Cập nhật SystemUser
     @PutMapping
-    public ResponseEntity<Object> updateSalary(@RequestBody Salary salary) {
-
+    public ResponseEntity<Object> update(@RequestBody SystemUser systemUser) {
         try {
-            String response = salaryService.updateSalary(salary);
+            String response = systemUserService.update(systemUser);
             if (response.contains("KHÔNG THÀNH CÔNG"))
                 return ResponseEntity.badRequest().body(response);
 
@@ -45,12 +44,24 @@ public class SalaryController {
         }
     }
 
-    // 3. Hiển thị danh sách salary theo mã nhân viên
-    @GetMapping("/{maNV}")
-    public ResponseEntity<Object> getNhanVienByPhongBan(@PathVariable String maNV) {
 
+    // 3. Hiển thị chi tiet SystemUser theo id
+    @GetMapping("/{id}")
+    public ResponseEntity<Object> detail(@PathVariable String id) {
         try {
-            List<Salary> response = salaryService.reportSalary(maNV);
+            SystemUser response = systemUserService.detail(id);
+            return ResponseEntity.ok().body(response);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error: " + e.getMessage());
+        }
+    }
+
+
+    // 4. Hiển thị danh sách SystemUser
+    @GetMapping()
+    public ResponseEntity<Object> list() {
+        try {
+            List<SystemUser> response = systemUserService.list();
             return ResponseEntity.ok().body(response);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Error: " + e.getMessage());

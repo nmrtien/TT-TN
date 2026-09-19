@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-import ptit.entity.Salary;
+import ptit.entity.Model;
 import ptit.proxy.EmployeeClient;
 import ptit.repository.SalaryRepository;
 import ptit.service.ISalary;
@@ -20,7 +20,7 @@ public class SalaryService implements ISalary {
     private final EmployeeClient employeeClient;
 
     @Override
-    public String createSalary(Salary salary) {
+    public String createSalary(Model salary) {
 
         String result = validateSalary(salary);
         if (StringUtils.hasLength(result)) {
@@ -32,7 +32,7 @@ public class SalaryService implements ISalary {
     }
 
     @Override
-    public String updateSalary(Salary salary) {
+    public String updateSalary(Model salary) {
 
         String result = validateSalary(salary);
         if (StringUtils.hasLength(result)) {
@@ -40,7 +40,7 @@ public class SalaryService implements ISalary {
             return result;
         }
 
-        Salary salarySaved = salaryRepository.findById(salary.getId()).orElse(null);
+        Model salarySaved = salaryRepository.findById(salary.getId()).orElse(null);
         if (salarySaved == null) {
             result = "KHÔNG THÀNH CÔNG. MÃ KHÔNG TỒN TẠI";
             log.error(result);
@@ -51,7 +51,7 @@ public class SalaryService implements ISalary {
     }
 
     @Override
-    public List<Salary> reportSalary(String maNV) {
+    public List<Model> reportSalary(String maNV) {
 
         //        Salary salary = new Salary();
 //        if (salaryList.isEmpty())
@@ -63,7 +63,7 @@ public class SalaryService implements ISalary {
         return salaryRepository.findByMaNhanVien(maNV);
     }
 
-    private String saveSalary(Salary salary) {
+    private String saveSalary(Model salary) {
 
         salaryRepository.save(salary);
         String result = "THÀNH CÔNG";
@@ -71,7 +71,7 @@ public class SalaryService implements ISalary {
         return result;
     }
 
-    private String validateSalary(Salary salary) {
+    private String validateSalary(Model salary) {
 
         if (salary == null)
             return "KHÔNG THÀNH CÔNG. LƯƠNG THƯỞNG KHÔNG ĐƯỢC PHÉP NULL";
