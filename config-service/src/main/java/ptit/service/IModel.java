@@ -14,4 +14,6 @@ public interface IModel {
 
     List<Model> list();
 
+    List<Model> list(Integer modelLevel);
+
 }

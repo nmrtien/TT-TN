@@ -10,6 +10,8 @@ import java.util.Set;
 
 public interface QuestionRepository extends MongoRepository<Question, String> {
 
+    List<Question> findAllByModelCodeIn(Set<String> modelCodes);
+
     List<Question> findAllByModelCode(String modelCode);
 
     List<Question> findAllByQuestionCode(String questionCode);

@@ -1,4 +1,4 @@
-package ptit.dto;
+package ptit.constant;
 
 public enum ActiveStatus {
 

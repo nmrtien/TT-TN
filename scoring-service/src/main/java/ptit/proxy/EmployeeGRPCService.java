@@ -5,8 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.devh.boot.grpc.server.service.GrpcService;
 import com.hollow.grpc.*;
-import ptit.entity.NhanVien;
-import ptit.service.INhanVien;
+import ptit.entity.CreditTask;
 
 @Slf4j
 @GrpcService
@@ -22,7 +21,7 @@ public class EmployeeGRPCService extends EmployeeServiceGrpc.EmployeeServiceImpl
         log.info("getEmployeeCode with maNVReq: {}", maNVReq);
 
         String maNVRes = "";
-        NhanVien nhanVien = nhanVienService.getNhanVien(maNVReq);
+        CreditTask nhanVien = nhanVienService.getNhanVien(maNVReq);
         if (nhanVien != null)
             maNVRes = nhanVien.getMaNhanVien();
 

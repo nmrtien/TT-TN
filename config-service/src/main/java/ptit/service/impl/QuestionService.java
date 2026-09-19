@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import ptit.entity.Question;
-import ptit.proxy.EmployeeClient;
 import ptit.repository.QuestionRepository;
 import ptit.service.IQuestion;
 
@@ -20,7 +19,6 @@ import java.util.stream.Collectors;
 public class QuestionService implements IQuestion {
 
     private final QuestionRepository questionRepository;
-    private final EmployeeClient employeeClient;
 
     @Override
     public String create(Question question) {
@@ -72,6 +70,12 @@ public class QuestionService implements IQuestion {
     @Override
     public List<Question> list(String modelCode) {
         return questionRepository.findAllByModelCode(modelCode);
+    }
+
+
+    @Override
+    public List<Question> list(Set<String> modelCodes) {
+        return questionRepository.findAllByModelCodeIn(modelCodes);
     }
 
 

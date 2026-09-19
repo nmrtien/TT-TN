@@ -17,6 +17,8 @@ public interface IQuestion {
 
     List<Question> list(String modelCode);
 
+    List<Question> list(Set<String> modelCode);
+
     void updateQuestion(Set<String> questionIds, String modelCode);
 
 }

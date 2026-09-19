@@ -7,19 +7,13 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import ptit.entity.Model;
 import ptit.entity.Question;
-import ptit.proxy.EmployeeClient;
 import ptit.repository.ModelRepository;
 import ptit.service.IModel;
 import ptit.service.IQuestion;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.time.format.ResolverStyle;
-import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -28,7 +22,6 @@ import java.util.stream.Collectors;
 public class ModelService implements IModel {
 
     private final ModelRepository modelRepository;
-    private final EmployeeClient employeeClient;
 
     private final IQuestion questionService;
 
@@ -82,6 +75,26 @@ public class ModelService implements IModel {
     @Override
     public List<Model> list() {
         return modelRepository.findAllByOrderByModelNameDesc();
+    }
+
+
+    @Override
+    public List<Model> list(Integer modelLevel) {
+        List<Model> models = modelRepository.findAllByModelLevel(modelLevel);
+        if (CollectionUtils.isEmpty(models))
+            return models;
+        Set<String> modelCodes = models.stream()
+                .map(Model::getModelCode)
+                .collect(Collectors.toSet());
+        List<Question> questions = questionService.list(modelCodes);
+        if (CollectionUtils.isEmpty(questions))
+            return models;
+        Map<String, List<Question>> map = questions.stream()
+                .collect(Collectors.groupingBy(Question::getModelCode));
+        for (Model model : models) {
+            model.setQuestions(map.get(model.getModelCode()));
+        }
+        return models;
     }
 
 

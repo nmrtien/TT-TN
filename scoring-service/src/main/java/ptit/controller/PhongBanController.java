@@ -3,8 +3,8 @@ package ptit.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ptit.entity.PhongBan;
-import ptit.service.IPhongBan;
+import ptit.entity.CreditApplication;
+import ptit.service.IScoring;
 
 import java.util.List;
 
@@ -13,11 +13,11 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PhongBanController {
 
-    private final IPhongBan phongBanService;
+    private final IScoring phongBanService;
 
     // 1. Tạo mới phòng ban
     @PostMapping
-    public ResponseEntity<Object> createPhongBan(@RequestBody PhongBan pb) {
+    public ResponseEntity<Object> createPhongBan(@RequestBody CreditApplication pb) {
 
         try {
             String response = phongBanService.createPhongBan(pb);
@@ -32,7 +32,7 @@ public class PhongBanController {
 
     // 2. Cập nhật phòng ban
     @PutMapping
-    public ResponseEntity<Object> updatePhongBan(@RequestBody PhongBan pb) {
+    public ResponseEntity<Object> updatePhongBan(@RequestBody CreditApplication pb) {
 
         try {
             String response = phongBanService.updatePhongBan(pb);
@@ -50,7 +50,7 @@ public class PhongBanController {
     public ResponseEntity<Object> getAllPhongBan() {
 
         try {
-            List<PhongBan> list = phongBanService.getAllPhongBan();
+            List<CreditApplication> list = phongBanService.getAllPhongBan();
             return ResponseEntity.ok().body(list);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("ERROR: " + e.getMessage());
