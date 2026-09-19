@@ -3,24 +3,24 @@ package ptit.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ptit.entity.Model;
-import ptit.service.IModel;
+import ptit.entity.Question;
+import ptit.service.IQuestion;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/configs/models")
+@RequestMapping("/api/v1/configs/questions")
 @RequiredArgsConstructor
-public class ModelController {
+public class QuestionController {
 
-    private final IModel modelService;
+    private final IQuestion questionService;
 
 
-    // 1. Tạo mới Model
+    // 1. Tạo mới Question
     @PostMapping
-    public ResponseEntity<Object> create(@RequestBody Model model) {
+    public ResponseEntity<Object> create(@RequestBody Question question) {
         try {
-            String response = modelService.create(model);
+            String response = questionService.create(question);
             if (response.contains("KHÔNG THÀNH CÔNG"))
                 return ResponseEntity.badRequest().body(response);
 
@@ -31,11 +31,11 @@ public class ModelController {
     }
 
 
-    // 2. Cập nhật Model
+    // 2. Cập nhật Question
     @PutMapping
-    public ResponseEntity<Object> update(@RequestBody Model model) {
+    public ResponseEntity<Object> update(@RequestBody Question question) {
         try {
-            String response = modelService.update(model);
+            String response = questionService.update(question);
             if (response.contains("KHÔNG THÀNH CÔNG"))
                 return ResponseEntity.badRequest().body(response);
 
@@ -46,11 +46,11 @@ public class ModelController {
     }
 
 
-    // 3. Hiển thị chi tiet Model theo id
+    // 3. Hiển thị chi tiet Question theo id
     @GetMapping("/{id}")
     public ResponseEntity<Object> detail(@PathVariable String id) {
         try {
-            Model response = modelService.detail(id);
+            Question response = questionService.detail(id);
             return ResponseEntity.ok().body(response);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Error: " + e.getMessage());
@@ -58,11 +58,11 @@ public class ModelController {
     }
 
 
-    // 4. Hiển thị danh sách Model
+    // 4. Hiển thị danh sách Question
     @GetMapping()
     public ResponseEntity<Object> list() {
         try {
-            List<Model> response = modelService.list();
+            List<Question> response = questionService.list();
             return ResponseEntity.ok().body(response);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Error: " + e.getMessage());

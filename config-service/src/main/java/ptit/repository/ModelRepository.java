@@ -7,6 +7,8 @@ import java.util.List;
 
 public interface ModelRepository extends MongoRepository<Model, String> {
 
+    List<Model> findAllByModelCode(String modelCode);
+
     List<Model> findAllByOrderByModelNameDesc();
 
 }

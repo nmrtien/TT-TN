@@ -75,7 +75,7 @@ public class SystemUserService implements ISystemUser {
     private String saveSystemUser(SystemUser systemUser) {
         systemUserRepository.save(systemUser);
         String result = "THÀNH CÔNG";
-        log.error(result);
+        log.info(result);
         return result;
     }
 

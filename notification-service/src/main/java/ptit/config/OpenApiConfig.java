@@ -12,7 +12,7 @@ public class OpenApiConfig {
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
-                .addServersItem(new Server().url("/salary").description("Route qua Gateway"))
+                .addServersItem(new Server().url("/notifications").description("Route qua Gateway"))
                 .info(new Info().title("Employee API").version("1.0"));
     }
 }

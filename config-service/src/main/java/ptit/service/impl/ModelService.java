@@ -6,9 +6,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import ptit.entity.Model;
+import ptit.entity.Question;
 import ptit.proxy.EmployeeClient;
 import ptit.repository.ModelRepository;
 import ptit.service.IModel;
+import ptit.service.IQuestion;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -16,6 +18,9 @@ import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -25,6 +30,8 @@ public class ModelService implements IModel {
     private final ModelRepository modelRepository;
     private final EmployeeClient employeeClient;
 
+    private final IQuestion questionService;
+
     @Override
     public String create(Model model) {
         String result = validateModel(model);
@@ -32,6 +39,10 @@ public class ModelService implements IModel {
             log.error(result);
             return result;
         }
+        List<Model> models = modelRepository.findAllByModelCode(model.getModelCode());
+        if (!CollectionUtils.isEmpty(models))
+            return "KHÔNG THÀNH CÔNG. MÃ MÔ HÌNH ĐÃ TỒN TẠI";
+        model.setId(null);
         return saveModel(model);
     }
 
@@ -51,13 +62,20 @@ public class ModelService implements IModel {
             log.error(result);
             return result;
         }
+        model.setModelCode(modelSaved.getModelCode());
         return saveModel(model);
     }
 
 
     @Override
     public Model detail(String id) {
-        return modelRepository.findById(id).orElse(new Model());
+        Model model = modelRepository.findById(id).orElse(new Model());
+        String modelCode = model.getModelCode();
+        if (model.getId() == null || !StringUtils.hasLength(modelCode))
+            return model;
+        List<Question> questions = questionService.list(modelCode);
+        model.setQuestions(questions);
+        return model;
     }
 
 
@@ -69,8 +87,14 @@ public class ModelService implements IModel {
 
     private String saveModel(Model model) {
         modelRepository.save(model);
+        List<Question> questions = model.getQuestions();
+        Set<String> questionIds = questions.stream()
+                .map(Question::getId)
+                .filter(StringUtils::hasLength)
+                .collect(Collectors.toSet());
+        questionService.updateQuestion(questionIds, model.getModelCode());
         String result = "THÀNH CÔNG";
-        log.error(result);
+        log.info(result);
         return result;
     }
 

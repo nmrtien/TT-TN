@@ -1,9 +1,9 @@
 package ptit.service;
 
-import ptit.entity.Model;
 import ptit.entity.Question;
 
 import java.util.List;
+import java.util.Set;
 
 public interface IQuestion {
 
@@ -14,5 +14,9 @@ public interface IQuestion {
     Question detail(String id);
 
     List<Question> list();
+
+    List<Question> list(String modelCode);
+
+    void updateQuestion(Set<String> questionIds, String modelCode);
 
 }
