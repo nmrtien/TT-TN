@@ -1,0 +1,51 @@
+server:
+  port: 8080 # Port của Gateway
+
+spring:
+  cloud:
+    gateway:
+      routes:
+        # Route cho User Service
+        - id: user-management-service
+          uri: http://localhost:8081 # Port HTTP của User Service
+          predicates:
+            - Path=/users/**
+          filters:
+            - StripPrefix=1
+
+        # Route cho Config Service
+        - id: config-service
+          uri: http://localhost:8082 # Port HTTP của Config Service
+          predicates:
+            - Path=/config/**
+          filters:
+            - StripPrefix=1
+
+        # Route cho Scoring Service
+        - id: salary-service
+          uri: http://localhost:8083 # Port HTTP của Scoring Service
+          predicates:
+            - Path=/scoring/**
+          filters:
+            - StripPrefix=1
+
+        # Route cho Notification Service
+        - id: notification-service
+          uri: http://localhost:8084 # Port HTTP của Notification Service
+          predicates:
+            - Path=/notification/**
+          filters:
+            - StripPrefix=1
+
+springdoc:
+  swagger-ui:
+    urls:
+      - name: User Service
+        url: /users/v3/api-docs
+      - name: Config Service
+        url: /config/v3/api-docs
+      - name: Scoring Service
+        url: /scoring/v3/api-docs
+      - name: Notification Service
+        url: /notification/v3/api-docs
+  swagger-ui.path: /swagger-ui.html

@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+package com.hollow.grpc;
+
+service EmployeeService {
+  rpc GetEmployeeCode (EmployeeRequest) returns (EmployeeResponse);
+}
+
+message EmployeeRequest {
+  string maNV = 1;
+}
+
+message EmployeeResponse {
+  string maNV = 1;
+}
