@@ -68,6 +68,18 @@ public class QuestionService implements IQuestion {
 
 
     @Override
+    public List<Question> listValid() {
+        return questionRepository.findAllByModelCodeIsNullOrderByQuestionNameDesc();
+    }
+
+
+    @Override
+    public List<Question> listDetail(String modelCode) {
+        return questionRepository.findAllByModelCodeOrModelCodeIsNullOrderByQuestionNameDesc(modelCode);
+    }
+
+
+    @Override
     public List<Question> list(String modelCode) {
         return questionRepository.findAllByModelCode(modelCode);
     }

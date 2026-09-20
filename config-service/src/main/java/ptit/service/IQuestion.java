@@ -15,6 +15,10 @@ public interface IQuestion {
 
     List<Question> list();
 
+    List<Question> listValid();
+
+    List<Question> listDetail(String modelCode);
+
     List<Question> list(String modelCode);
 
     List<Question> list(Set<String> modelCode);

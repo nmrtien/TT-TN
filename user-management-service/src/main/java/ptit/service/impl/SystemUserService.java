@@ -67,6 +67,12 @@ public class SystemUserService implements ISystemUser {
 
 
     @Override
+    public SystemUser detail(String username, String password) {
+        return systemUserRepository.findByUserNameAndPassword(username, password).orElse(new SystemUser());
+    }
+
+
+    @Override
     public List<SystemUser> list() {
         return systemUserRepository.findAllByOrderByUserNameDesc();
     }
@@ -85,6 +91,11 @@ public class SystemUserService implements ISystemUser {
             return "KHÔNG THÀNH CÔNG. THÔNG TIN USER KHÔNG ĐƯỢC PHÉP NULL";
         if (!StringUtils.hasLength(systemUser.getUserName()))
             return "KHÔNG THÀNH CÔNG. MÃ NHÂN VIÊN KHÔNG ĐƯỢC ĐỂ TRỐNG";
+        String password = systemUser.getPassword();
+        if (!StringUtils.hasLength(password))
+            return "KHÔNG THÀNH CÔNG. MẬT KHẨU KHÔNG ĐƯỢC ĐỂ TRỐNG";
+        if (password.trim().length() < 6)
+            return "KHÔNG THÀNH CÔNG. MẬT KHẨU PHẢI CÓ ÍT NHẤT 6 KÝ TỰ";
         if (!StringUtils.hasLength(systemUser.getFullName()))
             return "KHÔNG THÀNH CÔNG. HỌ VÀ TÊN KHÔNG ĐƯỢC ĐỂ TRỐNG";
         if (!StringUtils.hasLength(systemUser.getPhone()))

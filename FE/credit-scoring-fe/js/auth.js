@@ -1,0 +1,1 @@
+document.getElementById('loginForm').addEventListener('submit',e=>{e.preventDefault();localStorage.setItem('access_token','mock-token');location.href='../index.html'})

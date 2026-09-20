@@ -18,6 +18,10 @@ public interface QuestionRepository extends MongoRepository<Question, String> {
 
     List<Question> findAllByOrderByQuestionNameDesc();
 
+    List<Question> findAllByModelCodeIsNullOrderByQuestionNameDesc();
+
+    List<Question> findAllByModelCodeOrModelCodeIsNullOrderByQuestionNameDesc(String modelCode);
+
     @Query("{ '_id': { $in: ?0 } }")
     @Update("{ '$set': { 'modelCode': ?1 } }")
     void updateModelCodeByQuestionIds(Set<String> questionIds, String modelCode);

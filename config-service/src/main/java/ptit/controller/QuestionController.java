@@ -69,4 +69,28 @@ public class QuestionController {
         }
     }
 
+
+    // 5. Hiển thị danh sách Question
+    @GetMapping("/valid")
+    public ResponseEntity<Object> listValid() {
+        try {
+            List<Question> response = questionService.listValid();
+            return ResponseEntity.ok().body(response);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error: " + e.getMessage());
+        }
+    }
+
+
+    // 6. Hiển thị danh sách Question detail
+    @GetMapping("/detail/{modelCode}")
+    public ResponseEntity<Object> listDetail(@PathVariable String modelCode) {
+        try {
+            List<Question> response = questionService.listDetail(modelCode);
+            return ResponseEntity.ok().body(response);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error: " + e.getMessage());
+        }
+    }
+
 }

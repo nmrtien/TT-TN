@@ -17,6 +17,9 @@ public class SystemUser {
     @Field("user_name")
     private String userName;
 
+    @Field("user_password")
+    private String password;
+
     @Field("full_name")
     private String fullName;
 

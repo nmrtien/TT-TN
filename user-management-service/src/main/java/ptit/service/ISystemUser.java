@@ -12,6 +12,8 @@ public interface ISystemUser {
 
     SystemUser detail(String id);
 
+    SystemUser detail(String username, String password);
+
     List<SystemUser> list();
 
 }
