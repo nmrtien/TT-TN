@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+package com.hollow.grpc;
+
+service ModelService {
+  rpc GetModels (ModelRequest) returns (ModelResponse);
+}
+
+message ModelRequest {
+  int32 modelLevel = 4;
+}
+
+// 1. Phản hồi trả về chứa một DANH SÁCH các Model
+message ModelResponse {
+  repeated ModelData models = 1;
+}
+
+// 2. Định nghĩa cấu trúc đối tượng Model
+message ModelData {
+  string id = 1;
+  string model_code = 2; // Nên dùng snake_case trong proto, gRPC Java sẽ tự map thành camelCase
+  string model_name = 3;
+  int32 model_level = 4; // Integer trong Java map thành int32 trong proto
+  repeated QuestionData questions = 5; // Danh sách Question
+}
+
+// 3. Định nghĩa cấu trúc đối tượng Question
+message QuestionData {
+  string id = 1;
+  string question_code = 2;
+  string question_name = 3;
+  string model_code = 4;
+  string question_answer = 5;
+}

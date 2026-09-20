@@ -7,7 +7,4 @@ import java.util.Optional;
 
 public interface CreditTaskRepository extends MongoRepository<CreditTask, String> {
 
-    Optional<CreditTask> findByMaNhanVien(String maNhanVien);
-
-    List<CreditTask> findByMaPhongBanOrderByTenNhanVienDesc(String maPhongBan);
 }

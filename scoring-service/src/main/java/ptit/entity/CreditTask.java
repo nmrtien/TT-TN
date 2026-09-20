@@ -7,8 +7,11 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import ptit.constant.CreditStatus;
 import ptit.constant.RoleGroup;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 @Data
-@Document(collection = "Nhan_vien")
+@Document(collection = "credit_task")
 public class CreditTask {
 
     @Id
@@ -26,7 +29,22 @@ public class CreditTask {
     @Field("comment")
     private String comment;
 
+    @Field("models")
+    private List<Model> models;
+
+    @Field("create_time")
+    private LocalDateTime createTime;
+
+    @Field("update_time")
+    private LocalDateTime updateTime;
+
     @Field("status")
     private CreditStatus status;
+
+    private CreditApplication application;
+
+    private String nextTaskId;
+
+    private String errorMsg;
 
 }

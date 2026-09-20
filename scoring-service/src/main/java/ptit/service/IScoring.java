@@ -2,16 +2,21 @@ package ptit.service;
 
 import ptit.entity.CreditApplication;
 import ptit.entity.CreditTask;
+import ptit.entity.Model;
 
 import java.util.List;
 
 public interface IScoring {
 
-    String createApplication(CreditApplication application);
+    CreditTask createApplication(CreditApplication application);
 
-    String closeApplication(String applicationId);
+    CreditTask closeApplication(String taskId);
 
-    String completeTask(CreditTask task);
+    CreditTask claimTask(String taskId, String assignee);
 
+    CreditTask getTask(String taskId);
 
+    CreditTask completeTask(CreditTask task);
+
+    List<Model> getModels(Integer level);
 }

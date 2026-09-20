@@ -6,6 +6,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import ptit.constant.CreditStatus;
 
+import java.time.LocalDateTime;
+
 @Data
 @Document(collection = "credit_application")
 public class CreditApplication {
@@ -61,9 +63,15 @@ public class CreditApplication {
     @Field("loan_term")
     private String loanTerm;
 
+    @Field("create_time")
+    private LocalDateTime createTime;
+
+    @Field("update_time")
+    private LocalDateTime updateTime;
+
     @Field("status")
     private CreditStatus status;
 
-    private String validateResult;
+    private String errorMsg;
 
 }

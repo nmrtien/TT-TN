@@ -121,7 +121,15 @@ public class ModelService implements IModel {
             return "KHÔNG THÀNH CÔNG. TÊN MÔ HÌNH KHÔNG ĐƯỢC ĐỂ TRỐNG";
         if (model.getModelLevel() == null)
             return "KHÔNG THÀNH CÔNG. CẤP MÔ HÌNH KHÔNG ĐƯỢC ĐỂ TRỐNG";
+        if (model.getModelLevel() != 1 && model.getModelLevel() != 2 && model.getModelLevel() != 3)
+            return "KHÔNG THÀNH CÔNG. CẤP MÔ HÌNH PHẢI LÀ 1/2/3";
         if (CollectionUtils.isEmpty(model.getQuestions()))
+            return "KHÔNG THÀNH CÔNG. DANH SÁCH CÂU HỎI CỦA MÔ HÌNH KHÔNG ĐƯỢC ĐỂ TRỐNG";
+        Set<String> questionIds = model.getQuestions().stream()
+                .map(Question::getId)
+                .filter(StringUtils::hasLength)
+                .collect(Collectors.toSet());
+        if (CollectionUtils.isEmpty(questionIds))
             return "KHÔNG THÀNH CÔNG. DANH SÁCH CÂU HỎI CỦA MÔ HÌNH KHÔNG ĐƯỢC ĐỂ TRỐNG";
         return null;
     }
