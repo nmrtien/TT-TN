@@ -1,6 +1,11 @@
 let questions = [];
 let selectedQuestion = null;
 let formMode = null;
+
+let currentPageQuestion = 1;
+let pageSizeQuestion = 5;
+
+
 function loadQuestionsPage() {
     setPageHeader(
         'Quản lý câu hỏi',
@@ -86,37 +91,14 @@ function loadQuestionsPage() {
             </div>
         </div>
 
-        <div class="pagination">
-            <div class="pagination-list">
-                <button
-                    type="button"
-                    class="page-btn"
-                    disabled>
-
-                    ‹
-
-                </button>
-
-                <button
-                    type="button"
-                    class="page-btn active">
-
-                    1
-
-                </button>
-
-                <button
-                    type="button"
-                    class="page-btn"
-                    disabled>
-
-                    ›
-
-                </button>
-
-            </div>
-
-        </div>
+        <div
+    id="questionPagination"
+    class="pagination">
+    <div
+        id="questionPaginationList"
+        class="pagination-list">
+    </div>
+</div>
 
     </div>
 
@@ -740,85 +722,124 @@ try {
 // ===============================
 
 function renderQuestions() {
+    const tableBody =
+        document.getElementById('questionTableBody');
 
-const tableBody = document.getElementById('questionTableBody');
+    const questionCount =
+        document.getElementById('questionCount');
 
-const questionCount = document.getElementById('questionCount');
+    if (!tableBody) {
+        return;
+    }
 
-if (!tableBody) {
-    return;
+    if (questionCount) {
+        questionCount.textContent = questions.length;
+    }
+
+    if (!questions || questions.length === 0) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="6" class="table-empty">
+                    Không có dữ liệu
+                </td>
+            </tr>
+        `;
+
+        renderQuestionPagination();
+        return;
+    }
+
+    const totalPages =
+        Math.ceil(
+            questions.length / pageSizeQuestion
+        );
+
+    if (currentPageQuestion > totalPages) {
+        currentPageQuestion = totalPages;
+    }
+
+    const startIndex =
+        (currentPageQuestion - 1) * pageSizeQuestion;
+
+    const endIndex =
+        startIndex + pageSizeQuestion;
+
+    const pageQuestions =
+        questions.slice(startIndex, endIndex);
+
+    tableBody.innerHTML = pageQuestions
+        .map((question, index) => {
+            return `
+                <tr>
+                    <td class="text-center">
+                        ${startIndex + index + 1}
+                    </td>
+
+                    <td>
+                        <span class="id-text">
+                            ${escapeHtml(question.id)}
+                        </span>
+                    </td>
+
+                    <td>
+                        <strong>
+                            ${escapeHtml(question.questionCode)}
+                        </strong>
+                    </td>
+
+                    <td>
+                        ${escapeHtml(question.questionName)}
+                    </td>
+
+                    <td>
+                        ${
+                            question.modelCode
+                                ? `
+                                    <span class="model-badge">
+                                        ${escapeHtml(question.modelCode)}
+                                    </span>
+                                  `
+                                : `
+                                    <span class="text-muted">
+                                        -
+                                    </span>
+                                  `
+                        }
+                    </td>
+
+                    <td>
+                        <div class="table-actions">
+                            <button
+                                type="button"
+                                class="btn-icon btn-view"
+                                title="Cập nhật"
+                                onclick="viewQuestion('${escapeJs(question.id)}')">
+                                ✎
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        })
+        .join('');
+
+    renderQuestionPagination();
 }
 
-if (questionCount) {
-    questionCount.textContent = questions.length;
-}
 
-if (!questions || questions.length === 0) {
+function changeQuestionPage(page) {
+    const totalPages =
+        Math.ceil(
+            questions.length / pageSizeQuestion
+        );
 
-    tableBody.innerHTML = `
-        <tr>
-            <td colspan="6" class="table-empty">
-                Không có dữ liệu
-            </td>
-        </tr>
-    `;
+    if (page < 1 || page > totalPages) {
+        return;
+    }
 
-    return;
-}
+    currentPageQuestion = page;
 
-tableBody.innerHTML = questions.map((question, index) => {
-
-    return `
-        <tr>
-
-            <td class="text-center">
-                ${index + 1}
-            </td>
-
-            <td>
-                <span class="id-text">
-                    ${escapeHtml(question.id)}
-                </span>
-            </td>
-
-            <td>
-                <strong>
-                    ${escapeHtml(question.questionCode)}
-                </strong>
-            </td>
-
-            <td>
-                ${escapeHtml(question.questionName)}
-            </td>
-
-            <td>
-                ${question.modelCode
-                    ? `<span class="model-badge">
-                           ${escapeHtml(question.modelCode)}
-                       </span>`
-                    : `<span class="text-muted">-</span>`
-                }
-            </td>
-
-            <td>
-                <div class="table-actions">
-
-                    <button
-                        type="button"
-                        class="btn-icon btn-view"
-                        title="Cập nhật"
-                        onclick="viewQuestion('${escapeJs(question.id)}')">
-                        ✎
-                    </button>
-
-                </div>
-            </td>
-
-        </tr>
-    `;
-
-}).join('');
-
+    renderQuestions();
 }
 
 // ===============================
@@ -1313,6 +1334,62 @@ function showToast(message, type = 'info') {
         toast.classList.remove('show');
         toast.classList.add('hidden');
     }, 5000);
+}
+
+
+function renderQuestionPagination() {
+    const paginationList =
+        document.getElementById('questionPaginationList');
+
+    if (!paginationList) {
+        return;
+    }
+
+    const totalPages =
+        Math.ceil(
+            questions.length / pageSizeQuestion
+        );
+
+    if (totalPages <= 1) {
+        paginationList.innerHTML = '';
+        return;
+    }
+
+    let html = '';
+
+    // Previous
+    html += `
+        <button
+            type="button"
+            class="page-btn ${currentPageQuestion === 1 ? 'pagination-disabled' : ''}"
+            onclick="changeQuestionPage(${currentPageQuestion - 1})">
+            ‹
+        </button>
+    `;
+
+    // Các trang
+    for (let page = 1; page <= totalPages; page++) {
+        html += `
+            <button
+                type="button"
+                class="page-btn ${page === currentPageQuestion ? 'active' : ''}"
+                onclick="changeQuestionPage(${page})">
+                ${page}
+            </button>
+        `;
+    }
+
+    // Next
+    html += `
+        <button
+            type="button"
+            class="page-btn ${currentPageQuestion === totalPages ? 'pagination-disabled' : ''}"
+            onclick="changeQuestionPage(${currentPageQuestion + 1})">
+            ›
+        </button>
+    `;
+
+    paginationList.innerHTML = html;
 }
 
 // ===============================

@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import ptit.entity.SystemUser;
-import ptit.proxy.EmployeeClient;
+import ptit.proxy.NotificationClient;
 import ptit.repository.SystemUserRepository;
 import ptit.service.ISystemUser;
 
@@ -14,7 +14,9 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
-import java.util.List;
+import java.util.*;
+
+import ptit.entity.Email;
 
 @Slf4j
 @Service
@@ -22,7 +24,7 @@ import java.util.List;
 public class SystemUserService implements ISystemUser {
 
     private final SystemUserRepository systemUserRepository;
-    private final EmployeeClient employeeClient;
+    private final NotificationClient notificationClient;
 
 
     @Override
@@ -36,6 +38,8 @@ public class SystemUserService implements ISystemUser {
         if (!CollectionUtils.isEmpty(systemUsers))
             return "KHÔNG THÀNH CÔNG. USER ĐÃ TỒN TẠI";
         systemUser.setId(null);
+        systemUser.setPassword(getNewPassword());
+        sendEmail(systemUser);
         return saveSystemUser(systemUser);
     }
 
@@ -56,6 +60,7 @@ public class SystemUserService implements ISystemUser {
             return result;
         }
         systemUser.setUserName(systemUserSaved.getUserName());
+        systemUser.setPassword(systemUserSaved.getPassword());
         return saveSystemUser(systemUser);
     }
 
@@ -91,11 +96,6 @@ public class SystemUserService implements ISystemUser {
             return "KHÔNG THÀNH CÔNG. THÔNG TIN USER KHÔNG ĐƯỢC PHÉP NULL";
         if (!StringUtils.hasLength(systemUser.getUserName()))
             return "KHÔNG THÀNH CÔNG. MÃ NHÂN VIÊN KHÔNG ĐƯỢC ĐỂ TRỐNG";
-        String password = systemUser.getPassword();
-        if (!StringUtils.hasLength(password))
-            return "KHÔNG THÀNH CÔNG. MẬT KHẨU KHÔNG ĐƯỢC ĐỂ TRỐNG";
-        if (password.trim().length() < 6)
-            return "KHÔNG THÀNH CÔNG. MẬT KHẨU PHẢI CÓ ÍT NHẤT 6 KÝ TỰ";
         if (!StringUtils.hasLength(systemUser.getFullName()))
             return "KHÔNG THÀNH CÔNG. HỌ VÀ TÊN KHÔNG ĐƯỢC ĐỂ TRỐNG";
         if (!StringUtils.hasLength(systemUser.getPhone()))
@@ -114,6 +114,8 @@ public class SystemUserService implements ISystemUser {
             return "KHÔNG THÀNH CÔNG. NGÀY SINH KHÔNG HỢP LỆ";
         if (!StringUtils.hasLength(systemUser.getPosition()))
             return "KHÔNG THÀNH CÔNG. NGÀY SINH KHÔNG ĐƯỢC ĐỂ TRỐNG";
+        if (systemUser.getRoleGroup() == null)
+            return "KHÔNG THÀNH CÔNG. NHÓM QUYỀN KHÔNG HỢP LỆ";
         if (!StringUtils.hasLength(systemUser.getId()))
             systemUser.setId(null);
         return null;
@@ -134,5 +136,25 @@ public class SystemUserService implements ISystemUser {
         } catch (DateTimeParseException e) {
             return false;
         }
+    }
+
+
+    private String getNewPassword() {
+        String uuid = UUID.randomUUID().toString();
+        Random random = new Random();
+        int randomNumber = random.nextInt(900) + 100;
+        return uuid.split("-")[0] + randomNumber;
+    }
+
+
+    private void sendEmail(SystemUser systemUser) {
+        Email email = new Email();
+        email.setSubject("THÔNG BÁO TẠO TÀI KHOẢN THÀNH CÔNG TẠI CREDIT SCORING PLATFORM");
+        email.setContent("Chúc mừng bạn đã tạo thành công tài khoản tại CSP. " +
+                "Vui lòng không cung cấp thông tin cho bất kỳ ai. UserName: "+systemUser.getUserName()
+                +". Password: "+systemUser.getPassword());
+        email.setFullNames(new HashSet<>(Collections.singleton(systemUser.getFullName())));
+        email.setTo(new HashSet<>(Collections.singleton(systemUser.getEmail())));
+        notificationClient.sendEmail(email);
     }
 }

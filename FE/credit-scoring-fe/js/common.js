@@ -14,7 +14,7 @@ function shell(active, title, subtitle) {
                 <span>Tổng quan</span>
             </div>
 
-            <div class="nav-item ${active === 'users' ? 'active' : ''}">
+            <div class="nav-item ${active === 'users' ? 'active' : ''}" onclick="event.stopPropagation(); loadUsersPage()">
     <span class="nav-icon">🪪</span>
     <span>Người dùng</span>
 </div>

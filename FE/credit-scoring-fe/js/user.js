@@ -1,378 +1,778 @@
-let questions = [];
-let selectedQuestion = null;
-let formMode = null;
-function loadQuestionsPage() {
+let users = [];
+let selectedUser = null;
+let formModeUser = null;
+
+function loadUsersPage() {
+
     setPageHeader(
-        'Quản lý câu hỏi',
-        'Quản lý danh sách câu hỏi chấm điểm tín dụng'
+        'Quản lý người dùng',
+        'Quản lý danh sách người dùng chấm điểm tín dụng'
     );
+
     document.getElementById('page-content').innerHTML = `
+
         <section class="content">
-    <div class="page-title">
-        <div class="page-actions">
-            <button
-                type="button"
-                id="btnCreateQuestion"
-                class="btn btn-primary">
-                <span class="btn-icon-text">＋</span>
-                Tạo câu hỏi
-            </button>
-        </div>
-    </div>
 
-    <div class="content-card">
-        <div class="card-header">
-            <div>
-                <h2>Danh sách câu hỏi</h2>
-                <p>
-                    Tổng số:
-                    <strong id="questionCount">0</strong>
-                    câu hỏi
-                </p>
+            <div class="page-title">
+                <div class="page-actions">
+
+                    <button
+                        type="button"
+                        id="btnCreateUser"
+                        class="btn btn-primary">
+
+                        <span class="btn-icon-text">＋</span>
+                        Tạo người dùng
+
+                    </button>
+
+                </div>
             </div>
-            <div class="card-header-actions">
-                <button
-                    type="button"
-                    id="btnRefresh"
-                    class="btn btn-secondary btn-sm">
-                    ↻
-                    Làm mới
-                </button>
+
+
+            <div class="content-card">
+
+                <!-- HEADER -->
+                <div class="card-header">
+
+                    <div>
+
+                        <h2>Danh sách người dùng</h2>
+
+                        <p>
+                            Tổng số:
+                            <strong id="userCount">0</strong>
+                            người dùng
+                        </p>
+
+                    </div>
+
+
+                    <div class="card-header-actions">
+
+                        <button
+                            type="button"
+                            id="btnRefresh"
+                            class="btn btn-secondary btn-sm">
+
+                            ↻
+                            Làm mới
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- TABLE -->
+                <div class="table-wrapper">
+
+                    <table class="user-table">
+
+                        <thead>
+
+                            <tr>
+
+                                <th class="col-stt">
+                                    STT
+                                </th>
+
+                                <th class="col-id">
+                                    ID
+                                </th>
+
+                                <th>
+                                    Tên đăng nhập
+                                </th>
+
+                                <th>
+                                    Họ và tên
+                                </th>
+
+                                <th>
+                                    Email
+                                </th>
+
+                                <th>
+                                    Số điện thoại
+                                </th>
+
+                                <th>
+                                    Nhóm quyền
+                                </th>
+
+                                <th>
+                                    Trạng thái
+                                </th>
+
+                                <th class="col-action">
+                                    Thao tác
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody id="userTableBody">
+                            <!-- JavaScript render -->
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+                <!-- EMPTY STATE -->
+                <div
+                    id="emptyState"
+                    class="empty-state hidden">
+
+                    <div class="empty-icon">
+                        ?
+                    </div>
+
+                    <div class="empty-title">
+                        Chưa có người dùng
+                    </div>
+
+                    <div class="empty-description">
+                        Hiện tại chưa có người dùng nào trong hệ thống.
+                    </div>
+
+                </div>
+
+
+                <!-- PAGINATION -->
+                <div class="pagination">
+
+                    <div class="pagination-list">
+
+                        <button
+                            type="button"
+                            class="page-btn"
+                            disabled>
+
+                            ‹
+
+                        </button>
+
+
+                        <button
+                            type="button"
+                            class="page-btn active">
+
+                            1
+
+                        </button>
+
+
+                        <button
+                            type="button"
+                            class="page-btn"
+                            disabled>
+
+                            ›
+
+                        </button>
+
+                    </div>
+
+                </div>
+
             </div>
-        </div>
-        <!-- =================================================
-             TABLE
-             ================================================= -->
-        <div class="table-wrapper">
-            <table class="question-table">
-                <thead>
-                <tr>
-                    <th class="col-stt">
-                        STT
-                    </th>
-                    <th class="col-id">
-                        ID
-                    </th>
-                    <th class="col-code">
-                        Mã câu hỏi
-                    </th>
-                    <th>
-                        Tên câu hỏi
-                    </th>
-                    <th class="col-model">
-                        Mô hình
-                    </th>
-                    <th class="col-action">
-                        Thao tác
-                    </th>
-                </tr>
-                </thead>
-                <tbody id="questionTableBody">
-                <!-- JavaScript render -->
-                </tbody>
-            </table>
-        </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             CREATE / UPDATE MODAL
+             ===================================================== -->
+
         <div
-            id="emptyState"
-            class="empty-state hidden">
-            <div class="empty-icon">
-                ?
-            </div>
-            <div class="empty-title">
-                Chưa có câu hỏi
-            </div>
-            <div class="empty-description">
-                Hiện tại chưa có câu hỏi nào trong hệ thống.
-            </div>
-        </div>
-
-        <div class="pagination">
-            <div class="pagination-list">
-                <button
-                    type="button"
-                    class="page-btn"
-                    disabled>
-
-                    ‹
-
-                </button>
-
-                <button
-                    type="button"
-                    class="page-btn active">
-
-                    1
-
-                </button>
-
-                <button
-                    type="button"
-                    class="page-btn"
-                    disabled>
-
-                    ›
-
-                </button>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</section> 
-<div
-    id="questionFormModal"
-    class="modal-overlay hidden">
-
-<div
-    class="modal question-modal"
-    role="dialog">
-
-    <div class="modal-header">
-
-        <div>
-
-            <h2 id="formModalTitle">
-                Tạo câu hỏi
-            </h2>
-
-            <p id="formModalDescription">
-                Nhập thông tin câu hỏi mới
-            </p>
-
-        </div>
-
-        <button
-            type="button"
-            class="modal-close"
-            id="btnCloseFormModal">
-
-            ×
-
-        </button>
-
-    </div>
-
-
-    <form id="questionForm">
-
-        <div class="modal-body">
-
-            <!-- Error -->
+            id="userFormModal"
+            class="modal-overlay hidden">
 
             <div
-                id="formError"
-                class="alert alert-danger hidden">
-            </div>
+                class="modal user-modal"
+                role="dialog">
+
+                <div class="modal-header">
+
+                    <div>
+
+                        <h2 id="formModalTitle">
+                            Tạo người dùng
+                        </h2>
+
+                        <p id="formModalDescription">
+                            Nhập thông tin người dùng mới
+                        </p>
+
+                    </div>
 
 
-            <!-- ID -->
+                    <button
+                        type="button"
+                        class="modal-close"
+                        id="btnCloseFormModal">
 
-            <div
-                id="idFormGroup"
-                class="form-group hidden">
+                        ×
 
-                <label class="form-label">
-                    ID
-                </label>
+                    </button>
 
-                <input
-                    type="text"
-                    id="questionId"
-                    class="form-control readonly"
-                    disabled>
-
-            </div>
+                </div>
 
 
-            <!-- Question Code -->
+                <form id="userForm">
 
-            <div class="form-group">
+                    <div class="modal-body">
 
-                <label
-                    for="questionCode"
-                    class="form-label">
-
-                    Mã câu hỏi
-                    <span class="required">*</span>
-
-                </label>
-
-                <input
-                    type="text"
-                    id="questionCode"
-                    name="questionCode"
-                    class="form-control"
-                    maxlength="50"
-                    autocomplete="off"
-                    placeholder="Ví dụ: Q005">
-
-                <span
-                    id="questionCodeHelp"
-                    class="form-help">
-
-                    Mã câu hỏi phải là duy nhất.
-
-                </span>
-
-            </div>
+                        <div
+                            id="formError"
+                            class="alert alert-danger hidden">
+                        </div>
 
 
-            <!-- Question Name -->
+                        <!-- ID -->
 
-            <div class="form-group">
+                        <div
+                            id="idFormGroup"
+                            class="form-group hidden">
 
-                <label
-                    for="questionName"
-                    class="form-label">
+                            <label class="form-label">
+                                ID
+                            </label>
 
-                    Tên câu hỏi
-                    <span class="required">*</span>
+                            <input
+                                type="text"
+                                id="userId"
+                                class="form-control readonly-field"
+                                readonly>
 
-                </label>
+                        </div>
 
-                <textarea
-                    id="questionName"
-                    name="questionName"
-                    class="form-control question-name-input"
-                    maxlength="500"
-                    rows="4"
-                    placeholder="Nhập nội dung câu hỏi..."></textarea>
 
-                <span class="form-help">
-                    Nhập nội dung câu hỏi sử dụng trong hệ thống.
-                </span>
+                        <!-- USERNAME -->
+
+                        <div class="form-group">
+
+                            <label
+                                for="userName"
+                                class="form-label">
+
+                                Tên đăng nhập
+                                <span class="required">*</span>
+
+                            </label>
+
+                            <input
+                                type="text"
+                                id="userName"
+                                name="userName"
+                                class="form-control"
+                                maxlength="100"
+                                autocomplete="off"
+                                placeholder="Ví dụ: tiennv9"
+                                required>
+
+                        </div>
+
+
+                        <!-- FULL NAME -->
+
+                        <div class="form-group">
+
+                            <label
+                                for="fullName"
+                                class="form-label">
+
+                                Họ và tên
+                                <span class="required">*</span>
+
+                            </label>
+
+                            <input
+                                type="text"
+                                id="fullName"
+                                name="fullName"
+                                class="form-control"
+                                maxlength="255"
+                                placeholder="Ví dụ: Nguyen Van Tien"
+                                required>
+
+                        </div>
+
+
+                        <!-- EMAIL -->
+
+                        <div class="form-group">
+
+                            <label
+                                for="email"
+                                class="form-label">
+
+                                Email
+                                <span class="required">*</span>
+
+                            </label>
+
+                            <input
+                                type="email"
+                                id="email"
+                                name="email"
+                                class="form-control"
+                                maxlength="255"
+                                placeholder="Ví dụ: tiennv9@gmail.com"
+                                required>
+
+                        </div>
+
+
+                        <!-- PHONE -->
+
+                        <div class="form-group">
+
+                            <label
+                                for="phone"
+                                class="form-label">
+
+                                Số điện thoại
+                                <span class="required">*</span>
+
+                            </label>
+
+                            <input
+                                type="text"
+                                id="phone"
+                                name="phone"
+                                class="form-control"
+                                maxlength="20"
+                                placeholder="Ví dụ: 0965563883"
+                                required>
+
+                        </div>
+
+
+                        <!-- BIRTHDAY -->
+
+                        <div class="form-group">
+
+                            <label
+                                for="birthday"
+                                class="form-label">
+
+                                Ngày sinh
+                                <span class="required">*</span>
+
+                            </label>
+
+                            <input
+                                type="text"
+                                id="birthday"
+                                name="birthday"
+                                class="form-control"
+                                maxlength="10"
+                                placeholder="dd/MM/yyyy"
+                                required>
+
+                        </div>
+
+
+                        <!-- POSITION -->
+
+                        <div class="form-group">
+
+                            <label
+                                for="position"
+                                class="form-label">
+
+                                Chức vụ
+                                <span class="required">*</span>
+
+                            </label>
+
+                            <input
+                                type="text"
+                                id="position"
+                                name="position"
+                                class="form-control"
+                                maxlength="255"
+                                placeholder="Ví dụ: Director"
+                                required>
+
+                        </div>
+
+
+                
+                        <!-- ROLE GROUP -->
+
+                        <div class="form-group">
+
+                            <label
+                                for="roleGroup"
+                                class="form-label">
+
+                                Nhóm quyền
+                                <span class="required">*</span>
+
+                            </label>
+
+                            <select
+                                id="roleGroup"
+                                name="roleGroup"
+                                class="form-control"
+                                required>
+
+                                <option value="RB_RM">
+                                    RB_RM
+                                </option>
+
+                                <option value="RB_CA">
+                                    RB_CA
+                                </option>
+
+                                <option value="RB_AM">
+                                    RB_AM
+                                </option>
+
+                            </select>
+
+                    </div>
+
+
+                        <!-- STATUS -->
+
+                        <div class="form-group">
+
+                            <label
+                                for="status"
+                                class="form-label">
+
+                                Trạng thái
+                                <span class="required">*</span>
+
+                            </label>
+
+                            <select
+                                id="status"
+                                name="status"
+                                class="form-control"
+                                required>
+
+                                <option value="A">
+                                    Hoạt động
+                                </option>
+
+                                <option value="I">
+                                    Không hoạt động
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="modal-footer">
+
+                        <button
+                            type="button"
+                            id="btnCancelForm"
+                            class="btn btn-secondary">
+
+                            Hủy
+
+                        </button>
+
+
+                        <button
+                            type="submit"
+                            id="btnSubmitUser"
+                            class="btn btn-primary">
+
+                            Tạo mới
+
+                        </button>
+
+                    </div>
+
+                </form>
 
             </div>
 
         </div>
 
 
-        <div class="modal-footer">
+        <!-- =====================================================
+             DETAIL MODAL
+             ===================================================== -->
 
-            <button
-                type="button"
-                id="btnCancelForm"
-                class="btn btn-secondary">
+        <div
+            id="userDetailModal"
+            class="modal-overlay hidden">
 
-                Hủy
+            <div class="modal user-modal">
 
-            </button>
+                <div class="modal-header">
 
-            <button
-                type="submit"
-                id="btnSubmitQuestion"
-                class="btn btn-primary">
+                    <div>
 
-                Tạo mới
+                        <h2>
+                            Chi tiết người dùng
+                        </h2>
 
-            </button>
+                        <p>
+                            Xem và cập nhật thông tin người dùng
+                        </p>
 
-        </div>
+                    </div>
 
-    </form>
 
-</div>
+                    <button
+                        type="button"
+                        class="modal-close"
+                        id="btnCloseDetailModal">
 
-</div>
+                        ×
 
-<!-- =========================================================
-     DETAIL MODAL
-     ========================================================= -->
+                    </button>
 
-<div id="questionDetailModal" class="modal-overlay hidden">
-    <div class="modal">
+                </div>
 
-        <div class="modal-header">
-            <div>
-                <h2>Chi tiết câu hỏi</h2>
-                <p>Xem và cập nhật thông tin câu hỏi</p>
+
+                <div class="modal-body">
+
+                    <div id="detailLoading">
+                        Đang tải thông tin người dùng...
+                    </div>
+
+
+                    <div
+                        id="detailContent"
+                        class="hidden">
+
+
+                        <!-- ID -->
+
+                        <div class="form-group">
+
+                            <label for="detailId">
+                                ID
+                            </label>
+
+                            <input
+                                type="text"
+                                id="detailId"
+                                class="form-control readonly-field"
+                                readonly>
+
+                        </div>
+
+
+                        <!-- USERNAME -->
+
+                        <div class="form-group">
+
+                            <label for="detailUserName">
+                                Tên đăng nhập
+                            </label>
+
+                            <input
+                                type="text"
+                                id="detailUserName"
+                                class="form-control readonly-field"
+                                readonly>
+
+                        </div>
+
+
+                        <!-- FULL NAME -->
+
+                        <div class="form-group">
+
+                            <label for="detailFullName">
+                                Họ và tên
+                            </label>
+
+                            <input
+                                type="text"
+                                id="detailFullName"
+                                class="form-control">
+
+                        </div>
+
+
+                        <!-- EMAIL -->
+
+                        <div class="form-group">
+
+                            <label for="detailEmail">
+                                Email
+                            </label>
+
+                            <input
+                                type="email"
+                                id="detailEmail"
+                                class="form-control">
+
+                        </div>
+
+
+                        <!-- PHONE -->
+
+                        <div class="form-group">
+
+                            <label for="detailPhone">
+                                Số điện thoại
+                            </label>
+
+                            <input
+                                type="text"
+                                id="detailPhone"
+                                class="form-control">
+
+                        </div>
+
+
+                        <!-- BIRTHDAY -->
+
+                        <div class="form-group">
+
+                            <label for="detailBirthday">
+                                Ngày sinh
+                            </label>
+
+                            <input
+                                type="text"
+                                id="detailBirthday"
+                                class="form-control"
+                                placeholder="dd/MM/yyyy">
+
+                        </div>
+
+
+                        <!-- POSITION -->
+
+                        <div class="form-group">
+
+                            <label for="detailPosition">
+                                Chức vụ
+                            </label>
+
+                            <input
+                                type="text"
+                                id="detailPosition"
+                                class="form-control">
+
+                        </div>
+
+
+                        <!-- ROLE GROUP -->
+
+                        <div class="form-group">
+
+                            <label for="detailRoleGroup">
+                                Nhóm quyền
+                            </label>
+
+                            <select
+                                id="detailRoleGroup"
+                                class="form-control">
+
+                                <option value="RB_RM">
+                                    RB_RM
+                                </option>
+
+                                <option value="RB_CA">
+                                    RB_CA
+                                </option>
+
+                                <option value="RB_AM">
+                                    RB_AM
+                                </option>
+
+                            </select>
+
+                        </div>
+
+
+                        <!-- STATUS -->
+
+                        <div class="form-group">
+
+                            <label for="detailStatus">
+                                Trạng thái
+                            </label>
+
+                            <select
+                                id="detailStatus"
+                                class="form-control">
+
+                                <option value="A">
+                                    Hoạt động
+                                </option>
+
+                                <option value="I">
+                                    Không hoạt động
+                                </option>
+
+                            </select>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="modal-footer">
+
+                    <button
+                        type="button"
+                        id="btnCloseDetail"
+                        class="btn btn-secondary">
+
+                        Đóng
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        id="btnSaveDetail"
+                        class="btn btn-primary">
+
+                        Lưu thay đổi
+
+                    </button>
+
+                </div>
+
             </div>
 
-            <button
-                type="button"
-                class="modal-close"
-                id="btnCloseDetailModal">
-                ×
-            </button>
         </div>
 
-        <div class="modal-body">
 
-            <div id="detailLoading">
-                Đang tải thông tin câu hỏi...
-            </div>
+        <!-- =====================================================
+             TOAST
+             ===================================================== -->
 
-            <div id="detailContent" class="hidden">
+        <div
+            id="toast"
+            class="toast hidden">
 
-                <div class="form-group">
-    <label for="detailId">ID</label>
-    <input
-        type="text"
-        id="detailId"
-        class="form-control readonly-field"
-        readonly>
-</div>
-
-<div class="form-group">
-    <label for="detailQuestionCode">Mã câu hỏi</label>
-    <input
-        type="text"
-        id="detailQuestionCode"
-        class="form-control readonly-field"
-        readonly>
-</div>
-
-<div class="form-group">
-    <label for="detailQuestionName">Tên câu hỏi</label>
-    <textarea
-        id="detailQuestionName"
-        class="form-control"
-        rows="4"></textarea>
-</div>
-
-            </div>
+            <span id="toastMessage"></span>
 
         </div>
-
-        <div class="modal-footer">
-
-            <button
-                type="button"
-                id="btnCloseDetail"
-                class="btn btn-secondary">
-                Đóng
-            </button>
-
-            <button
-                type="button"
-                id="btnSaveDetail"
-                class="btn btn-primary">
-                Lưu thay đổi
-            </button>
-
-        </div>
-
-    </div>
-</div>
-<!-- =========================================================
-     TOAST
-     ========================================================= -->
-
-<div
-    id="toast"
-    class="toast hidden">
-
-<span id="toastMessage"></span>
-
-</div>
 
     `;
 
     registerEvents();
 
-    loadQuestions();
+    loadUsers();
 }
 
 
@@ -383,13 +783,14 @@ function loadQuestionsPage() {
 function registerEvents() {
 
     // ==========================================
-    // NÚT TẠO CÂU HỎI
+    // TẠO NGƯỜI DÙNG
     // ==========================================
-    const btnCreateQuestion =
-        document.getElementById('btnCreateQuestion');
 
-    if (btnCreateQuestion) {
-        btnCreateQuestion.addEventListener(
+    const btnCreateUser =
+        document.getElementById('btnCreateUser');
+
+    if (btnCreateUser) {
+        btnCreateUser.addEventListener(
             'click',
             openCreateModal
         );
@@ -397,13 +798,14 @@ function registerEvents() {
 
 
     // ==========================================
-    // FORM TẠO / CẬP NHẬT CÂU HỎI
+    // FORM TẠO / CẬP NHẬT
     // ==========================================
-    const questionForm =
-        document.getElementById('questionForm');
 
-    if (questionForm) {
-        questionForm.addEventListener(
+    const userForm =
+        document.getElementById('userForm');
+
+    if (userForm) {
+        userForm.addEventListener(
             'submit',
             handleFormSubmit
         );
@@ -411,8 +813,9 @@ function registerEvents() {
 
 
     // ==========================================
-    // MODAL FORM - NÚT X
+    // ĐÓNG FORM - NÚT X
     // ==========================================
+
     const btnCloseFormModal =
         document.getElementById('btnCloseFormModal');
 
@@ -425,8 +828,9 @@ function registerEvents() {
 
 
     // ==========================================
-    // MODAL FORM - NÚT HỦY
+    // ĐÓNG FORM - NÚT HỦY
     // ==========================================
+
     const btnCancelForm =
         document.getElementById('btnCancelForm');
 
@@ -439,22 +843,24 @@ function registerEvents() {
 
 
     // ==========================================
-    // NÚT REFRESH
+    // REFRESH
     // ==========================================
+
     const btnRefresh =
         document.getElementById('btnRefresh');
 
     if (btnRefresh) {
         btnRefresh.addEventListener(
             'click',
-            loadQuestions
+            loadUsers
         );
     }
 
 
     // ==========================================
-    // MODAL DETAIL - NÚT X
+    // DETAIL - NÚT X
     // ==========================================
+
     const btnCloseDetailModal =
         document.getElementById('btnCloseDetailModal');
 
@@ -467,8 +873,9 @@ function registerEvents() {
 
 
     // ==========================================
-    // MODAL DETAIL - NÚT ĐÓNG
+    // DETAIL - NÚT ĐÓNG
     // ==========================================
+
     const btnCloseDetail =
         document.getElementById('btnCloseDetail');
 
@@ -481,64 +888,70 @@ function registerEvents() {
 
 
     // ==========================================
-    // MODAL DETAIL - NÚT CẬP NHẬT
+    // DETAIL - LƯU THAY ĐỔI
     // ==========================================
+
     const btnSaveDetail =
-    document.getElementById('btnSaveDetail');
+        document.getElementById('btnSaveDetail');
 
-if (btnSaveDetail) {
-    btnSaveDetail.addEventListener(
-        'click',
-        handleDetailSave
-    );
-}
+    if (btnSaveDetail) {
+        btnSaveDetail.addEventListener(
+            'click',
+            handleDetailSave
+        );
+    }
 
 
     // ==========================================
-    // CLICK RA NGOÀI MODAL FORM
+    // CLICK RA NGOÀI FORM MODAL
     // ==========================================
-    const questionFormModal =
-        document.getElementById('questionFormModal');
 
-    if (questionFormModal) {
+    const userFormModal =
+        document.getElementById('userFormModal');
 
-        questionFormModal.addEventListener(
+    if (userFormModal) {
+
+        userFormModal.addEventListener(
             'click',
             function (event) {
 
-                if (event.target === questionFormModal) {
+                if (event.target === userFormModal) {
                     closeFormModal();
                 }
 
             }
         );
+
     }
 
 
     // ==========================================
-    // CLICK RA NGOÀI MODAL DETAIL
+    // CLICK RA NGOÀI DETAIL MODAL
     // ==========================================
-    const questionDetailModal =
-        document.getElementById('questionDetailModal');
 
-    if (questionDetailModal) {
+    const userDetailModal =
+        document.getElementById('userDetailModal');
 
-        questionDetailModal.addEventListener(
+    if (userDetailModal) {
+
+        userDetailModal.addEventListener(
             'click',
             function (event) {
 
-                if (event.target === questionDetailModal) {
+                if (event.target === userDetailModal) {
                     closeDetailModal();
                 }
 
             }
         );
+
     }
 
 
     // ==========================================
-    // ESC ĐỂ ĐÓNG MODAL
+    // ESC - ĐÓNG MODAL
     // ==========================================
+
     document.addEventListener(
         'keydown',
         function (event) {
@@ -547,15 +960,13 @@ if (btnSaveDetail) {
                 return;
             }
 
+
             const formModal =
-                document.getElementById(
-                    'questionFormModal'
-                );
+                document.getElementById('userFormModal');
 
             const detailModal =
-                document.getElementById(
-                    'questionDetailModal'
-                );
+                document.getElementById('userDetailModal');
+
 
             if (
                 formModal &&
@@ -563,6 +974,7 @@ if (btnSaveDetail) {
             ) {
                 closeFormModal();
             }
+
 
             if (
                 detailModal &&
@@ -573,94 +985,190 @@ if (btnSaveDetail) {
 
         }
     );
+
 }
 
 
 async function handleDetailSave() {
 
-    if (!selectedQuestion) {
+    if (!selectedUser) {
         return;
     }
 
     const id =
         document.getElementById('detailId').value;
 
-    const questionCode =
-        document.getElementById('detailQuestionCode')
+    const userName =
+        document.getElementById('detailUserName')
             .value.trim();
 
-    const questionName =
-        document.getElementById('detailQuestionName')
+    const fullName =
+        document.getElementById('detailFullName')
             .value.trim();
 
-    if (!questionCode) {
+    const email =
+        document.getElementById('detailEmail')
+            .value.trim();
+
+    const phone =
+        document.getElementById('detailPhone')
+            .value.trim();
+
+    const birthday =
+        document.getElementById('detailBirthday')
+            .value.trim();
+
+    const position =
+        document.getElementById('detailPosition')
+            .value.trim();
+
+    const roleGroup =
+        document.getElementById('detailRoleGroup')
+            .value.trim();
+
+    const status =
+        document.getElementById('detailStatus').value;
+
+
+    // ===============================
+    // VALIDATE
+    // ===============================
+
+    if (!userName) {
         showToast(
-            'Vui lòng nhập mã câu hỏi',
+            'Vui lòng nhập tên đăng nhập',
             'error'
         );
         return;
     }
 
-    if (!questionName) {
+    if (!fullName) {
         showToast(
-            'Vui lòng nhập tên câu hỏi',
+            'Vui lòng nhập họ và tên',
             'error'
         );
         return;
     }
+
+    if (!email) {
+        showToast(
+            'Vui lòng nhập email',
+            'error'
+        );
+        return;
+    }
+
+    if (!phone) {
+        showToast(
+            'Vui lòng nhập số điện thoại',
+            'error'
+        );
+        return;
+    }
+
+    if (!birthday) {
+        showToast(
+            'Vui lòng nhập ngày sinh',
+            'error'
+        );
+        return;
+    }
+
+    if (!position) {
+        showToast(
+            'Vui lòng nhập chức vụ',
+            'error'
+        );
+        return;
+    }
+
+    if (!roleGroup) {
+        showToast(
+            'Vui lòng nhập nhóm quyền',
+            'error'
+        );
+        return;
+    }
+
+
+    // ===============================
+    // SAVE
+    // ===============================
+
+    const btnSaveDetail =
+        document.getElementById('btnSaveDetail');
 
     try {
-
-        const btnSaveDetail =
-            document.getElementById('btnSaveDetail');
 
         if (btnSaveDetail) {
             btnSaveDetail.disabled = true;
             btnSaveDetail.textContent = 'Đang lưu...';
         }
 
-        await updateQuestion(
-            id,
-            questionCode,
-            questionName
-        );
+        await updateUser({
+            id: id,
+            userName: userName,
+            fullName: fullName,
+            email: email,
+            phone: phone,
+            birthday: birthday,
+            position: position,
+            roleGroup: roleGroup,
+            status: status
+        });
 
-        // Cập nhật object hiện tại
-        selectedQuestion.questionCode =
-            questionCode;
 
-        selectedQuestion.questionName =
-            questionName;
+        // ===============================
+        // CẬP NHẬT OBJECT HIỆN TẠI
+        // ===============================
 
-        // Đóng modal
+        selectedUser.userName = userName;
+        selectedUser.fullName = fullName;
+        selectedUser.email = email;
+        selectedUser.phone = phone;
+        selectedUser.birthday = birthday;
+        selectedUser.position = position;
+        selectedUser.roleGroup = roleGroup;
+        selectedUser.status = status;
+
+
+        // ===============================
+        // ĐÓNG MODAL
+        // ===============================
+
         closeDetailModal();
 
-        // Load lại danh sách
-        await loadQuestions();
 
-        // Thông báo
+        // ===============================
+        // LOAD LẠI DANH SÁCH
+        // ===============================
+
+        await loadUsers();
+
+
+        // ===============================
+        // THÔNG BÁO
+        // ===============================
+
         showToast(
-            'Cập nhật câu hỏi thành công',
+            'Cập nhật người dùng thành công',
             'success'
         );
 
     } catch (error) {
 
         console.error(
-            'Update question error:',
+            'Update user error:',
             error
         );
 
         showToast(
             error.message ||
-            'Cập nhật câu hỏi thất bại',
+            'Cập nhật người dùng thất bại',
             'error'
         );
 
     } finally {
-
-        const btnSaveDetail =
-            document.getElementById('btnSaveDetail');
 
         if (btnSaveDetail) {
             btnSaveDetail.disabled = false;
@@ -670,184 +1178,28 @@ async function handleDetailSave() {
     }
 }
 
+
 // ===============================
-// GET ALL QUESTIONS
+// GET ALL Users
 // ===============================
 
-async function loadQuestions() {
-
-const tableBody = document.getElementById('questionTableBody');
-
-if (tableBody) {
-    tableBody.innerHTML = `
-        <tr>
-            <td colspan="6" class="table-loading">
-                Đang tải dữ liệu...
-            </td>
-        </tr>
-    `;
-}
-
-try {
-
-    const response = await fetch(
-        `${API_BASE_URL}/configs/api/v1/configs/questions`,
-        {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        }
-    );
-
-    if (!response.ok) {
-        throw new Error(
-            `Không thể lấy danh sách câu hỏi. HTTP ${response.status}`
-        );
-    }
-
-    const data = await response.json();
-
-    // Backend trả trực tiếp array
-    questions = Array.isArray(data) ? data : [];
-
-    renderQuestions();
-
-} catch (error) {
-
-    console.error('Load questions error:', error);
+async function loadUsers() {
+    const tableBody =
+        document.getElementById('userTableBody');
 
     if (tableBody) {
         tableBody.innerHTML = `
             <tr>
-                <td colspan="6" class="table-empty">
-                    Không thể tải danh sách câu hỏi
+                <td colspan="9" class="table-loading">
+                    Đang tải dữ liệu...
                 </td>
             </tr>
         `;
     }
 
-    showToast(
-        error.message || 'Có lỗi xảy ra khi tải danh sách câu hỏi',
-        'error'
-    );
-}
-
-}
-
-// ===============================
-// RENDER TABLE
-// ===============================
-
-function renderQuestions() {
-
-const tableBody = document.getElementById('questionTableBody');
-
-const questionCount = document.getElementById('questionCount');
-
-if (!tableBody) {
-    return;
-}
-
-if (questionCount) {
-    questionCount.textContent = questions.length;
-}
-
-if (!questions || questions.length === 0) {
-
-    tableBody.innerHTML = `
-        <tr>
-            <td colspan="6" class="table-empty">
-                Không có dữ liệu
-            </td>
-        </tr>
-    `;
-
-    return;
-}
-
-tableBody.innerHTML = questions.map((question, index) => {
-
-    return `
-        <tr>
-
-            <td class="text-center">
-                ${index + 1}
-            </td>
-
-            <td>
-                <span class="id-text">
-                    ${escapeHtml(question.id)}
-                </span>
-            </td>
-
-            <td>
-                <strong>
-                    ${escapeHtml(question.questionCode)}
-                </strong>
-            </td>
-
-            <td>
-                ${escapeHtml(question.questionName)}
-            </td>
-
-            <td>
-                ${question.modelCode
-                    ? `<span class="model-badge">
-                           ${escapeHtml(question.modelCode)}
-                       </span>`
-                    : `<span class="text-muted">-</span>`
-                }
-            </td>
-
-            <td>
-                <div class="table-actions">
-
-                    <button
-                        type="button"
-                        class="btn-icon btn-view"
-                        title="Cập nhật"
-                        onclick="viewQuestion('${escapeJs(question.id)}')">
-                        ✎
-                    </button>
-
-                </div>
-            </td>
-
-        </tr>
-    `;
-
-}).join('');
-
-}
-
-// ===============================
-// DETAIL
-// ===============================
-
-async function viewQuestion(id) {
-    const modal = document.getElementById('questionDetailModal');
-
-    // Mở modal và hiển thị loading
-    if (modal) {
-        modal.classList.remove('hidden');
-        modal.classList.add('show');
-    }
-
-    const loading = document.getElementById('detailLoading');
-    const content = document.getElementById('detailContent');
-
-    if (loading) {
-        loading.classList.remove('hidden');
-    }
-
-    if (content) {
-        content.classList.add('hidden');
-    }
-
     try {
         const response = await fetch(
-            `${API_BASE_URL}/configs/api/v1/configs/questions/${encodeURIComponent(id)}`,
+            `${API_BASE_URL}/users/api/v1/users`,
             {
                 method: 'GET',
                 headers: {
@@ -857,42 +1209,301 @@ async function viewQuestion(id) {
         );
 
         if (!response.ok) {
-            const message = await response.text();
+            const message =
+                await getResponseErrorMessage(response);
+
             throw new Error(
-                message || `Không thể lấy thông tin câu hỏi. HTTP ${response.status}`
+                message ||
+                `Không thể lấy danh sách người dùng. HTTP ${response.status}`
             );
         }
 
-        const question = await response.json();
+        const data = await response.json();
 
-        console.log('========== QUESTION DETAIL ==========');
-        console.log('API response:', question);
+        // Backend trả trực tiếp array
+        users = Array.isArray(data)
+            ? data
+            : [];
 
-        selectedQuestion = question;
+        renderUsers();
 
-        // Render data
-        renderQuestionDetail(question);
+    } catch (error) {
+        console.error(
+            'Load users error:',
+            error
+        );
 
-        // Ẩn loading
+        users = [];
+
+        if (tableBody) {
+            tableBody.innerHTML = `
+                <tr>
+                    <td colspan="9" class="table-empty">
+                        Không thể tải danh sách người dùng
+                    </td>
+                </tr>
+            `;
+        }
+
+        const userCount =
+            document.getElementById('userCount');
+
+        if (userCount) {
+            userCount.textContent = '0';
+        }
+
+        showToast(
+            error.message ||
+            'Có lỗi xảy ra khi tải danh sách người dùng',
+            'error'
+        );
+    }
+}
+
+// ===============================
+// RENDER TABLE
+// ===============================
+
+function renderUsers() {
+    const tableBody =
+        document.getElementById('userTableBody');
+
+    const userCount =
+        document.getElementById('userCount');
+
+    if (!tableBody) {
+        return;
+    }
+
+    // Cập nhật tổng số người dùng
+    if (userCount) {
+        userCount.textContent = users.length;
+    }
+
+    // Không có dữ liệu
+    if (!users || users.length === 0) {
+        tableBody.innerHTML = `
+            <tr>
+                <td colspan="9" class="table-empty">
+                    Không có dữ liệu
+                </td>
+            </tr>
+        `;
+
+        return;
+    }
+
+    tableBody.innerHTML = users.map((user, index) => {
+        return `
+            <tr>
+                <!-- STT -->
+                <td class="text-center">
+                    ${index + 1}
+                </td>
+
+                <!-- ID -->
+                <td>
+                    <span class="id-text">
+                        ${escapeHtml(user.id)}
+                    </span>
+                </td>
+
+                <!-- TÊN ĐĂNG NHẬP -->
+                <td>
+                    <strong>
+                        ${escapeHtml(user.userName)}
+                    </strong>
+                </td>
+
+                <!-- HỌ VÀ TÊN -->
+                <td>
+                    ${escapeHtml(user.fullName)}
+                </td>
+
+                <!-- EMAIL -->
+                <td>
+                    ${escapeHtml(user.email)}
+                </td>
+
+                <!-- SỐ ĐIỆN THOẠI -->
+                <td>
+                    ${escapeHtml(user.phone)}
+                </td>
+
+                <!-- NHÓM QUYỀN -->
+                <td>
+                    ${
+                        user.roleGroup
+                            ? `
+                                <span class="model-badge">
+                                    ${escapeHtml(user.roleGroup)}
+                                </span>
+                              `
+                            : `
+                                <span class="text-muted">
+                                    -
+                                </span>
+                              `
+                    }
+                </td>
+
+                <!-- TRẠNG THÁI -->
+                <td>
+                    ${
+                        user.status === 'A'
+                            ? `
+                                <span class="status-badge status-active">
+                                    Hoạt động
+                                </span>
+                              `
+                            : `
+                                <span class="status-badge status-inactive">
+                                    Không hoạt động
+                                </span>
+                              `
+                    }
+                </td>
+
+                <!-- THAO TÁC -->
+                <td class="col-action">
+                    <div class="table-actions">
+                        <button
+                            type="button"
+                            class="btn-icon btn-view"
+                            title="Xem chi tiết"
+                            onclick="viewUser('${escapeJs(user.id)}')">
+                            ✎
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+// ===============================
+// DETAIL
+// ===============================
+
+async function viewUser(id) {
+    const modal =
+        document.getElementById('userDetailModal');
+
+    const loading =
+        document.getElementById('detailLoading');
+
+    const content =
+        document.getElementById('detailContent');
+
+    // ===============================
+    // MỞ MODAL
+    // ===============================
+
+    if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('show');
+    }
+
+    // ===============================
+    // HIỂN THỊ LOADING
+    // ===============================
+
+    if (loading) {
+        loading.classList.remove('hidden');
+        loading.textContent =
+            'Đang tải thông tin người dùng...';
+    }
+
+    if (content) {
+        content.classList.add('hidden');
+    }
+
+    try {
+        // ===============================
+        // CALL API
+        // ===============================
+
+        const response = await fetch(
+            `${API_BASE_URL}/users/api/v1/users/${encodeURIComponent(id)}`,
+            {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            }
+        );
+
+        if (!response.ok) {
+            const message =
+                await getResponseErrorMessage(response);
+
+            throw new Error(
+                message ||
+                `Không thể lấy thông tin người dùng. HTTP ${response.status}`
+            );
+        }
+
+        const user =
+            await response.json();
+
+        console.log(
+            '========== USER DETAIL =========='
+        );
+
+        console.log(
+            'API response:',
+            user
+        );
+
+        // ===============================
+        // LƯU USER ĐANG CHỌN
+        // ===============================
+
+        selectedUser = user;
+
+        // ===============================
+        // RENDER DETAIL
+        // ===============================
+
+        renderUserDetail(user);
+
+        // ===============================
+        // ẨN LOADING
+        // ===============================
+
         if (loading) {
             loading.classList.add('hidden');
         }
 
-        // Hiện nội dung
+        // ===============================
+        // HIỆN CONTENT
+        // ===============================
+
         if (content) {
             content.classList.remove('hidden');
         }
 
     } catch (error) {
-        console.error('Load question detail error:', error);
+        console.error(
+            'Load user detail error:',
+            error
+        );
 
+        // Hiển thị lỗi trong modal
         if (loading) {
+            loading.classList.remove('hidden');
             loading.textContent =
-                error.message || 'Không thể tải thông tin câu hỏi';
+                error.message ||
+                'Không thể tải thông tin người dùng';
+        }
+
+        if (content) {
+            content.classList.add('hidden');
         }
 
         showToast(
-            error.message || 'Không thể tải thông tin câu hỏi',
+            error.message ||
+            'Không thể tải thông tin người dùng',
             'error'
         );
     }
@@ -902,29 +1513,68 @@ async function viewQuestion(id) {
 // RENDER DETAIL
 // ===============================
 
-function renderQuestionDetail(question) {
-
+function renderUserDetail(user) {
     const detailId =
         document.getElementById('detailId');
 
-    const detailQuestionCode =
-        document.getElementById('detailQuestionCode');
+    const detailUserName =
+        document.getElementById('detailUserName');
 
-    const detailQuestionName =
-        document.getElementById('detailQuestionName');
+    const detailFullName =
+        document.getElementById('detailFullName');
+
+    const detailEmail =
+        document.getElementById('detailEmail');
+
+    const detailPhone =
+        document.getElementById('detailPhone');
+
+    const detailBirthday =
+        document.getElementById('detailBirthday');
+
+    const detailPosition =
+        document.getElementById('detailPosition');
+
+    const detailRoleGroup =
+        document.getElementById('detailRoleGroup');
+
+    const detailStatus =
+        document.getElementById('detailStatus');
 
     if (detailId) {
-        detailId.value = question.id || '';
+        detailId.value = user.id || '';
     }
 
-    if (detailQuestionCode) {
-        detailQuestionCode.value =
-            question.questionCode || '';
+    if (detailUserName) {
+        detailUserName.value = user.userName || '';
     }
 
-    if (detailQuestionName) {
-        detailQuestionName.value =
-            question.questionName || '';
+    if (detailFullName) {
+        detailFullName.value = user.fullName || '';
+    }
+
+    if (detailEmail) {
+        detailEmail.value = user.email || '';
+    }
+
+    if (detailPhone) {
+        detailPhone.value = user.phone || '';
+    }
+
+    if (detailBirthday) {
+        detailBirthday.value = user.birthday || '';
+    }
+
+    if (detailPosition) {
+        detailPosition.value = user.position || '';
+    }
+
+    if (detailRoleGroup) {
+        detailRoleGroup.value = user.roleGroup || 'RB_RM';
+    }
+
+    if (detailStatus) {
+        detailStatus.value = user.status || 'A';
     }
 }
 
@@ -933,39 +1583,95 @@ function renderQuestionDetail(question) {
 // ===============================
 
 function openCreateModal() {
-    formMode = 'create';
-    selectedQuestion = null;
-
     const modal =
-        document.getElementById('questionFormModal');
+        document.getElementById('userFormModal');
 
     const form =
-        document.getElementById('questionForm');
+        document.getElementById('userForm');
 
-    const modalTitle =
-        document.getElementById('formModalTitle');
+    const title =
+        document.getElementById('userFormTitle');
 
-    const questionCode =
-        document.getElementById('questionCode');
+    const userIdGroup =
+        document.getElementById('userIdGroup');
 
-    const questionName =
-        document.getElementById('questionName');
+    const userId =
+        document.getElementById('userId');
+
+    const userName =
+        document.getElementById('userName');
+
+    const fullName =
+        document.getElementById('fullName');
+
+    const email =
+        document.getElementById('email');
+
+    const phone =
+        document.getElementById('phone');
+
+    const birthday =
+        document.getElementById('birthday');
+
+    const position =
+        document.getElementById('position');
+
+    const roleGroup =
+        document.getElementById('roleGroup');
+
+    const status =
+        document.getElementById('status');
+
+    formModeUser = 'create';
+    selectedUser = null;
+
+    if (title) {
+        title.textContent = 'Thêm người dùng';
+    }
 
     if (form) {
         form.reset();
     }
 
-    if (modalTitle) {
-        modalTitle.textContent = 'Tạo câu hỏi';
+    if (userId) {
+        userId.value = '';
     }
 
-    if (questionCode) {
-        questionCode.disabled = false;
-        questionCode.value = '';
+    if (userIdGroup) {
+        userIdGroup.classList.add('hidden');
     }
 
-    if (questionName) {
-        questionName.value = '';
+    if (userName) {
+        userName.value = '';
+    }
+
+
+    if (fullName) {
+        fullName.value = '';
+    }
+
+    if (email) {
+        email.value = '';
+    }
+
+    if (phone) {
+        phone.value = '';
+    }
+
+    if (birthday) {
+        birthday.value = '';
+    }
+
+    if (position) {
+        position.value = '';
+    }
+
+    if (roleGroup) {
+        roleGroup.value = '';
+    }
+
+    if (status) {
+        status.value = 'A';
     }
 
     if (modal) {
@@ -973,8 +1679,10 @@ function openCreateModal() {
         modal.classList.add('show');
     }
 
-    if (questionCode) {
-        questionCode.focus();
+    if (userName) {
+        setTimeout(() => {
+            userName.focus();
+        }, 100);
     }
 }
 
@@ -983,50 +1691,116 @@ function openCreateModal() {
 // OPEN UPDATE
 // ===============================
 
-function editQuestion(id) {
-
-const question = questions.find(
-    item => String(item.id) === String(id)
-);
-
-if (!question) {
-
-    showToast(
-        'Không tìm thấy câu hỏi',
-        'error'
+function editUser(id) {
+    const user = users.find(
+        item => String(item.id) === String(id)
     );
 
-    return;
+    if (!user) {
+        showToast(
+            'Không tìm thấy người dùng',
+            'error'
+        );
+        return;
+    }
+
+    openUpdateModal(user);
 }
 
-openUpdateModal(question);
+function openUpdateModal(user) {
+    const modal =
+        document.getElementById('userFormModal');
 
-}
+    const title =
+        document.getElementById('userFormTitle');
 
-function openUpdateModal(question) {
-formMode = 'update';
-selectedQuestion = question;
-const modal = document.getElementById('questionFormModal');
-const modalTitle = document.getElementById('formModalTitle');
-const questionCode = document.getElementById('questionCode');
-const questionName = document.getElementById('questionName');
-if (modalTitle) {
-    modalTitle.textContent = 'Cập nhật câu hỏi';
-}
-if (questionCode) {
-    questionCode.value = question.questionCode || '';
-    // Update không cho sửa mã câu hỏi
-    questionCode.disabled = true;
-}
-if (questionName) {
-    questionName.value = question.questionName || '';
-}
-if (modal) {
-    modal.classList.add('show');
-}
-if (questionName) {
-    questionName.focus();
-}
+    const userIdGroup =
+        document.getElementById('userIdGroup');
+
+    const userId =
+        document.getElementById('userId');
+
+    const userName =
+        document.getElementById('userName');
+
+    const fullName =
+        document.getElementById('fullName');
+
+    const email =
+        document.getElementById('email');
+
+    const phone =
+        document.getElementById('phone');
+
+    const birthday =
+        document.getElementById('birthday');
+
+    const position =
+        document.getElementById('position');
+
+    const roleGroup =
+        document.getElementById('roleGroup');
+
+    const status =
+        document.getElementById('status');
+
+    formModeUser = 'update';
+    selectedUser = user;
+
+    if (title) {
+        title.textContent = 'Cập nhật người dùng';
+    }
+
+    if (userIdGroup) {
+        userIdGroup.classList.remove('hidden');
+    }
+
+    if (userId) {
+        userId.value = user.id || '';
+    }
+
+    if (userName) {
+        userName.value = user.userName || '';
+    }
+
+    if (fullName) {
+        fullName.value = user.fullName || '';
+    }
+
+    if (email) {
+        email.value = user.email || '';
+    }
+
+    if (phone) {
+        phone.value = user.phone || '';
+    }
+
+    if (birthday) {
+        birthday.value = user.birthday || '';
+    }
+
+    if (position) {
+        position.value = user.position || '';
+    }
+
+    if (roleGroup) {
+        roleGroup.value = user.roleGroup || '';
+    }
+
+    if (status) {
+        status.value = user.status || 'A';
+    }
+
+    if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('show');
+    }
+
+    if (userName) {
+        setTimeout(() => {
+            userName.focus();
+        }, 100);
+    }
 }
 
 // ===============================
@@ -1035,80 +1809,178 @@ if (questionName) {
 
 async function handleFormSubmit(event) {
     event.preventDefault();
-    const questionCode = document.getElementById('questionCode').value.trim();
-    const questionName = document.getElementById('questionName').value.trim();
-    if (!questionCode) {
-        showToast('Vui lòng nhập mã câu hỏi', 'error');
+
+    const id =
+        document.getElementById('userId').value.trim();
+
+    const userName =
+        document.getElementById('userName').value.trim();
+
+
+    const fullName =
+        document.getElementById('fullName').value.trim();
+
+    const email =
+        document.getElementById('email').value.trim();
+
+    const phone =
+        document.getElementById('phone').value.trim();
+
+    const birthday =
+        document.getElementById('birthday').value.trim();
+
+    const position =
+        document.getElementById('position').value.trim();
+
+    const roleGroup =
+        document.getElementById('roleGroup').value.trim();
+
+    const status =
+        document.getElementById('status').value;
+
+    if (!userName) {
+        showToast(
+            'Vui lòng nhập tên đăng nhập',
+            'error'
+        );
         return;
     }
-    if (!questionName) {
-        showToast('Vui lòng nhập tên câu hỏi', 'error');
+
+
+    if (!fullName) {
+        showToast(
+            'Vui lòng nhập họ và tên',
+            'error'
+        );
         return;
     }
+
+    if (!email) {
+        showToast(
+            'Vui lòng nhập email',
+            'error'
+        );
+        return;
+    }
+
+    if (!phone) {
+        showToast(
+            'Vui lòng nhập số điện thoại',
+            'error'
+        );
+        return;
+    }
+
+    if (!birthday) {
+        showToast(
+            'Vui lòng nhập ngày sinh',
+            'error'
+        );
+        return;
+    }
+
+    if (!position) {
+        showToast(
+            'Vui lòng nhập chức vụ',
+            'error'
+        );
+        return;
+    }
+
+    if (!roleGroup) {
+        showToast(
+            'Vui lòng nhập nhóm quyền',
+            'error'
+        );
+        return;
+    }
+
+    const userData = {
+        userName: userName,
+        fullName: fullName,
+        email: email,
+        phone: phone,
+        birthday: birthday,
+        position: position,
+        roleGroup: roleGroup,
+        status: status
+    };
+
+
     const submitButton =
-        document.getElementById('btnSubmitQuestion');
+        document.getElementById('btnSubmitUser');
+
     try {
-        setFormLoading(true);
-        if (formMode === 'create') {
-            await createQuestion(
-                questionCode,
-                questionName
-            );
-            // 200 OK
-            closeFormModal();
-            await loadQuestions();
+        if (submitButton) {
+            submitButton.disabled = true;
+            submitButton.textContent =
+                formModeUser === 'create'
+                    ? 'Đang tạo...'
+                    : 'Đang cập nhật...';
+        }
+
+        if (formModeUser === 'create') {
+            await createUser(userData);
+
             showToast(
-                'THÀNH CÔNG',
+                'Tạo người dùng thành công',
                 'success'
             );
-        } else if (formMode === 'update') {
-            await updateQuestion(
-                selectedQuestion.id,
-                questionCode,
-                questionName
-            );
-            // 200 OK
-            closeFormModal();
-            await loadQuestions();
+        } else {
+            await updateUser({
+                id: id,
+                ...userData
+            });
+
             showToast(
-                'THÀNH CÔNG',
+                'Cập nhật người dùng thành công',
                 'success'
             );
         }
 
+        closeFormModal();
+        await loadUsers();
+
     } catch (error) {
-        console.error('Submit question error:', error);
-        // 400 / 500...
-        // Giữ nguyên modal để user sửa dữ liệu
+        console.error(
+            'Save user error:',
+            error
+        );
+
         showToast(
-            error.message || 'Có lỗi xảy ra',
+            error.message ||
+            'Lưu người dùng thất bại',
             'error'
         );
+
     } finally {
-        setFormLoading(false);
+        if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.textContent =
+                formModeUser === 'create'
+                    ? 'Thêm người dùng'
+                    : 'Lưu thay đổi';
+        }
     }
 }
 
 
-async function createQuestion(questionCode, questionName) {
+async function createUser(userData) {
     const response = await fetch(
-        `${API_BASE_URL}/configs/api/v1/configs/questions`,
+        `${API_BASE_URL}/users/api/v1/users`,
         {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                questionCode: questionCode,
-                questionName: questionName
-            })
+            body: JSON.stringify(userData)
         }
     );
 
     const message = await response.text();
     if (!response.ok) {
         throw new Error(
-            message || `Tạo câu hỏi thất bại. HTTP ${response.status}`
+            message || `Tạo mới người dùng thất bại. HTTP ${response.status}`
         );
     }
 
@@ -1117,29 +1989,24 @@ async function createQuestion(questionCode, questionName) {
 
 // ===============================
 // PUT UPDATE
-// PUT /api/v1/configs/question
 // ===============================
 
-async function updateQuestion(id, questionCode, questionName) {
+async function updateUser(userData) {
     const response = await fetch(
-        `${API_BASE_URL}/configs/api/v1/configs/questions`,
+        `${API_BASE_URL}/users/api/v1/users`,
         {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                id: id,
-                questionCode: questionCode,
-                questionName: questionName
-            })
+            body: JSON.stringify(userData)
         }
     );
 
-const message = await response.text();
+    const message = await response.text();
     if (!response.ok) {
         throw new Error(
-            message || `Cập nhật câu hỏi thất bại. HTTP ${response.status}`
+            message || `Cập nhật người dùng thất bại. HTTP ${response.status}`
         );
     }
 
@@ -1150,53 +2017,72 @@ const message = await response.text();
 // MODAL
 // ===============================
 
-function openDetailModal() {
+function openDetailModal(user) {
     const modal =
-        document.getElementById('questionDetailModal');
+        document.getElementById('userDetailModal');
 
-    if (modal) {
-        modal.classList.remove('hidden');
-        modal.classList.add('show');
+    if (!modal) {
+        return;
     }
+
+    selectedUser = user;
+
+    renderUserDetail(user);
+
+    const loading =
+        document.getElementById('detailLoading');
+
+    const content =
+        document.getElementById('detailContent');
+
+    if (loading) {
+        loading.classList.add('hidden');
+    }
+
+    if (content) {
+        content.classList.remove('hidden');
+    }
+
+    modal.classList.remove('hidden');
+    modal.classList.add('show');
 }
 
 function closeDetailModal() {
     const modal =
-        document.getElementById('questionDetailModal');
+        document.getElementById('userDetailModal');
 
     if (modal) {
         modal.classList.remove('show');
         modal.classList.add('hidden');
     }
 
-    selectedQuestion = null;
+    selectedUser = null;
 }
 
 function closeFormModal() {
     const modal =
-        document.getElementById('questionFormModal');
+        document.getElementById('userFormModal');
+
+    const form =
+        document.getElementById('userForm');
+
+    const userId =
+        document.getElementById('userId');
 
     if (modal) {
         modal.classList.remove('show');
         modal.classList.add('hidden');
     }
-
-    const form =
-        document.getElementById('questionForm');
 
     if (form) {
         form.reset();
     }
 
-    const questionCode =
-        document.getElementById('questionCode');
-
-    if (questionCode) {
-        questionCode.disabled = false;
+    if (userId) {
+        userId.value = '';
     }
-
-    selectedQuestion = null;
-    formMode = null;
+    formModeUser = null;
+    selectedUser = null;
 }
 
 // ===============================
@@ -1206,7 +2092,7 @@ function closeFormModal() {
 function setFormLoading(loading) {
 
 const submitButton =
-    document.getElementById('btnSubmitQuestion');
+    document.getElementById('btnSubmitUser');
 
 if (!submitButton) {
     return;
@@ -1222,7 +2108,7 @@ if (loading) {
     submitButton.disabled = false;
 
     submitButton.textContent =
-        formMode === 'update'
+        formModeUser === 'update'
             ? 'Cập nhật'
             : 'Tạo mới';
 }

@@ -714,6 +714,11 @@ color: #8997aa;
 PAGINATION
 ========================================================= */
 
+.page-btn.pagination-disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
 .pagination {
 display: flex;
 justify-content: space-between;
