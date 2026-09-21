@@ -94,8 +94,12 @@ public class SystemUserService implements ISystemUser {
     private String validateSystemUser(SystemUser systemUser) {
         if (systemUser == null)
             return "KHÔNG THÀNH CÔNG. THÔNG TIN USER KHÔNG ĐƯỢC PHÉP NULL";
-        if (!StringUtils.hasLength(systemUser.getUserName()))
+        String userName = systemUser.getUserName();
+        if (!StringUtils.hasLength(userName))
             return "KHÔNG THÀNH CÔNG. MÃ NHÂN VIÊN KHÔNG ĐƯỢC ĐỂ TRỐNG";
+        String regex = "^[a-zA-Z0-9]{4,}$";
+        if (!userName.matches(regex))
+            return "KHÔNG THÀNH CÔNG. MÃ NHÂN VIÊN KHÔNG HỢP LỆ";
         if (!StringUtils.hasLength(systemUser.getFullName()))
             return "KHÔNG THÀNH CÔNG. HỌ VÀ TÊN KHÔNG ĐƯỢC ĐỂ TRỐNG";
         if (!StringUtils.hasLength(systemUser.getPhone()))

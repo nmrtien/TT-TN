@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Đăng nhập | CREDIT SCORING</title>
+
+    <link rel="stylesheet" href="css/login.css">
+</head>
+
+<body>
+
+<div class="login-page">
+
+    <!-- ================= LEFT PANEL ================= -->
+    <section class="login-intro">
+
+        <div class="intro-content">
+
+            <!-- Logo -->
+            <div class="brand">
+                <div class="brand-icon">
+                    <span class="bar bar-1"></span>
+                    <span class="bar bar-2"></span>
+                    <span class="bar bar-3"></span>
+                </div>
+
+                <div class="brand-text">
+                    <div class="brand-name">
+                        CREDIT <span>SCORING</span>
+                    </div>
+
+                    <div class="brand-subtitle">
+                        Hệ thống chấm điểm tín dụng khách hàng cá nhân
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- Intro -->
+            <div class="intro-main">
+
+                <h1>
+                    Đánh giá chính xác
+                    <span>Kiến tạo niềm tin</span>
+                </h1>
+
+                <p class="intro-description">
+                    Ứng dụng công nghệ hiện đại để phân tích dữ liệu,
+                    đánh giá rủi ro và hỗ trợ quyết định tín dụng hiệu quả.
+                </p>
+
+
+                <!-- Features -->
+                <div class="features">
+
+                    <div class="feature-item">
+
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M12 3L5 6v5c0 4.55 2.98 8.74 7 10
+                                         4.02-1.26 7-5.45 7-10V6l-7-3z"/>
+                            </svg>
+                        </div>
+
+                        <div>
+                            <h3>Chính xác</h3>
+                            <p>Dựa trên mô hình và dữ liệu lớn</p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="feature-item">
+
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M13 2L3 14h7l-1 8 10-12h-7z"/>
+                            </svg>
+                        </div>
+
+                        <div>
+                            <h3>Nhanh chóng</h3>
+                            <p>Tối ưu quy trình, tiết kiệm thời gian</p>
+                        </div>
+
+                    </div>
+
+
+                    <div class="feature-item">
+
+                        <div class="feature-icon">
+                            <svg viewBox="0 0 24 24">
+                                <circle cx="12" cy="12" r="8"/>
+                                <circle cx="12" cy="12" r="3"/>
+                                <path d="M12 4V2"/>
+                                <path d="M20 12h2"/>
+                            </svg>
+                        </div>
+
+                        <div>
+                            <h3>Hiệu quả</h3>
+                            <p>Hỗ trợ ra quyết định tín dụng thông minh</p>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- Background graphic -->
+        <div class="city-background"></div>
+
+        <div class="data-graphic">
+
+            <div class="chart-line">
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+
+            <div class="chart-bars">
+                <div style="height: 45px;"></div>
+                <div style="height: 75px;"></div>
+                <div style="height: 105px;"></div>
+                <div style="height: 135px;"></div>
+                <div style="height: 90px;"></div>
+                <div style="height: 170px;"></div>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ================= RIGHT PANEL ================= -->
+    <section class="login-section">
+
+        <div class="login-card">
+
+            <!-- Card logo -->
+            <div class="card-logo">
+
+                <div class="card-logo-icon">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+
+                <div class="card-logo-text">
+                    CREDIT <strong>SCORING</strong>
+                </div>
+
+            </div>
+
+
+            <h2>Đăng nhập hệ thống</h2>
+
+            <p class="login-description">
+                Vui lòng nhập tài khoản và mật khẩu để tiếp tục
+            </p>
+
+
+            <!-- Error -->
+            <div id="loginError" class="login-error" style="display: none;"> <span class="error-icon">!</span> <span id="loginErrorMessage"></span> </div>
+
+
+            <!-- Login form -->
+            <form id="loginForm">
+
+                <!-- Username -->
+                <div class="form-group">
+
+                    <label for="userName">
+                        Tên đăng nhập
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <svg class="input-icon" viewBox="0 0 24 24">
+                            <circle cx="12" cy="8" r="4"/>
+                            <path d="M4 21c0-4 3.5-7 8-7s8 3 8 7"/>
+                        </svg>
+
+                        <input
+                            id="userName"
+                            name="userName"
+                            type="text"
+                            placeholder="Nhập tên đăng nhập"
+                            autocomplete="username"
+                            required
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- Password -->
+                <div class="form-group">
+
+                    <label for="password">
+                        Mật khẩu
+                    </label>
+
+                    <div class="input-wrapper">
+
+                        <svg class="input-icon" viewBox="0 0 24 24">
+                            <rect x="4" y="10" width="16" height="11" rx="2"/>
+                            <path d="M8 10V7a4 4 0 0 1 8 0v3"/>
+                        </svg>
+
+                        <input
+                            id="password"
+                            name="password"
+                            type="password"
+                            placeholder="Nhập mật khẩu"
+                            autocomplete="current-password"
+                            required
+                        >
+
+                        <button
+                            type="button"
+                            id="togglePassword"
+                            class="toggle-password"
+                            aria-label="Hiển thị mật khẩu"
+                        >
+                            <svg id="eyeIcon" viewBox="0 0 24 24">
+                                <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/>
+                                <circle cx="12" cy="12" r="3"/>
+                            </svg>
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Submit -->
+                <button
+                    type="submit"
+                    id="loginButton"
+                    class="login-button"
+                >
+
+                    <span id="loginButtonText">
+                        Đăng nhập
+                    </span>
+
+                    <svg
+                        id="loginArrow"
+                        viewBox="0 0 24 24"
+                    >
+                        <path d="M5 12h14"/>
+                        <path d="M13 6l6 6-6 6"/>
+                    </svg>
+
+                    <span
+                        id="loginSpinner"
+                        class="spinner"
+                    ></span>
+
+                </button>
+
+            </form>
+
+
+            <!-- Divider -->
+            <div class="divider">
+                <span></span>
+                <p>Hoặc</p>
+                <span></span>
+            </div>
+
+
+            <!-- Security message -->
+            <div class="security-message">
+
+                <svg viewBox="0 0 24 24">
+                    <path d="M12 3L5 6v5c0 4.55 2.98 8.74 7 10
+                             4.02-1.26 7-5.45 7-10V6l-7-3z"/>
+                    <path d="M9 12l2 2 4-4"/>
+                </svg>
+
+                <span>
+                    Hệ thống được bảo mật và chỉ dành cho
+                    người dùng được ủy quyền.
+                </span>
+
+            </div>
+
+            <div class="copyright">
+                © 2026 CREDIT SCORING
+            </div>
+
+        </div>
+
+    </section>
+
+</div>
+
+
+<script src="js/login.js"></script>
+<script>
+    checkLoginAuthentication();
+</script>
+</body>
+</html>

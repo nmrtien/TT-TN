@@ -23,6 +23,9 @@ import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -49,8 +52,37 @@ public class ScoringService implements IScoring {
                     "VUI LÒNG HOÀN TẤT HOẶC ĐÓNG CÁC HỒ SƠ CŨ ĐỂ TIẾP TỤC";
             return buildFailTask(result);
         }
+        application.setStatus(CreditStatus.NEW);
         CreditApplication applicationSaved = saveApplication(application);
         return createNextTask(new CreditTask(), applicationSaved);
+    }
+
+
+    @Override
+    public List<CreditApplication> getApplications(CreditStatus status) {
+        List<CreditApplication> applications = applicationRepository.findByStatusOrderByCreateTimeDesc(status);
+        if (CollectionUtils.isEmpty(applications))
+            return applications;
+        Set<String> applicationIds = applications.stream()
+                .map(CreditApplication::getId)
+                .collect(Collectors.toSet());
+        List<CreditTask> tasks = taskRepository.findAllByApplicationIdIn(applicationIds);
+        Map<String, CreditTask> latestTaskMap = tasks.stream()
+                .collect(Collectors.toMap(
+                        CreditTask::getApplicationId, // Key: applicationId
+                        task -> task,                 // Value: CreditTask hiện tại
+                        (existingTask, newTask) ->
+                                existingTask.getCreateTime().isAfter(newTask.getCreateTime())
+                                        ? existingTask
+                                        : newTask             // Nếu trùng key, giữ lại task có createTime mới hơn
+                ));
+        for (CreditApplication application : applications) {
+            CreditTask latestTask = latestTaskMap.get(application.getId());
+            if (latestTask == null)
+                continue;
+            application.setLatestTaskId(latestTask.getId());
+        }
+        return applications;
     }
 
 
@@ -87,7 +119,13 @@ public class ScoringService implements IScoring {
 
     @Override
     public CreditTask getTask(String taskId) {
-        return taskRepository.findById(taskId).orElse(new CreditTask());
+        CreditTask task = taskRepository.findById(taskId).orElse(new CreditTask());
+        if (task.getId() == null)
+            return task;
+        CreditApplication application = applicationRepository
+                .findById(task.getApplicationId()).orElse(new CreditApplication());
+        task.setApplication(application);
+        return task;
     }
 
 
@@ -113,6 +151,10 @@ public class ScoringService implements IScoring {
             saveApplication(application);
             return amTaskSaved;
         }
+        if (RoleGroup.RB_RM == task.getRoleGroup()) {
+            application.setStatus(CreditStatus.IN_PROGRESS);
+            saveApplication(application);
+        }
         return createNextTask(taskSaved, application);
     }
 
@@ -129,6 +171,7 @@ public class ScoringService implements IScoring {
         RoleGroup nextRoleGroup = task.getRoleGroup() == null ? RoleGroup.RB_RM
                 : RoleGroup.RB_RM == task.getRoleGroup() ? RoleGroup.RB_CA : RoleGroup.RB_AM;
         int nextLevelTask = task.getRoleGroup() == null ? 1 : RoleGroup.RB_RM == task.getRoleGroup() ? 2 : 3;
+        LocalDateTime now = LocalDateTime.now();
         List<Model> models = getModels(nextLevelTask);
         CreditTask newTask = new CreditTask();
         BeanUtils.copyProperties(task, newTask);
@@ -138,6 +181,8 @@ public class ScoringService implements IScoring {
         newTask.setRoleGroup(nextRoleGroup);
         newTask.setModels(models);
         newTask.setStatus(CreditStatus.NEW);
+        newTask.setCreateTime(now);
+        newTask.setUpdateTime(now);
 
         CreditTask newSaved = taskRepository.save(newTask);
         newTask.setNextTaskId(newSaved.getId());
@@ -175,10 +220,10 @@ public class ScoringService implements IScoring {
 
 
     private CreditApplication saveApplication(CreditApplication application) {
+        LocalDateTime now = LocalDateTime.now();
         if (application.getId() == null)
-            application.setCreateTime(LocalDateTime.now());
-        else
-            application.setUpdateTime(LocalDateTime.now());
+            application.setCreateTime(now);
+        application.setUpdateTime(now);
         return applicationRepository.save(application);
     }
 
@@ -190,8 +235,8 @@ public class ScoringService implements IScoring {
             return "KHÔNG THÀNH CÔNG. LOẠI CHỨNG TỪ PHÁP LÝ KHÁCH HÀNG KHÔNG ĐƯỢC ĐỂ TRỐNG";
         if (!StringUtils.hasLength(application.getLegalDocNumber()))
             return "KHÔNG THÀNH CÔNG. SỐ CHỨNG TỪ PHÁP LÝ KHÁCH HÀNG KHÔNG ĐƯỢC ĐỂ TRỐNG";
-        String regexLegalDocNumber = "d{12}$";
-        if (!application.getPhone().matches(regexLegalDocNumber))
+        String regexLegalDocNumber = "^\\d{12}$";
+        if (!application.getLegalDocNumber().matches(regexLegalDocNumber))
             return "KHÔNG THÀNH CÔNG. ĐỊNH DẠNG SỐ CHỨNG TỪ PHÁP LÝ KHÁCH HÀNG KHÔNG HỢP LỆ";
         if (!StringUtils.hasLength(application.getPhone()))
             return "KHÔNG THÀNH CÔNG. SỐ ĐIỆN THOẠI KHÁCH HÀNG KHÔNG ĐƯỢC ĐỂ TRỐNG";

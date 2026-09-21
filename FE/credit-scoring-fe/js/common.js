@@ -32,7 +32,7 @@ function shell(active, title, subtitle) {
                 <div class="nav-children">
 
                     <div class="nav-child ${active === 'create-dossier' ? 'active' : ''}"
-                         onclick="event.stopPropagation(); location.href='dossiers-create.html'">
+                         onclick="event.stopPropagation(); loadCreateDossierPage()">
                         <span class="child-dot">•</span>
                         <span>Khởi tạo Hồ sơ</span>
                     </div>
@@ -112,14 +112,35 @@ function shell(active, title, subtitle) {
                 <div class="user">
                     <span>🔔</span>
 
-                    <div class="avatar">NT</div>
+                    <div class="avatar">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="8" r="4"></circle>
+        <path d="M4 21c0-4 3.5-7 8-7s8 3 8 7"></path>
+    </svg>
+</div>
 
                     <div>
-                        <b>Nguyễn Văn Tiến</b>
-                        <small style="display:block;color:#71819a">
-                            Quản trị hệ thống
-                        </small>
-                    </div>
+    <b id="userFullName"></b>
+
+    <small
+        id="userRoleGroup"
+        style="display:block;color:#71819a"
+    ></small>
+</div>
+
+<button
+    type="button"
+    id="logoutButton"
+    class="logout-button"
+    title="Đăng xuất"
+    aria-label="Đăng xuất"
+>
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M10 17l5-5-5-5"></path>
+        <path d="M15 12H3"></path>
+        <path d="M19 3h-6v2h6v14h-6v2h6c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"></path>
+    </svg>
+</button>
                 </div>
 
             </header>
@@ -128,17 +149,36 @@ function shell(active, title, subtitle) {
 
                 <div class="page-title">
                     <div>
-                        <h1>${title}</h1>
-                        <p>${subtitle}</p>
+                        <h1></h1>
+                        <p></p>
                     </div>
                 </div>
 
-                <div id="page-content"></div>
+                <div id="page-content">
+                
+                </div>
+
 
             </section>
 
+            
+
         </main>
     `;
+
+    const userData = localStorage.getItem('credit_scoring_user');
+
+if (userData) {
+    const user = JSON.parse(userData);
+
+    document.getElementById('userFullName').textContent = user.fullName;
+    document.getElementById('userRoleGroup').textContent = user.roleGroup;
+}
+
+document.getElementById('logoutButton')?.addEventListener('click', function () {
+    localStorage.removeItem('credit_scoring_user');
+    window.location.href = 'login.html';
+});
 }
 
 
@@ -189,3 +229,117 @@ function setPageHeader(title, subtitle) {
         subtitleElement.textContent = subtitle;
     }
 }
+
+
+function checkAuthentication() {
+
+    const userData = localStorage.getItem('credit_scoring_user');
+
+    // ========================================
+    // 1. Chưa đăng nhập
+    // ========================================
+
+    if (!userData) {
+        window.location.href = 'login.html';
+        return false;
+    }
+
+
+    // ========================================
+    // 2. Parse dữ liệu user
+    // ========================================
+
+    let user;
+
+    try {
+
+        user = JSON.parse(userData);
+
+    } catch (error) {
+
+        console.error(
+            'Invalid credit_scoring_user data:',
+            error
+        );
+
+        localStorage.removeItem('credit_scoring_user');
+
+        window.location.href = 'login.html';
+
+        return false;
+    }
+
+
+    // ========================================
+    // 3. Kiểm tra user object
+    // ========================================
+
+    if (
+        !user ||
+        typeof user !== 'object' ||
+        Array.isArray(user)
+    ) {
+
+        localStorage.removeItem('credit_scoring_user');
+
+        window.location.href = 'login.html';
+
+        return false;
+    }
+
+
+    // ========================================
+    // 4. Các thông tin bắt buộc
+    // ========================================
+
+    const requiredFields = [
+        'userName',
+        'roleGroup',
+        'email',
+        'fullName'
+    ];
+
+
+    // ========================================
+    // 5. Kiểm tra từng field
+    // ========================================
+
+    const isInvalid = requiredFields.some(function (field) {
+
+        const value = user[field];
+
+        return (
+            value === null ||
+            value === undefined ||
+            String(value).trim() === ''
+        );
+
+    });
+
+
+    // ========================================
+    // 6. User không hợp lệ
+    // ========================================
+
+    if (isInvalid) {
+
+        localStorage.removeItem('credit_scoring_user');
+
+        window.location.href = 'login.html';
+
+        return false;
+    }
+
+
+    // ========================================
+    // 7. User hợp lệ
+    // ========================================
+
+    return true;
+}
+
+
+document.getElementById('logoutButton')?.addEventListener('click', function () {
+    localStorage.removeItem('credit_scoring_user');
+    window.location.href = 'login.html';
+});

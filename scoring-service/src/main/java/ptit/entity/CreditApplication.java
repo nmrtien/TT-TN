@@ -72,6 +72,8 @@ public class CreditApplication {
     @Field("status")
     private CreditStatus status;
 
+    private String latestTaskId;
+
     private String errorMsg;
 
 }

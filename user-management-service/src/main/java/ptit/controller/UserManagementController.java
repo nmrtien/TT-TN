@@ -71,8 +71,8 @@ public class UserManagementController {
 
 
     // 5. Login
-    @PostMapping("/detail")
-    public ResponseEntity<Object> detail(@RequestBody SystemUser systemUser) {
+    @PostMapping("/login")
+    public ResponseEntity<Object> login(@RequestBody SystemUser systemUser) {
         try {
             SystemUser response = systemUserService.detail(systemUser.getUserName(), systemUser.getPassword());
             return ResponseEntity.ok().body(response);
