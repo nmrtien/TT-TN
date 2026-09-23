@@ -1,0 +1,65 @@
+.loading-cell,
+.error-cell {
+    text-align: center;
+    padding: 24px;
+}
+
+.error-cell {
+    color: #dc2626;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 32px;
+    color: #6b7280;
+}
+
+.btn-view-dossier {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: auto;
+    min-width: 90px;
+    height: 34px;
+
+    box-sizing: border-box;
+
+    padding: 0 12px;
+
+    border: 1px solid #2563eb;
+    border-radius: 6px;
+
+    background: #eff6ff;
+    color: #2563eb;
+
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1;
+
+    white-space: nowrap;
+    overflow: hidden;
+
+    cursor: pointer;
+
+    transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease;
+}
+
+.btn-view-dossier:hover {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: #ffffff;
+}
+
+.btn-view-dossier:active {
+    transform: scale(0.97);
+}
+
+.btn-view-dossier:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}

@@ -10,4 +10,6 @@ public interface CreditTaskRepository extends MongoRepository<CreditTask, String
 
     List<CreditTask> findAllByApplicationIdIn(Set<String> applicationIds);
 
+    List<CreditTask> findAllByAssignee(String assignee);
+
 }

@@ -8,9 +8,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import ptit.constant.CreditStatus;
 import ptit.constant.RoleGroup;
-import ptit.entity.CreditApplication;
-import ptit.entity.CreditTask;
-import ptit.entity.Model;
+import ptit.entity.*;
 import ptit.proxy.ConfigClient;
 import ptit.repository.CreditApplicationRepository;
 import ptit.repository.CreditTaskRepository;
@@ -59,30 +57,34 @@ public class ScoringService implements IScoring {
 
 
     @Override
+    public List<CreditApplication> getApplications(ApplicationRequest request) {
+        List<CreditApplication> applications = applicationRepository.findAllByOrderByCreateTimeDesc();
+        Map<String, CreditTask> latestTaskMap = getLatestTaskMap(applications);
+        if (CollectionUtils.isEmpty(latestTaskMap))
+            return applications;
+        return applications.stream()
+                .filter(application -> {
+                    CreditTask latestTask = latestTaskMap.get(application.getId());
+                    return latestTask != null && StringUtils.isEmpty(latestTask.getAssignee())
+                            && latestTask.getRoleGroup().equals(request.getRoleGroup());
+                }).peek(application -> {
+                    CreditTask latestTask = latestTaskMap.get(application.getId());
+                    application.setLatestTaskId(latestTask.getId());
+                }).toList();
+    }
+
+
+    @Override
     public List<CreditApplication> getApplications(CreditStatus status) {
         List<CreditApplication> applications = applicationRepository.findByStatusOrderByCreateTimeDesc(status);
-        if (CollectionUtils.isEmpty(applications))
+        Map<String, CreditTask> latestTaskMap = getLatestTaskMap(applications);
+        if (CollectionUtils.isEmpty(latestTaskMap))
             return applications;
-        Set<String> applicationIds = applications.stream()
-                .map(CreditApplication::getId)
-                .collect(Collectors.toSet());
-        List<CreditTask> tasks = taskRepository.findAllByApplicationIdIn(applicationIds);
-        Map<String, CreditTask> latestTaskMap = tasks.stream()
-                .collect(Collectors.toMap(
-                        CreditTask::getApplicationId, // Key: applicationId
-                        task -> task,                 // Value: CreditTask hiện tại
-                        (existingTask, newTask) ->
-                                existingTask.getCreateTime().isAfter(newTask.getCreateTime())
-                                        ? existingTask
-                                        : newTask             // Nếu trùng key, giữ lại task có createTime mới hơn
-                ));
-        for (CreditApplication application : applications) {
-            CreditTask latestTask = latestTaskMap.get(application.getId());
-            if (latestTask == null)
-                continue;
-            application.setLatestTaskId(latestTask.getId());
-        }
-        return applications;
+        return applications.stream()
+                .peek(application -> {
+                    CreditTask latestTask = latestTaskMap.get(application.getId());
+                    application.setLatestTaskId(latestTask.getId());
+                }).toList();
     }
 
 
@@ -103,8 +105,19 @@ public class ScoringService implements IScoring {
 
 
     @Override
-    public CreditTask claimTask(String taskId, String assignee) {
-        CreditTask task = validateTaskAction(taskId, CreditStatus.NEW);
+    public CreditTask claimTask(ClaimTask claimTask) {
+        if (claimTask == null || !StringUtils.hasLength(claimTask.getTaskId())
+                || !StringUtils.hasLength(claimTask.getUserName()))
+            return buildFailTask("KHÔNG THÀNH CÔNG. YÊU CẦU NHẬN VIỆC KHÔNG HỢP LỆ");
+        List<CreditTask> tasks = taskRepository.findAllByAssignee(claimTask.getUserName());
+        if (!CollectionUtils.isEmpty(tasks)) {
+            boolean isInProgress = tasks.stream().anyMatch(t -> CreditStatus.IN_PROGRESS == t.getStatus()
+                    || CreditStatus.NEW == t.getStatus());
+            if (isInProgress)
+                return buildFailTask("KHÔNG THÀNH CÔNG. BẠN ĐANG XỬ LÝ HỒ SƠ KHÁC. " +
+                        "HÃY XỬ LÝ TIẾP HOẶC ĐÓNG HỒ SƠ ĐÓ ĐỂ CÓ THỂ NHẬN VIỆC");
+        }
+        CreditTask task = validateTaskAction(claimTask.getTaskId(), CreditStatus.NEW);
         if (StringUtils.hasLength(task.getErrorMsg()))
             return buildFailTask(task.getErrorMsg());
         if (StringUtils.hasLength(task.getAssignee()))
@@ -112,7 +125,8 @@ public class ScoringService implements IScoring {
         CreditApplication application = validateApplicationAction(task.getApplicationId());
         if (StringUtils.hasLength(application.getErrorMsg()))
             return buildFailTask(application.getErrorMsg());
-        task.setAssignee(assignee);
+        task.setAssignee(claimTask.getUserName());
+        task.setStatus(CreditStatus.IN_PROGRESS);
         return taskRepository.save(task);
     }
 
@@ -141,20 +155,22 @@ public class ScoringService implements IScoring {
             result = "KHÔNG THÀNH CÔNG. CÔNG VIỆC KHÔNG TỒN TẠI";
             return buildFailTask(result);
         }
-        if (CreditStatus.IN_PROGRESS != application.getStatus()) {
+        if (CreditStatus.IN_PROGRESS != application.getStatus() && RoleGroup.RB_RM != task.getRoleGroup()) {
             result = "KHÔNG THÀNH CÔNG. TRẠNG THÁI HỒ SƠ KHÔNG ĐƯỢC PHÉP HOÀN THÀNH";
             return buildFailTask(result);
         }
         if (RoleGroup.RB_AM == task.getRoleGroup()) {
-            CreditTask amTaskSaved = taskRepository.save(task);
             application.setStatus(task.getStatus());
             saveApplication(application);
-            return amTaskSaved;
+            task.setStatus(CreditStatus.COMPLETED);
+            return taskRepository.save(task);
         }
         if (RoleGroup.RB_RM == task.getRoleGroup()) {
             application.setStatus(CreditStatus.IN_PROGRESS);
             saveApplication(application);
         }
+        task.setStatus(CreditStatus.COMPLETED);
+        taskRepository.save(task);
         return createNextTask(taskSaved, application);
     }
 
@@ -164,6 +180,25 @@ public class ScoringService implements IScoring {
         if (level == null)
             return Collections.emptyList();
         return configClient.getModels(level);
+    }
+
+
+    private Map<String, CreditTask> getLatestTaskMap(List<CreditApplication> applications) {
+        if (CollectionUtils.isEmpty(applications))
+            return Collections.emptyMap();
+        Set<String> applicationIds = applications.stream()
+                .map(CreditApplication::getId)
+                .collect(Collectors.toSet());
+        List<CreditTask> tasks = taskRepository.findAllByApplicationIdIn(applicationIds);
+        return tasks.stream()
+                .collect(Collectors.toMap(
+                        CreditTask::getApplicationId, // Key: applicationId
+                        task -> task,                 // Value: CreditTask hiện tại
+                        (existingTask, newTask) ->
+                                existingTask.getCreateTime().isAfter(newTask.getCreateTime())
+                                        ? existingTask
+                                        : newTask             // Nếu trùng key, giữ lại task có createTime mới hơn
+                ));
     }
 
 

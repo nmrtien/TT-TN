@@ -9,6 +9,8 @@ import java.util.Optional;
 
 public interface CreditApplicationRepository extends MongoRepository<CreditApplication, String> {
 
+    List<CreditApplication> findAllByOrderByCreateTimeDesc();
+
     List<CreditApplication> findByStatusOrderByCreateTimeDesc(CreditStatus status);
 
     List<CreditApplication> findByLegalDocTypeAndLegalDocNumberAndStatus(String legalDocType,

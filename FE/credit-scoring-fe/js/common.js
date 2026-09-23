@@ -38,13 +38,13 @@ function shell(active, title, subtitle) {
                     </div>
 
                     <div class="nav-child ${active === 'unassigned-dossiers' ? 'active' : ''}"
-                         onclick="event.stopPropagation(); location.href='dossiers-unassigned.html'">
+                         onclick="event.stopPropagation(); loadUnassignedDossiersPage()">
                         <span class="child-dot">•</span>
                         <span>Hồ sơ Chưa phân công</span>
                     </div>
 
                     <div class="nav-child ${active === 'processing-dossiers' ? 'active' : ''}"
-                         onclick="event.stopPropagation(); location.href='dossiers-processing.html'">
+                         onclick="event.stopPropagation(); loadInprogressDossiersPage()">
                         <span class="child-dot">•</span>
                         <span>Hồ sơ Đang xử lý</span>
                     </div>

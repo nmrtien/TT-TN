@@ -4,9 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ptit.constant.CreditStatus;
-import ptit.entity.CreditApplication;
-import ptit.entity.CreditTask;
-import ptit.entity.Model;
+import ptit.entity.*;
 import ptit.service.IScoring;
 
 import java.util.List;
@@ -23,6 +21,28 @@ public class ScoringController {
     public ResponseEntity<Object> login(@RequestBody CreditApplication application) {
         try {
             CreditTask response = scoringService.createApplication(application);
+            return ResponseEntity.ok().body(response);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("ERROR: " + e.getMessage());
+        }
+    }
+
+
+    @PostMapping("/tasks/claim")
+    public ResponseEntity<Object> claimTask(@RequestBody ClaimTask claimTask) {
+        try {
+            CreditTask response = scoringService.claimTask(claimTask);
+            return ResponseEntity.ok().body(response);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("ERROR: " + e.getMessage());
+        }
+    }
+
+
+    @PostMapping("/tasks/unassign")
+    public ResponseEntity<Object> claimTask(@RequestBody ApplicationRequest request) {
+        try {
+            List<CreditApplication> response = scoringService.getApplications(request);
             return ResponseEntity.ok().body(response);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("ERROR: " + e.getMessage());

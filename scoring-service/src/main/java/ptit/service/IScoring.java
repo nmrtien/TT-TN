@@ -1,9 +1,7 @@
 package ptit.service;
 
 import ptit.constant.CreditStatus;
-import ptit.entity.CreditApplication;
-import ptit.entity.CreditTask;
-import ptit.entity.Model;
+import ptit.entity.*;
 
 import java.util.List;
 
@@ -11,11 +9,13 @@ public interface IScoring {
 
     CreditTask createApplication(CreditApplication application);
 
+    List<CreditApplication> getApplications(ApplicationRequest request);
+
     List<CreditApplication> getApplications(CreditStatus status);
 
     CreditTask closeApplication(String taskId);
 
-    CreditTask claimTask(String taskId, String assignee);
+    CreditTask claimTask(ClaimTask claimTask);
 
     CreditTask getTask(String taskId);
 
