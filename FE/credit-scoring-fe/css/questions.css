@@ -24,6 +24,23 @@ color: #172b4d;
 SIDEBAR
 ========================================================= */
 
+.question-table .col-id {
+    width: 240px;
+    min-width: 240px;
+    padding: 12px 35px 12px 20px;
+}
+
+.question-table .col-code {
+    width: 180px;
+    min-width: 180px;
+    padding: 12px 20px 12px 35px;
+}
+
+.question-table td:nth-child(2),
+.question-table td:nth-child(3) {
+    white-space: nowrap;
+}
+
 .sidebar {
 width: 250px;
 background: #102f57;

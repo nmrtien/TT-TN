@@ -11,7 +11,9 @@ public interface IScoring {
 
     List<CreditApplication> getApplications(ApplicationRequest request);
 
-    List<CreditApplication> getApplications(CreditStatus status);
+//    List<CreditApplication> getApplications(CreditStatus status);
+
+    CreditTask detailTask(ApplicationRequest request);
 
     CreditTask closeApplication(String taskId);
 
@@ -22,4 +24,6 @@ public interface IScoring {
     CreditTask completeTask(CreditTask task);
 
     List<Model> getModels(Integer level);
+
+    List<CreditTask> getAllTasks();
 }

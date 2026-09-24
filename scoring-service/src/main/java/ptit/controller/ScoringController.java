@@ -39,8 +39,8 @@ public class ScoringController {
     }
 
 
-    @PostMapping("/tasks/unassign")
-    public ResponseEntity<Object> claimTask(@RequestBody ApplicationRequest request) {
+    @PostMapping("/applications/search")
+    public ResponseEntity<Object> getApplications(@RequestBody ApplicationRequest request) {
         try {
             List<CreditApplication> response = scoringService.getApplications(request);
             return ResponseEntity.ok().body(response);
@@ -50,13 +50,24 @@ public class ScoringController {
     }
 
 
-    @GetMapping("/{status}/applications")
-    public ResponseEntity<Object> getApplications(@PathVariable CreditStatus status) {
+    @PostMapping("/tasks/detail")
+    public ResponseEntity<Object> detailTask(@RequestBody ApplicationRequest request) {
         try {
-            List<CreditApplication> response = scoringService.getApplications(status);
+            CreditTask response = scoringService.detailTask(request);
             return ResponseEntity.ok().body(response);
         } catch (Exception e) {
-            return ResponseEntity.internalServerError().body("Error: " + e.getMessage());
+            return ResponseEntity.internalServerError().body("ERROR: " + e.getMessage());
+        }
+    }
+
+
+    @PostMapping("/tasks/complete")
+    public ResponseEntity<Object> completeTask(@RequestBody CreditTask creditTask) {
+        try {
+            CreditTask response = scoringService.completeTask(creditTask);
+            return ResponseEntity.ok().body(response);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("ERROR: " + e.getMessage());
         }
     }
 
@@ -65,6 +76,17 @@ public class ScoringController {
     public ResponseEntity<Object> detailTask(@PathVariable String id) {
         try {
             CreditTask response = scoringService.getTask(id);
+            return ResponseEntity.ok().body(response);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error: " + e.getMessage());
+        }
+    }
+
+
+    @GetMapping("/tasks")
+    public ResponseEntity<Object> getAllTasks() {
+        try {
+            List<CreditTask> response = scoringService.getAllTasks();
             return ResponseEntity.ok().body(response);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Error: " + e.getMessage());

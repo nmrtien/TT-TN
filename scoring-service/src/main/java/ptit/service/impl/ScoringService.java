@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import ptit.constant.CreditStatus;
@@ -19,15 +20,13 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class ScoringService implements IScoring {
 
     private final CreditApplicationRepository applicationRepository;
@@ -58,33 +57,25 @@ public class ScoringService implements IScoring {
 
     @Override
     public List<CreditApplication> getApplications(ApplicationRequest request) {
-        List<CreditApplication> applications = applicationRepository.findAllByOrderByCreateTimeDesc();
-        Map<String, CreditTask> latestTaskMap = getLatestTaskMap(applications);
-        if (CollectionUtils.isEmpty(latestTaskMap))
-            return applications;
+        List<CreditTask> tasks;
+        if (CreditStatus.NEW == request.getStatus())
+            tasks = taskRepository.findAllByRoleGroupAndAssigneeIsNull(request.getRoleGroup());
+        else tasks = taskRepository.findAllByRoleGroupAndAssignee(request.getRoleGroup(), request.getUserName());
+        if (CollectionUtils.isEmpty(tasks))
+            return Collections.emptyList();
+        Set<String> applicationIds = tasks.stream()
+                .map(CreditTask::getApplicationId)
+                .collect(Collectors.toSet());
+        List<CreditApplication> applications = applicationRepository.findAllByIdInOrderByCreateTimeDesc(applicationIds);
+        if (CollectionUtils.isEmpty(applications))
+            return Collections.emptyList();
+        Map<String, String> latestTaskMap = tasks.stream()
+                .collect(Collectors.toMap(CreditTask::getApplicationId, CreditTask::getId, (a, b) -> a));
         return applications.stream()
-                .filter(application -> {
-                    CreditTask latestTask = latestTaskMap.get(application.getId());
-                    return latestTask != null && StringUtils.isEmpty(latestTask.getAssignee())
-                            && latestTask.getRoleGroup().equals(request.getRoleGroup());
-                }).peek(application -> {
-                    CreditTask latestTask = latestTaskMap.get(application.getId());
-                    application.setLatestTaskId(latestTask.getId());
-                }).toList();
-    }
-
-
-    @Override
-    public List<CreditApplication> getApplications(CreditStatus status) {
-        List<CreditApplication> applications = applicationRepository.findByStatusOrderByCreateTimeDesc(status);
-        Map<String, CreditTask> latestTaskMap = getLatestTaskMap(applications);
-        if (CollectionUtils.isEmpty(latestTaskMap))
-            return applications;
-        return applications.stream()
-                .peek(application -> {
-                    CreditTask latestTask = latestTaskMap.get(application.getId());
-                    application.setLatestTaskId(latestTask.getId());
-                }).toList();
+                .filter(a -> request.getStatus().equals(a.getStatus()))
+                .peek(application ->
+                    application.setLatestTaskId(latestTaskMap.get(application.getId()))
+                ).toList();
     }
 
 
@@ -109,22 +100,16 @@ public class ScoringService implements IScoring {
         if (claimTask == null || !StringUtils.hasLength(claimTask.getTaskId())
                 || !StringUtils.hasLength(claimTask.getUserName()))
             return buildFailTask("KHÔNG THÀNH CÔNG. YÊU CẦU NHẬN VIỆC KHÔNG HỢP LỆ");
-        List<CreditTask> tasks = taskRepository.findAllByAssignee(claimTask.getUserName());
-        if (!CollectionUtils.isEmpty(tasks)) {
-            boolean isInProgress = tasks.stream().anyMatch(t -> CreditStatus.IN_PROGRESS == t.getStatus()
-                    || CreditStatus.NEW == t.getStatus());
-            if (isInProgress)
-                return buildFailTask("KHÔNG THÀNH CÔNG. BẠN ĐANG XỬ LÝ HỒ SƠ KHÁC. " +
-                        "HÃY XỬ LÝ TIẾP HOẶC ĐÓNG HỒ SƠ ĐÓ ĐỂ CÓ THỂ NHẬN VIỆC");
-        }
         CreditTask task = validateTaskAction(claimTask.getTaskId(), CreditStatus.NEW);
         if (StringUtils.hasLength(task.getErrorMsg()))
             return buildFailTask(task.getErrorMsg());
         if (StringUtils.hasLength(task.getAssignee()))
             return buildFailTask("KHÔNG THÀNH CÔNG. CÔNG VIỆC ĐANG ĐƯỢC USER KHÁC XỬ LÝ");
-        CreditApplication application = validateApplicationAction(task.getApplicationId());
+        CreditApplication application = validateApplicationActionClaim(task.getApplicationId());
         if (StringUtils.hasLength(application.getErrorMsg()))
             return buildFailTask(application.getErrorMsg());
+        application.setStatus(CreditStatus.IN_PROGRESS);
+        saveApplication(application);
         task.setAssignee(claimTask.getUserName());
         task.setStatus(CreditStatus.IN_PROGRESS);
         return taskRepository.save(task);
@@ -138,6 +123,20 @@ public class ScoringService implements IScoring {
             return task;
         CreditApplication application = applicationRepository
                 .findById(task.getApplicationId()).orElse(new CreditApplication());
+        task.setApplication(application);
+        return task;
+    }
+
+
+    @Override
+    public CreditTask detailTask(ApplicationRequest request) {
+        CreditApplication application = applicationRepository
+                .findById(request.getApplicationId()).orElse(new CreditApplication());
+        CreditTask task = taskRepository
+                .findByApplicationIdAndAssigneeAndRoleGroup(request.getApplicationId(), request.getUserName(),
+                        request.getRoleGroup());
+        if (task == null)
+            return buildFailTask("BẠN KHÔNG CÓ CÔNG VIỆC NÀO CỦA HỒ SƠ NÀY");
         task.setApplication(application);
         return task;
     }
@@ -159,18 +158,18 @@ public class ScoringService implements IScoring {
             result = "KHÔNG THÀNH CÔNG. TRẠNG THÁI HỒ SƠ KHÔNG ĐƯỢC PHÉP HOÀN THÀNH";
             return buildFailTask(result);
         }
-        if (RoleGroup.RB_AM == task.getRoleGroup()) {
+        taskSaved.setModels(task.getModels());
+        taskSaved.setStatus(CreditStatus.COMPLETED);
+        if (RoleGroup.RB_AM == taskSaved.getRoleGroup()) {
             application.setStatus(task.getStatus());
             saveApplication(application);
-            task.setStatus(CreditStatus.COMPLETED);
-            return taskRepository.save(task);
+            return taskRepository.save(taskSaved);
         }
-        if (RoleGroup.RB_RM == task.getRoleGroup()) {
+        if (RoleGroup.RB_RM == taskSaved.getRoleGroup()) {
             application.setStatus(CreditStatus.IN_PROGRESS);
             saveApplication(application);
         }
-        task.setStatus(CreditStatus.COMPLETED);
-        taskRepository.save(task);
+        taskRepository.save(taskSaved);
         return createNextTask(taskSaved, application);
     }
 
@@ -183,22 +182,9 @@ public class ScoringService implements IScoring {
     }
 
 
-    private Map<String, CreditTask> getLatestTaskMap(List<CreditApplication> applications) {
-        if (CollectionUtils.isEmpty(applications))
-            return Collections.emptyMap();
-        Set<String> applicationIds = applications.stream()
-                .map(CreditApplication::getId)
-                .collect(Collectors.toSet());
-        List<CreditTask> tasks = taskRepository.findAllByApplicationIdIn(applicationIds);
-        return tasks.stream()
-                .collect(Collectors.toMap(
-                        CreditTask::getApplicationId, // Key: applicationId
-                        task -> task,                 // Value: CreditTask hiện tại
-                        (existingTask, newTask) ->
-                                existingTask.getCreateTime().isAfter(newTask.getCreateTime())
-                                        ? existingTask
-                                        : newTask             // Nếu trùng key, giữ lại task có createTime mới hơn
-                ));
+    @Override
+    public List<CreditTask> getAllTasks() {
+        return taskRepository.findAll();
     }
 
 
@@ -207,7 +193,9 @@ public class ScoringService implements IScoring {
                 : RoleGroup.RB_RM == task.getRoleGroup() ? RoleGroup.RB_CA : RoleGroup.RB_AM;
         int nextLevelTask = task.getRoleGroup() == null ? 1 : RoleGroup.RB_RM == task.getRoleGroup() ? 2 : 3;
         LocalDateTime now = LocalDateTime.now();
-        List<Model> models = getModels(nextLevelTask);
+        List<Model> models = task.getModels() == null ? new ArrayList<>() : task.getModels();
+        List<Model> modelsNew = getModels(nextLevelTask);
+        models.addAll(modelsNew);
         CreditTask newTask = new CreditTask();
         BeanUtils.copyProperties(task, newTask);
         newTask.setId(null);
@@ -223,6 +211,20 @@ public class ScoringService implements IScoring {
         newTask.setNextTaskId(newSaved.getId());
         newTask.setApplication(application);
         return newSaved;
+    }
+
+
+    private CreditApplication validateApplicationActionClaim(String applicationId) {
+        CreditApplication application = applicationRepository.findById(applicationId).orElse(new CreditApplication());
+        if (application.getId() == null) {
+            application.setErrorMsg("KHÔNG THÀNH CÔNG. HỒ SƠ KHÔNG TỒN TẠI");
+            return application;
+        }
+        if (CreditStatus.NEW != application.getStatus()) {
+            application.setErrorMsg("KHÔNG THÀNH CÔNG. TRẠNG THÁI HỒ SƠ KHÔNG CHO PHÉP THỰC HIỆN YÊU CẦU NÀY");
+            return application;
+        }
+        return application;
     }
 
 

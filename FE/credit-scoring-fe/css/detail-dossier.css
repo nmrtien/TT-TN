@@ -259,6 +259,80 @@
 }
 
 
+/* =========================
+   TASK STATUS
+   ========================= */
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 6px 14px;
+
+    border-radius: 999px;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    white-space: nowrap;
+}
+
+
+/* Đang xử lý */
+
+.status-in-progress {
+    color: #b45309;
+    background: #fff7ed;
+    border: 1px solid #fed7aa;
+}
+
+
+/* Đã hoàn thành */
+
+.status-completed {
+    color: #2563eb;
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+}
+
+
+/* Mới */
+
+.status-new {
+    color: #475569;
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+}
+
+
+/* Đã được duyệt */
+
+.status-approved {
+    color: #15803d;
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+}
+
+
+/* Bị từ chối */
+
+.status-rejected {
+    color: #dc2626;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+}
+
+
+/* Đã bị đóng */
+
+.status-closed {
+    color: #64748b;
+    background: #f8fafc;
+    border: 1px solid #cbd5e1;
+}
+
+
 .question-table th {
     background: #f8fafc;
 
@@ -306,7 +380,7 @@
 
 .question-table th:nth-child(2),
 .question-table td:nth-child(2) {
-    width: 140px;
+    width: 200px;
 }
 
 

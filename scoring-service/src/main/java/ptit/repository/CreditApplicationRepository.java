@@ -5,9 +5,12 @@ import ptit.constant.CreditStatus;
 import ptit.entity.CreditApplication;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 
 public interface CreditApplicationRepository extends MongoRepository<CreditApplication, String> {
+
+    List<CreditApplication> findAllByIdInOrderByCreateTimeDesc(Set<String> ids);
 
     List<CreditApplication> findAllByOrderByCreateTimeDesc();
 

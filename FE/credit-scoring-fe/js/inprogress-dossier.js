@@ -126,13 +126,53 @@ async function loadInprogressDossiers() {
 
     try {
 
+        // const response = await fetch(
+        //     `${API_BASE_URL}/scoring/api/v1/scoring/IN_PROGRESS/applications`,
+        //     {
+        //         method: 'GET',
+        //         headers: {
+        //             'Content-Type': 'application/json'
+        //         }
+        //     }
+        // );
+
+        const userJson = localStorage.getItem('credit_scoring_user');
+
+        if (!userJson) {
+            throw new Error(
+                'Không tìm thấy thông tin đăng nhập của người dùng.'
+            );
+        }
+
+        const user = JSON.parse(userJson);
+
+        const userName = user?.userName;
+        // const roleGroup = user?.roleGroup;
+        //TODO: FIX CODE TO TEST
+        const roleGroup = 'RB_RM';
+
+        if (!userName || !roleGroup) {
+            throw new Error(
+                'Thông tin userName hoặc roleGroup không hợp lệ.'
+            );
+        }
+        // Request body
+        const requestBody = {
+            userName: userName,
+            roleGroup: roleGroup,
+            status: 'IN_PROGRESS'
+        };
+
+        console.log('Call unassign tasks:', requestBody);
+
         const response = await fetch(
-            `${API_BASE_URL}/scoring/api/v1/scoring/IN_PROGRESS/applications`,
+            `${API_BASE_URL}/scoring/api/v1/scoring/applications/search`,
             {
-                method: 'GET',
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
-                }
+                },
+                body: JSON.stringify(requestBody)
             }
         );
 
@@ -351,10 +391,10 @@ function viewInProgressDossier(applicationId) {
         return;
     }
 
-    if (!dossier.latestTaskId) {
-        alert('Hồ sơ chưa có task để xử lý.');
-        return;
-    }
+    // if (!dossier.latestTaskId) {
+    //     alert('Hồ sơ chưa có task để xử lý.');
+    //     return;
+    // }
 
     console.log(
         'Application ID:',
@@ -367,7 +407,7 @@ function viewInProgressDossier(applicationId) {
     );
 
     loadDetailDossierPage(
-        dossier.latestTaskId
+        dossier.id
     );
 }
 

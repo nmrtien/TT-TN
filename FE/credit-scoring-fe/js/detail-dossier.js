@@ -8,10 +8,10 @@ let detailModels = [];
 /**
  * Load màn hình chi tiết hồ sơ
  */
-async function loadDetailDossierPage(taskId) {
+async function loadDetailDossierPage(applicationId) {
 
-    if (!taskId) {
-        console.error('Không có latestTaskId');
+    if (!applicationId) {
+        console.error('Không có applicationId');
 
         alert('Không tìm thấy thông tin task của hồ sơ.');
 
@@ -316,24 +316,63 @@ async function loadDetailDossierPage(taskId) {
 
     registerDetailDossierEvents();
 
-    await loadDetailDossier(taskId);
+    await loadDetailDossier(applicationId);
 }
 
 
 /**
  * Gọi API lấy chi tiết task
  */
-async function loadDetailDossier(taskId) {
+async function loadDetailDossier(applicationId) {
 
     try {
 
+        // const response = await fetch(
+        //     `${API_BASE_URL}/scoring/api/v1/scoring/${encodeURIComponent(taskId)}/tasks`,
+        //     {
+        //         method: 'GET',
+        //         headers: {
+        //             'Content-Type': 'application/json'
+        //         }
+        //     }
+        // );
+const userJson = localStorage.getItem('credit_scoring_user');
+
+        if (!userJson) {
+            throw new Error(
+                'Không tìm thấy thông tin đăng nhập của người dùng.'
+            );
+        }
+
+        const user = JSON.parse(userJson);
+
+        const userName = user?.userName;
+        // const roleGroup = user?.roleGroup;
+        //TODO: FIX CODE TO TEST
+        const roleGroup = 'RB_RM';
+
+        if (!userName || !roleGroup) {
+            throw new Error(
+                'Thông tin userName hoặc roleGroup không hợp lệ.'
+            );
+        }
+        // Request body
+        const requestBody = {
+            applicationId: applicationId,
+            userName: userName,
+            roleGroup: roleGroup
+        };
+
+        console.log('Call unassign tasks:', requestBody);
+
         const response = await fetch(
-            `${API_BASE_URL}/scoring/api/v1/scoring/${encodeURIComponent(taskId)}/tasks`,
+            `${API_BASE_URL}/scoring/api/v1/scoring/tasks/detail`,
             {
-                method: 'GET',
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
-                }
+                },
+                body: JSON.stringify(requestBody)
             }
         );
 
@@ -562,17 +601,62 @@ function renderApplication() {
 
 
     const statusElement =
-        document.getElementById(
-            'applicationStatus'
+    document.getElementById(
+        'applicationStatus'
+    );
+
+if (statusElement) {
+
+    const status =
+        detailTask?.status || '';
+
+    statusElement.textContent =
+        formatApplicationStatus(status);
+
+    // Reset class cũ
+    statusElement.className =
+        'status-badge';
+
+    // Thêm class theo trạng thái
+    if (status === 'COMPLETED') {
+
+        statusElement.classList.add(
+            'status-completed'
         );
 
-    if (statusElement) {
+    } else if (status === 'IN_PROGRESS') {
 
-        statusElement.textContent =
-            formatApplicationStatus(
-                detailApplication.status
-            );
+        statusElement.classList.add(
+            'status-in-progress'
+        );
+
+    } else if (status === 'NEW') {
+
+        statusElement.classList.add(
+            'status-new'
+        );
+
+    } else if (status === 'APPROVED') {
+
+        statusElement.classList.add(
+            'status-approved'
+        );
+
+    } else if (status === 'REJECTED') {
+
+        statusElement.classList.add(
+            'status-rejected'
+        );
+
+    } else if (status === 'CLOSED') {
+
+        statusElement.classList.add(
+            'status-closed'
+        );
     }
+}
+
+    
 }
 
 
@@ -740,9 +824,7 @@ function renderModels() {
 function registerDetailDossierEvents() {
 
     const btnBack =
-        document.getElementById(
-            'btnBackDossier'
-        );
+        document.getElementById('btnBackDossier');
 
     if (btnBack) {
 
@@ -758,21 +840,15 @@ function registerDetailDossierEvents() {
 
 
     const btnComplete =
-        document.getElementById(
-            'btnCompleteDossier'
-        );
+        document.getElementById('btnCompleteDossier');
 
     if (btnComplete) {
 
         btnComplete.addEventListener(
             'click',
-            function () {
+            async function () {
 
-                console.log(
-                    'Hoàn thành hồ sơ'
-                );
-
-                collectQuestionAnswers();
+                await completeDossier();
 
             }
         );
@@ -780,36 +856,208 @@ function registerDetailDossierEvents() {
 }
 
 
+async function completeDossier() {
+
+    collectQuestionAnswers();
+    if (!detailTask) {
+
+        showToast(
+            'Không tìm thấy thông tin task để hoàn thành.',
+            'error'
+        );
+
+        return;
+    }
+
+    const btnComplete =
+        document.getElementById('btnCompleteDossier');
+
+    try {
+
+        // Disable button để tránh click nhiều lần
+        if (btnComplete) {
+            btnComplete.disabled = true;
+            btnComplete.textContent = 'Đang hoàn thành...';
+        }
+
+
+        const response = await fetch(
+            `${API_BASE_URL}/scoring/api/v1/scoring/tasks/complete`,
+            {
+                method: 'POST',
+
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+
+                body: JSON.stringify(detailTask)
+            }
+        );
+
+
+        const message = await response.text();
+
+        let body = null;
+
+        if (message) {
+
+            try {
+
+                body = JSON.parse(message);
+
+            } catch (error) {
+
+                console.error(
+                    'Complete task response không phải JSON:',
+                    error
+                );
+
+            }
+        }
+
+
+        // =====================================================
+        // HTTP STATUS KHÁC 200
+        // =====================================================
+
+        if (response.status !== 200) {
+
+            const errorMessage =
+                body?.errorMsg ||
+                body?.message ||
+                body?.error ||
+                `Không thể hoàn thành hồ sơ. HTTP ${response.status}`;
+
+            showToast(
+                errorMessage,
+                'error'
+            );
+
+            return;
+        }
+
+
+        // =====================================================
+        // HTTP 200 NHƯNG BODY KHÔNG HỢP LỆ
+        // =====================================================
+
+        if (!body || !body.id) {
+
+            const errorMessage =
+                body?.errorMsg ||
+                'Hoàn thành hồ sơ không thành công.';
+
+            showToast(
+                errorMessage,
+                'error'
+            );
+
+            return;
+        }
+
+
+        // =====================================================
+        // COMPLETE THÀNH CÔNG
+        // =====================================================
+
+        showToast(
+            'Hoàn thành hồ sơ thành công.',
+            'success'
+        );
+
+
+        // Đợi một chút để user nhìn thấy toast
+        setTimeout(function () {
+
+            window.location.reload();
+
+        }, 500);
+
+
+    } catch (error) {
+
+        console.error(
+            'Complete dossier error:',
+            error
+        );
+
+        showToast(
+            error.message ||
+            'Có lỗi xảy ra khi hoàn thành hồ sơ.',
+            'error'
+        );
+
+    } finally {
+
+        if (btnComplete) {
+
+            btnComplete.disabled = false;
+
+            btnComplete.textContent =
+                'Hoàn thành';
+
+        }
+    }
+}
+
+
 /**
  * Thu thập câu trả lời
  */
+/**
+ * Thu thập và cập nhật câu trả lời vào detailTask
+ */
 function collectQuestionAnswers() {
+
+    if (!detailTask) {
+        console.error(
+            'Không có detailTask để cập nhật câu trả lời.'
+        );
+        return;
+    }
 
     const answerInputs =
         document.querySelectorAll(
             '.question-answer'
         );
 
-    const answers = [];
-
     answerInputs.forEach(input => {
 
-        answers.push({
-            questionId:
-                input.dataset.questionId,
+        const questionId =
+            input.dataset.questionId;
 
-            questionAnswer:
-                input.value
+        const questionAnswer =
+            input.value;
+
+        if (!questionId) {
+            return;
+        }
+
+        // Tìm question tương ứng trong tất cả model
+        detailTask.models?.forEach(model => {
+
+            model.questions?.forEach(question => {
+
+                if (
+                    String(question.id) ===
+                    String(questionId)
+                ) {
+
+                    question.questionAnswer =
+                        questionAnswer;
+                }
+
+            });
+
         });
 
     });
 
     console.log(
-        'Question answers:',
-        answers
+        'Detail task sau khi cập nhật câu trả lời:',
+        detailTask
     );
 }
-
 
 /**
  * Set value cho input
@@ -836,6 +1084,7 @@ function setInputValue(
 }
 
 
+
 /**
  * Format trạng thái
  */
@@ -846,6 +1095,7 @@ function formatApplicationStatus(
     const statusMap = {
         NEW: 'Mới',
         IN_PROGRESS: 'Đang xử lý',
+        COMPLETED: 'Đã hoàn thành',
         APPROVED: 'Đã được duyệt',
         REJECTED: 'Bị từ chối',
         CLOSED: 'Đã bị đóng'

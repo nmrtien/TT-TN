@@ -157,13 +157,14 @@ async function loadUnassignedDossiers() {
         // Request body
         const requestBody = {
             userName: userName,
-            roleGroup: roleGroup
+            roleGroup: roleGroup,
+            status: 'NEW'
         };
 
         console.log('Call unassign tasks:', requestBody);
 
         const response = await fetch(
-            `${API_BASE_URL}/scoring/api/v1/scoring/tasks/unassign`,
+            `${API_BASE_URL}/scoring/api/v1/scoring/applications/search`,
             {
                 method: 'POST',
                 headers: {

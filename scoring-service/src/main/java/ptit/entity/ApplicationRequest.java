@@ -7,6 +7,8 @@ import ptit.constant.RoleGroup;
 @Data
 public class ApplicationRequest {
 
+    private String applicationId;
+
     private String taskId;
 
     private String userName;

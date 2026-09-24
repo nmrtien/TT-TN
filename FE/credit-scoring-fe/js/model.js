@@ -903,9 +903,10 @@ try {
         );
     }
     const data = await response.json();
+    console.log('models: '+data)
     // Backend trả trực tiếp array
     models = Array.isArray(data) ? data : [];
-    renderModels();
+    renderConfigModels();
 } catch (error) {
 
     console.error('Load Models error:', error);
@@ -932,7 +933,7 @@ try {
 // RENDER TABLE
 // ===============================
 
-function renderModels() {
+function renderConfigModels() {
 
 const tableBody = document.getElementById('ModelTableBody');
 

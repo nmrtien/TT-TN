@@ -26,6 +26,9 @@ public class CreditTask {
     @Field("role_group")
     private RoleGroup roleGroup;
 
+    @Field("score")
+    private String score;
+
     @Field("comment")
     private String comment;
 
