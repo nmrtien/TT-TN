@@ -50,19 +50,19 @@ function shell(active, title, subtitle) {
                     </div>
 
                     <div class="nav-child ${active === 'approved-dossiers' ? 'active' : ''}"
-                         onclick="event.stopPropagation(); location.href='dossiers-approved.html'">
+                         onclick="event.stopPropagation(); loadApprovedDossiersPage()">
                         <span class="child-dot">•</span>
                         <span>Hồ sơ Đã được duyệt</span>
                     </div>
 
                     <div class="nav-child ${active === 'rejected-dossiers' ? 'active' : ''}"
-                         onclick="event.stopPropagation(); location.href='dossiers-rejected.html'">
+                         onclick="event.stopPropagation(); loadRejectedDossiersPage()">
                         <span class="child-dot">•</span>
                         <span>Hồ sơ Bị từ chối</span>
                     </div>
 
                     <div class="nav-child ${active === 'closed-dossiers' ? 'active' : ''}"
-                         onclick="event.stopPropagation(); location.href='dossiers-closed.html'">
+                         onclick="event.stopPropagation(); loadClosedDossiersPage()">
                         <span class="child-dot">•</span>
                         <span>Hồ sơ Đã bị đóng</span>
                     </div>

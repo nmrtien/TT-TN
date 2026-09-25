@@ -25,5 +25,7 @@ public interface IScoring {
 
     List<Model> getModels(Integer level);
 
+    List<CreditApplication> getAllApplication();
+
     List<CreditTask> getAllTasks();
 }

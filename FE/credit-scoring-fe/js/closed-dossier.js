@@ -1,16 +1,16 @@
-let inProgressDossiers = [];
+let closedDossiers = [];
 
-let inProgressCurrentPageDossier = 1;
+let closedCurrentPageDossier = 1;
 
-let inProgressPageSizeDossier = 5;
+let closedPageSizeDossier = 5;
 
 
-function loadInprogressDossiersPage() {
+function loadClosedDossiersPage() {
 
     shell(
-        'processing-dossiers',
-        'Hồ sơ đang xử lý',
-        'Quản lý danh sách hồ sơ đang được xử lý'
+        'closed-dossiers',
+        'Hồ sơ đã đóng',
+        'Quản lý danh sách hồ sơ đã đóng'
     );
 
     const pageContent = document.getElementById('page-content');
@@ -25,10 +25,10 @@ function loadInprogressDossiersPage() {
 
             <div class="card-header">
                 <div>
-                    <h3>Danh sách hồ sơ đang được xử lý</h3>
+                    <h3>Danh sách hồ sơ đã đóng</h3>
                     <span>
                         Tổng số:
-                        <strong id="inProgressDossierCount">0</strong>
+                        <strong id="closedDossierCount">0</strong>
                         hồ sơ
                     </span>
                 </div>
@@ -36,7 +36,7 @@ function loadInprogressDossiersPage() {
                 <button
                     type="button"
                     class="btn-secondary"
-                    id="btnRefreshInProgressDossier">
+                    id="btnRefreshClosedDossier">
                     ↻ Làm mới
                 </button>
             </div>
@@ -45,20 +45,20 @@ function loadInprogressDossiersPage() {
                 <table class="user-table">
 
                     <thead>
-    <tr>
-        <th>STT</th>
-        <th>ID</th>
-        <th>CIF</th>
-        <th>Loại giấy tờ</th>
-        <th>Số giấy tờ</th>
-        <th>Họ và tên</th>
-        <th>Mục đích vay</th>
-        <th>Thời hạn vay</th>
-        <th>Thao tác</th>
-    </tr>
-</thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>ID</th>
+                            <th>CIF</th>
+                            <th>Loại giấy tờ</th>
+                            <th>Số giấy tờ</th>
+                            <th>Họ và tên</th>
+                            <th>Mục đích vay</th>
+                            <th>Thời hạn vay</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
 
-                    <tbody id="dossierTableBody">
+                    <tbody id="closedDossierTableBody">
                         <tr>
                             <td colspan="9" class="loading-cell">
                                 Đang tải dữ liệu...
@@ -70,46 +70,46 @@ function loadInprogressDossiersPage() {
             </div>
 
             <div
-                id="dossierEmptyState"
+                id="closedDossierEmptyState"
                 class="empty-state"
                 style="display: none;">
-                Không có hồ sơ đang xử lý
+                Không có hồ sơ đã đóng
             </div>
 
             <div
                 class="pagination"
-                id="dossierInProgressPagination">
+                id="closedDossierPagination">
             </div>
 
         </div>
     `;
 
-    registerInprogressDossierEvents();
+    registerClosedDossierEvents();
 
-    loadInprogressDossiers();
+    loadClosedDossiers();
 }
 
 
 
-function registerInprogressDossierEvents() {
+function registerClosedDossierEvents() {
 
-    const btnRefreshInProgress = document.getElementById(
-        'btnRefreshInProgressDossier'
+    const btnRefresh = document.getElementById(
+        'btnRefreshClosedDossier'
     );
 
-    if (btnRefreshInProgress) {
-        btnRefreshInProgress.addEventListener(
+    if (btnRefresh) {
+        btnRefresh.addEventListener(
             'click',
-            loadInprogressDossiersPage
+            loadClosedDossiers
         );
     }
 }
 
 
-async function loadInprogressDossiers() {
+async function loadClosedDossiers() {
 
     const tableBody = document.getElementById(
-        'dossierTableBody'
+        'closedDossierTableBody'
     );
 
     if (!tableBody) {
@@ -118,7 +118,7 @@ async function loadInprogressDossiers() {
 
     tableBody.innerHTML = `
         <tr>
-            <td colspan="8" class="loading-cell">
+            <td colspan="9" class="loading-cell">
                 Đang tải dữ liệu...
             </td>
         </tr>
@@ -126,17 +126,9 @@ async function loadInprogressDossiers() {
 
     try {
 
-        // const response = await fetch(
-        //     `${API_BASE_URL}/scoring/api/v1/scoring/IN_PROGRESS/applications`,
-        //     {
-        //         method: 'GET',
-        //         headers: {
-        //             'Content-Type': 'application/json'
-        //         }
-        //     }
-        // );
-
-        const userJson = localStorage.getItem('credit_scoring_user');
+        const userJson = localStorage.getItem(
+            'credit_scoring_user'
+        );
 
         if (!userJson) {
             throw new Error(
@@ -147,8 +139,9 @@ async function loadInprogressDossiers() {
         const user = JSON.parse(userJson);
 
         const userName = user?.userName;
+
+        // TODO: bỏ hard-code sau khi test xong
         // const roleGroup = user?.roleGroup;
-        //TODO: FIX CODE TO TEST
         const roleGroup = 'RB_RM';
 
         if (!userName || !roleGroup) {
@@ -156,14 +149,17 @@ async function loadInprogressDossiers() {
                 'Thông tin userName hoặc roleGroup không hợp lệ.'
             );
         }
-        // Request body
+
         const requestBody = {
             userName: userName,
             roleGroup: roleGroup,
-            status: 'IN_PROGRESS'
+            status: 'CLOSED'
         };
 
-        console.log('Call unassign tasks:', requestBody);
+        console.log(
+            'Call closed dossiers:',
+            requestBody
+        );
 
         const response = await fetch(
             `${API_BASE_URL}/scoring/api/v1/scoring/applications/search`,
@@ -176,7 +172,8 @@ async function loadInprogressDossiers() {
             }
         );
 
-        console.log('call IN_PROGRESS')
+        console.log('Call CLOSED dossiers');
+
         const message = await response.text();
 
         if (!response.ok) {
@@ -212,62 +209,68 @@ async function loadInprogressDossiers() {
         }
 
         if (!message) {
-            inProgressDossiers = [];
+
+            closedDossiers = [];
+
         } else {
 
             const data = JSON.parse(message);
 
-            inProgressDossiers = Array.isArray(data)
+            closedDossiers = Array.isArray(data)
                 ? data
                 : [];
         }
 
-        inProgressCurrentPageDossier = 1;
+        closedCurrentPageDossier = 1;
 
-        renderDossiers();
+        renderClosedDossiers();
 
     } catch (error) {
 
         console.error(
-            'Load unassigned inProgressDossiers error:',
+            'Load closed dossiers error:',
             error
         );
 
-        inProgressDossiers = [];
+        closedDossiers = [];
 
         tableBody.innerHTML = `
             <tr>
-                <td colspan="8" class="error-cell">
+                <td colspan="9" class="error-cell">
                     ${escapeHtml(
-            error.message ||
-            'Không thể tải danh sách hồ sơ'
-        )}
+                        error.message ||
+                        'Không thể tải danh sách hồ sơ'
+                    )}
                 </td>
             </tr>
         `;
 
-        updateInProgressDossierCount();
+        updateClosedDossierCount();
+        renderClosedDossierPagination();
     }
 }
 
 
-function renderDossiers() {
+function renderClosedDossiers() {
 
     const tableBody = document.getElementById(
-        'dossierTableBody'
+        'closedDossierTableBody'
     );
 
     const emptyState = document.getElementById(
-        'dossierEmptyState'
+        'closedDossierEmptyState'
     );
 
     if (!tableBody) {
         return;
     }
 
-    updateInProgressDossierCount();
+    updateClosedDossierCount();
 
-    if (!inProgressDossiers || inProgressDossiers.length === 0) {
+    if (
+        !closedDossiers ||
+        closedDossiers.length === 0
+    ) {
 
         tableBody.innerHTML = '';
 
@@ -275,7 +278,7 @@ function renderDossiers() {
             emptyState.style.display = 'block';
         }
 
-        renderInProgressDossierPagination();
+        renderClosedDossierPagination();
 
         return;
     }
@@ -285,15 +288,15 @@ function renderDossiers() {
     }
 
     const startIndex =
-        (inProgressCurrentPageDossier - 1) *
-        inProgressPageSizeDossier;
+        (closedCurrentPageDossier - 1) *
+        closedPageSizeDossier;
 
     const endIndex =
         startIndex +
-        inProgressPageSizeDossier;
+        closedPageSizeDossier;
 
     const pageDossiers =
-        inProgressDossiers.slice(
+        closedDossiers.slice(
             startIndex,
             endIndex
         );
@@ -308,63 +311,63 @@ function renderDossiers() {
                 return `
                     <tr>
 
-                        <td>${stt}</td>
-
                         <td>
-                            ${escapeHtml(
-                    dossier.id || ''
-                )}
+                            ${stt}
                         </td>
 
                         <td>
                             ${escapeHtml(
-                    dossier.cif || ''
-                )}
+                                dossier.id || ''
+                            )}
                         </td>
 
                         <td>
                             ${escapeHtml(
-                    dossier.legalDocType || ''
-                )}
+                                dossier.cif || ''
+                            )}
                         </td>
 
                         <td>
                             ${escapeHtml(
-                    dossier.legalDocNumber || ''
-                )}
+                                dossier.legalDocType || ''
+                            )}
                         </td>
 
                         <td>
                             ${escapeHtml(
-                    dossier.fullName || ''
-                )}
+                                dossier.legalDocNumber || ''
+                            )}
+                        </td>
+
+                        <td>
+                            ${escapeHtml(
+                                dossier.fullName || ''
+                            )}
                         </td>
 
                         <td>
                             ${formatLoanPurpose(
-                    dossier.loanPurpose
-                )}
+                                dossier.loanPurpose
+                            )}
                         </td>
 
                         <td>
                             ${escapeHtml(
-                    dossier.loanTerm
-                        ? dossier.loanTerm + ' tháng'
-                        : ''
-                )}
+                                dossier.loanTerm
+                                    ? dossier.loanTerm + ' tháng'
+                                    : ''
+                            )}
                         </td>
 
                         <td>
-                    
 
-
-<button
-    type="button"
-    class="btn-view-dossier"
-    title="Xem chi tiết"
-    onclick="viewInProgressDossier('${escapeJs(dossier.id)}')">
-    Xem chi tiết
-</button>
+                            <button
+                                type="button"
+                                class="btn-view-dossier"
+                                title="Xem chi tiết"
+                                onclick="viewClosedDossier('${escapeJs(dossier.id)}')">
+                                Xem chi tiết
+                            </button>
 
                         </td>
 
@@ -374,30 +377,25 @@ function renderDossiers() {
             })
             .join('');
 
-    renderInProgressDossierPagination();
+    renderClosedDossierPagination();
 }
 
-function viewInProgressDossier(applicationId) {
+function viewClosedDossier(applicationId) {
 
-    const dossier = inProgressDossiers.find(
+    const dossier = closedDossiers.find(
         item => item.id === applicationId
     );
 
     if (!dossier) {
         console.error(
-            'Không tìm thấy hồ sơ:',
+            'Không tìm thấy hồ sơ đã đóng:',
             applicationId
         );
         return;
     }
 
-    // if (!dossier.latestTaskId) {
-    //     alert('Hồ sơ chưa có task để xử lý.');
-    //     return;
-    // }
-
     console.log(
-        'Application ID:',
+        'Closed Application ID:',
         dossier.id
     );
 
@@ -411,11 +409,11 @@ function viewInProgressDossier(applicationId) {
     );
 }
 
-function updateInProgressDossierCount() {
+function updateClosedDossierCount() {
 
     const countElement =
         document.getElementById(
-            'inProgressDossierCount'
+            'closedDossierCount'
         );
 
     if (!countElement) {
@@ -423,15 +421,15 @@ function updateInProgressDossierCount() {
     }
 
     countElement.textContent =
-        inProgressDossiers.length;
+        closedDossiers.length;
 }
 
 
-function renderInProgressDossierPagination() {
+function renderClosedDossierPagination() {
 
     const pagination =
         document.getElementById(
-            'dossierInProgressPagination'
+            'closedDossierPagination'
         );
 
     if (!pagination) {
@@ -440,8 +438,8 @@ function renderInProgressDossierPagination() {
 
     const totalPages =
         Math.ceil(
-            inProgressDossiers.length /
-            inProgressPageSizeDossier
+            closedDossiers.length /
+            closedPageSizeDossier
         );
 
     if (totalPages < 1) {
@@ -457,8 +455,12 @@ function renderInProgressDossierPagination() {
         <button
             type="button"
             class="page-btn"
-            ${inProgressCurrentPageDossier === 1 ? 'disabled' : ''}
-            onclick="changeInProgressDossierPage(${inProgressCurrentPageDossier - 1})">
+            ${
+                closedCurrentPageDossier === 1
+                    ? 'disabled'
+                    : ''
+            }
+            onclick="changeClosedDossierPage(${closedCurrentPageDossier - 1})">
             ‹
         </button>
     `;
@@ -472,11 +474,12 @@ function renderInProgressDossierPagination() {
         html += `
             <button
                 type="button"
-                class="page-btn ${page === inProgressCurrentPageDossier
-                ? 'active'
-                : ''
-            }"
-                onclick="changeInProgressDossierPage(${page})">
+                class="page-btn ${
+                    page === closedCurrentPageDossier
+                        ? 'active'
+                        : ''
+                }"
+                onclick="changeClosedDossierPage(${page})">
                 ${page}
             </button>
         `;
@@ -486,11 +489,12 @@ function renderInProgressDossierPagination() {
         <button
             type="button"
             class="page-btn"
-            ${inProgressCurrentPageDossier === totalPages
-            ? 'disabled'
-            : ''
-        }
-            onclick="changeInProgressDossierPage(${inProgressCurrentPageDossier + 1})">
+            ${
+                closedCurrentPageDossier === totalPages
+                    ? 'disabled'
+                    : ''
+            }
+            onclick="changeClosedDossierPage(${closedCurrentPageDossier + 1})">
             ›
         </button>
     `;
@@ -499,12 +503,12 @@ function renderInProgressDossierPagination() {
 }
 
 
-function changeInProgressDossierPage(page) {
+function changeClosedDossierPage(page) {
 
     const totalPages =
         Math.ceil(
-            inProgressDossiers.length /
-            inProgressPageSizeDossier
+            closedDossiers.length /
+            closedPageSizeDossier
         );
 
     if (
@@ -514,9 +518,9 @@ function changeInProgressDossierPage(page) {
         return;
     }
 
-    inProgressCurrentPageDossier = page;
+    closedCurrentPageDossier = page;
 
-    renderDossiers();
+    renderClosedDossiers();
 }
 
 

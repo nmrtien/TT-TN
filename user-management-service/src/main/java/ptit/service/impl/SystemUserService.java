@@ -72,6 +72,12 @@ public class SystemUserService implements ISystemUser {
 
 
     @Override
+    public List<SystemUser> getUsers(Set<String> userNames) {
+        return systemUserRepository.findAllByUserNameIn(userNames);
+    }
+
+
+    @Override
     public SystemUser detail(String username, String password) {
         return systemUserRepository.findByUserNameAndPassword(username, password).orElse(new SystemUser());
     }
@@ -93,13 +99,16 @@ public class SystemUserService implements ISystemUser {
 
     private String validateSystemUser(SystemUser systemUser) {
         if (systemUser == null)
-            return "KHÔNG THÀNH CÔNG. THÔNG TIN USER KHÔNG ĐƯỢC PHÉP NULL";
+            return "KHÔNG THÀNH CÔNG. THÔNG TIN NGƯỜI DÙNG KHÔNG ĐƯỢC PHÉP NULL";
         String userName = systemUser.getUserName();
         if (!StringUtils.hasLength(userName))
-            return "KHÔNG THÀNH CÔNG. MÃ NHÂN VIÊN KHÔNG ĐƯỢC ĐỂ TRỐNG";
+            return "KHÔNG THÀNH CÔNG. MÃ NGƯỜI DÙNG KHÔNG ĐƯỢC ĐỂ TRỐNG";
         String regex = "^[a-zA-Z0-9]{4,}$";
         if (!userName.matches(regex))
-            return "KHÔNG THÀNH CÔNG. MÃ NHÂN VIÊN KHÔNG HỢP LỆ";
+            return "KHÔNG THÀNH CÔNG. MÃ NGƯỜI DÙNG KHÔNG HỢP LỆ";
+        List<SystemUser> systemUsers = systemUserRepository.findAllByUserName(userName);
+        if (!CollectionUtils.isEmpty(systemUsers))
+            return "KHÔNG THÀNH CÔNG. MÃ NGƯỜI DÙNG ĐÃ TỒN TẠI";
         if (!StringUtils.hasLength(systemUser.getFullName()))
             return "KHÔNG THÀNH CÔNG. HỌ VÀ TÊN KHÔNG ĐƯỢC ĐỂ TRỐNG";
         if (!StringUtils.hasLength(systemUser.getPhone()))
@@ -157,7 +166,6 @@ public class SystemUserService implements ISystemUser {
         email.setContent("Chúc mừng bạn đã tạo thành công tài khoản tại CSP. " +
                 "Vui lòng không cung cấp thông tin cho bất kỳ ai. UserName: "+systemUser.getUserName()
                 +". Password: "+systemUser.getPassword());
-        email.setFullNames(new HashSet<>(Collections.singleton(systemUser.getFullName())));
         email.setTo(new HashSet<>(Collections.singleton(systemUser.getEmail())));
         notificationClient.sendEmail(email);
     }

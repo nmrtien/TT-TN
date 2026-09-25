@@ -48,6 +48,8 @@ public class CreditTask {
 
     private String nextTaskId;
 
+    private CreditStatus completeType;
+
     private String errorMsg;
 
 }

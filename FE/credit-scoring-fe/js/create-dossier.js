@@ -408,47 +408,47 @@ function registerCreateDossierEvents() {
             // VALIDATE
             if (!dossier.cif) {
                 console.log('VALIDATE CIF');
-                showToast('Vui lòng nhập CIF khách hàng', 'error');
+                showCreateDossierToast('Vui lòng nhập CIF khách hàng', 'error');
                 return;
             }
 
             if (!dossier.legalDocType) {
-                showToast('Vui lòng chọn loại giấy tờ', 'error');
+                showCreateDossierToast('Vui lòng chọn loại giấy tờ', 'error');
                 return;
             }
 
             if (!dossier.legalDocNumber) {
-                showToast('Vui lòng nhập số giấy tờ', 'error');
+                showCreateDossierToast('Vui lòng nhập số giấy tờ', 'error');
                 return;
             }
 
             if (!dossier.fullName) {
-                showToast('Vui lòng nhập họ và tên', 'error');
+                showCreateDossierToast('Vui lòng nhập họ và tên', 'error');
                 return;
             }
 
             if (!dossier.birthday) {
-                showToast('Vui lòng nhập ngày sinh', 'error');
+                showCreateDossierToast('Vui lòng nhập ngày sinh', 'error');
                 return;
             }
 
             if (!dossier.phone) {
-                showToast('Vui lòng nhập số điện thoại', 'error');
+                showCreateDossierToast('Vui lòng nhập số điện thoại', 'error');
                 return;
             }
 
             if (!dossier.address) {
-                showToast('Vui lòng nhập địa chỉ', 'error');
+                showCreateDossierToast('Vui lòng nhập địa chỉ', 'error');
                 return;
             }
 
             if (!dossier.loanPurpose) {
-                showToast('Vui lòng chọn mục đích vay', 'error');
+                showCreateDossierToast('Vui lòng chọn mục đích vay', 'error');
                 return;
             }
 
             if (!dossier.loanTerm) {
-                showToast('Vui lòng chọn thời hạn vay', 'error');
+                showCreateDossierToast('Vui lòng chọn thời hạn vay', 'error');
                 return;
             }
 
@@ -468,7 +468,7 @@ function registerCreateDossierEvents() {
 // HTTP 200 nhưng nghiệp vụ thất bại
 if (!response || response.id === null) {
 
-    showToast(
+    showCreateDossierToast(
         response?.errorMsg ||
         'Khởi tạo hồ sơ thất bại',
         'error'
@@ -478,7 +478,7 @@ if (!response || response.id === null) {
 }
 
 // Khởi tạo thành công
-showToast(
+showCreateDossierToast(
     'Khởi tạo hồ sơ thành công',
     'success'
 );
@@ -497,7 +497,7 @@ document
                     error
                 );
 
-                showToast(
+                showCreateDossierToast(
                     error.message ||
                     'Khởi tạo hồ sơ thất bại',
                     'error'

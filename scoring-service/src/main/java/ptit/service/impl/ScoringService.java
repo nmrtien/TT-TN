@@ -11,6 +11,8 @@ import ptit.constant.CreditStatus;
 import ptit.constant.RoleGroup;
 import ptit.entity.*;
 import ptit.proxy.ConfigClient;
+import ptit.proxy.NotificationClient;
+import ptit.proxy.UserClient;
 import ptit.repository.CreditApplicationRepository;
 import ptit.repository.CreditTaskRepository;
 import ptit.service.IScoring;
@@ -34,6 +36,10 @@ public class ScoringService implements IScoring {
     private final CreditTaskRepository taskRepository;
 
     private final ConfigClient configClient;
+
+    private final UserClient userClient;
+
+    private final NotificationClient notificationClient;
 
 
     @Override
@@ -69,10 +75,16 @@ public class ScoringService implements IScoring {
         List<CreditApplication> applications = applicationRepository.findAllByIdInOrderByCreateTimeDesc(applicationIds);
         if (CollectionUtils.isEmpty(applications))
             return Collections.emptyList();
+        List<CreditApplication> applicationsFinal;
+        if (CreditStatus.NEW != request.getStatus())
+            applicationsFinal = applications.stream()
+                    .filter(application -> application.getStatus() == request.getStatus())
+                    .toList();
+        else
+            applicationsFinal = new ArrayList<>(applications);
         Map<String, String> latestTaskMap = tasks.stream()
                 .collect(Collectors.toMap(CreditTask::getApplicationId, CreditTask::getId, (a, b) -> a));
-        return applications.stream()
-                .filter(a -> request.getStatus().equals(a.getStatus()))
+        return applicationsFinal.stream()
                 .peek(application ->
                     application.setLatestTaskId(latestTaskMap.get(application.getId()))
                 ).toList();
@@ -112,7 +124,13 @@ public class ScoringService implements IScoring {
         saveApplication(application);
         task.setAssignee(claimTask.getUserName());
         task.setStatus(CreditStatus.IN_PROGRESS);
-        return taskRepository.save(task);
+        CreditTask taskSaved = taskRepository.save(task);
+        sendEmail(new HashSet<>(Collections.singleton(taskSaved.getAssignee())),
+                "THÔNG BÁO TIẾP NHẬN CÔNG VIỆC THÀNH CÔNG TẠI CREDIT SCORING PLATFORM",
+                "Bạn đã tiếp nhận công việc thành công cho hồ sơ: "+application.getId()
+                        +". Thông tin khách hàng: "+application.getFullName()+", số Chứng từ pháp lý: "
+                        +application.getLegalDocNumber());
+        return taskSaved;
     }
 
 
@@ -143,34 +161,46 @@ public class ScoringService implements IScoring {
 
 
     @Override
-    public CreditTask completeTask(CreditTask task) {
-        CreditApplication application = validateApplicationAction(task.getApplicationId());
+    public CreditTask completeTask(CreditTask taskRequest) {
+        CreditApplication application = validateApplicationAction(taskRequest.getApplicationId());
         String result = application.getErrorMsg();
-        if (StringUtils.hasLength(application.getErrorMsg())) {
+        if (StringUtils.hasLength(application.getErrorMsg()))
             return buildFailTask(result);
-        }
-        CreditTask taskSaved = taskRepository.findById(task.getId()).orElse(null);
-        if (taskSaved == null) {
-            result = "KHÔNG THÀNH CÔNG. CÔNG VIỆC KHÔNG TỒN TẠI";
-            return buildFailTask(result);
-        }
-        if (CreditStatus.IN_PROGRESS != application.getStatus() && RoleGroup.RB_RM != task.getRoleGroup()) {
-            result = "KHÔNG THÀNH CÔNG. TRẠNG THÁI HỒ SƠ KHÔNG ĐƯỢC PHÉP HOÀN THÀNH";
-            return buildFailTask(result);
-        }
-        taskSaved.setModels(task.getModels());
+        CreditTask taskSaved = taskRepository.findById(taskRequest.getId()).orElse(null);
+        if (taskSaved == null)
+            return buildFailTask("KHÔNG THÀNH CÔNG. CÔNG VIỆC KHÔNG TỒN TẠI");
+        if (CreditStatus.IN_PROGRESS != application.getStatus() && RoleGroup.RB_RM != taskRequest.getRoleGroup())
+            return buildFailTask("KHÔNG THÀNH CÔNG. TRẠNG THÁI HỒ SƠ KHÔNG ĐƯỢC PHÉP HOÀN THÀNH");
+        if (CreditStatus.CLOSED == taskRequest.getCompleteType() && !StringUtils.hasLength(taskRequest.getComment()))
+            return buildFailTask("KHÔNG THÀNH CÔNG. LÝ DO ĐÓNG HỒ SƠ KHÔNG ĐƯỢC ĐỂ TRỐNG");
+        taskSaved.setComment(taskRequest.getComment());
+        taskSaved.setModels(taskRequest.getModels());
         taskSaved.setStatus(CreditStatus.COMPLETED);
-        if (RoleGroup.RB_AM == taskSaved.getRoleGroup()) {
-            application.setStatus(task.getStatus());
+        if (RoleGroup.RB_AM == taskSaved.getRoleGroup() || CreditStatus.CLOSED == taskRequest.getCompleteType()) {
+            application.setStatus(taskRequest.getCompleteType());
             saveApplication(application);
-            return taskRepository.save(taskSaved);
+            CreditTask lastTask = taskRepository.save(taskSaved);
+            String applicationStatus = CreditStatus.CLOSED == application.getStatus() ? "ĐÃ BỊ ĐÓNG với lý do: " + taskSaved.getComment()
+                    : CreditStatus.APPROVED == application.getStatus() ? "ĐÃ ĐƯỢC PHÊ DUYỆT với nội dung: " + taskSaved.getComment()
+                    : CreditStatus.REJECTED == application.getStatus() ? "ĐÃ BỊ TỪ CHỐI PHÊ DUYỆT với lý do: " + taskSaved.getComment() : "";
+            List<CreditTask> tasks = taskRepository.findAllByApplicationId(application.getId());
+            Set<String> userNames = tasks.stream()
+                    .map(CreditTask::getAssignee)
+                    .filter(StringUtils::hasLength).collect(Collectors.toSet());
+            sendEmail(userNames,
+                    "THÔNG BÁO HỒ SƠ ĐÃ ĐƯỢC HOÀN TẤT TẠI CREDIT SCORING PLATFORM",
+                    "Hồ sơ với mã: "+application.getId()+". Thông tin khách hàng: "
+                            +application.getFullName()+", số Chứng từ pháp lý: "
+                            +application.getLegalDocNumber() +" đã hoàn tất. Trạng thái hồ sơ: "+applicationStatus);
+            return lastTask;
         }
         if (RoleGroup.RB_RM == taskSaved.getRoleGroup()) {
             application.setStatus(CreditStatus.IN_PROGRESS);
             saveApplication(application);
         }
-        taskRepository.save(taskSaved);
-        return createNextTask(taskSaved, application);
+        CreditTask taskAfterSaved = taskRepository.save(taskSaved);
+        createNextTask(taskSaved, application);
+        return taskAfterSaved;
     }
 
 
@@ -179,6 +209,12 @@ public class ScoringService implements IScoring {
         if (level == null)
             return Collections.emptyList();
         return configClient.getModels(level);
+    }
+
+
+    @Override
+    public List<CreditApplication> getAllApplication() {
+        return applicationRepository.findAll();
     }
 
 
@@ -218,10 +254,6 @@ public class ScoringService implements IScoring {
         CreditApplication application = applicationRepository.findById(applicationId).orElse(new CreditApplication());
         if (application.getId() == null) {
             application.setErrorMsg("KHÔNG THÀNH CÔNG. HỒ SƠ KHÔNG TỒN TẠI");
-            return application;
-        }
-        if (CreditStatus.NEW != application.getStatus()) {
-            application.setErrorMsg("KHÔNG THÀNH CÔNG. TRẠNG THÁI HỒ SƠ KHÔNG CHO PHÉP THỰC HIỆN YÊU CẦU NÀY");
             return application;
         }
         return application;
@@ -321,6 +353,24 @@ public class ScoringService implements IScoring {
         CreditTask creditTask = new CreditTask();
         creditTask.setErrorMsg(errorMsg);
         return creditTask;
+    }
+
+
+    private void sendEmail(Set<String> userNames, String subject, String content) {
+        Email email = new Email();
+        email.setTo(userNames);
+        List<SystemUser> users = userClient.getUsers(email);
+        if (CollectionUtils.isEmpty(users)) {
+            log.info("get users with response is empty");
+            return;
+        }
+        Set<String> to = users.stream()
+                .map(SystemUser::getEmail)
+                .collect(Collectors.toSet());
+        email.setTo(to);
+        email.setSubject(subject);
+        email.setContent(content);
+        notificationClient.sendEmail(email);
     }
 
 }

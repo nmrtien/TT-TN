@@ -28,7 +28,7 @@ function loadUnassignedDossiersPage() {
                     <h3>Danh sách hồ sơ chưa phân công</h3>
                     <span>
                         Tổng số:
-                        <strong id="dossierCount">0</strong>
+                        <strong id="newDossierCount">0</strong>
                         hồ sơ
                     </span>
                 </div>
@@ -36,7 +36,7 @@ function loadUnassignedDossiersPage() {
                 <button
                     type="button"
                     class="btn-secondary"
-                    id="btnRefreshDossier">
+                    id="btnRefreshNewDossier">
                     ↻ Làm mới
                 </button>
             </div>
@@ -78,7 +78,7 @@ function loadUnassignedDossiersPage() {
 
             <div
                 class="pagination"
-                id="dossierPagination">
+                id="dossierNewPagination">
             </div>
 
             <div
@@ -99,12 +99,12 @@ function loadUnassignedDossiersPage() {
 
 function registerUnassignedDossierEvents() {
 
-    const btnRefresh = document.getElementById(
-        'btnRefreshDossier'
+    const btnRefreshNew = document.getElementById(
+        'btnRefreshNewDossier'
     );
 
-    if (btnRefresh) {
-        btnRefresh.addEventListener(
+    if (btnRefreshNew) {
+        btnRefreshNew.addEventListener(
             'click',
             loadUnassignedDossiers
         );
@@ -239,14 +239,14 @@ async function loadUnassignedDossiers() {
             <tr>
                 <td colspan="8" class="error-cell">
                     ${escapeHtml(
-                        error.message ||
-                        'Không thể tải danh sách hồ sơ'
-                    )}
+            error.message ||
+            'Không thể tải danh sách hồ sơ'
+        )}
                 </td>
             </tr>
         `;
 
-        updateDossierCount();
+        updateNewDossierCount();
     }
 }
 
@@ -265,7 +265,7 @@ function renderUnassignedDossiers() {
         return;
     }
 
-    updateDossierCount();
+    updateNewDossierCount();
 
     if (!newDossiers || newDossiers.length === 0) {
 
@@ -275,7 +275,7 @@ function renderUnassignedDossiers() {
             emptyState.style.display = 'block';
         }
 
-        renderDossierPagination();
+        renderNewDossierPagination();
 
         return;
     }
@@ -312,46 +312,46 @@ function renderUnassignedDossiers() {
 
                         <td>
                             ${escapeHtml(
-                                dossier.id || ''
-                            )}
+                    dossier.id || ''
+                )}
                         </td>
 
                         <td>
                             ${escapeHtml(
-                                dossier.cif || ''
-                            )}
+                    dossier.cif || ''
+                )}
                         </td>
 
                         <td>
                             ${escapeHtml(
-                                dossier.legalDocType || ''
-                            )}
+                    dossier.legalDocType || ''
+                )}
                         </td>
 
                         <td>
                             ${escapeHtml(
-                                dossier.legalDocNumber || ''
-                            )}
+                    dossier.legalDocNumber || ''
+                )}
                         </td>
 
                         <td>
                             ${escapeHtml(
-                                dossier.fullName || ''
-                            )}
+                    dossier.fullName || ''
+                )}
                         </td>
 
                         <td>
                             ${formatLoanPurpose(
-                                dossier.loanPurpose
-                            )}
+                    dossier.loanPurpose
+                )}
                         </td>
 
                         <td>
                             ${escapeHtml(
-                                dossier.loanTerm
-                                    ? dossier.loanTerm + ' tháng'
-                                    : ''
-                            )}
+                    dossier.loanTerm
+                        ? dossier.loanTerm + ' tháng'
+                        : ''
+                )}
                         </td>
 
                         <td>
@@ -370,14 +370,14 @@ function renderUnassignedDossiers() {
             })
             .join('');
 
-    renderDossierPagination();
+    renderNewDossierPagination();
 }
 
 
 async function claimDossier(taskId) {
 
     if (!taskId) {
-        showToast(
+        showNewDossierToast(
             'Nhận việc không thành công',
             'error'
         );
@@ -394,7 +394,7 @@ async function claimDossier(taskId) {
             localStorage.getItem('credit_scoring_user');
 
         if (!userJson) {
-            showToast(
+            showNewDossierToast(
                 'Nhận việc không thành công',
                 'error'
             );
@@ -406,7 +406,7 @@ async function claimDossier(taskId) {
         const userName = user?.userName;
 
         if (!userName) {
-            showToast(
+            showNewDossierToast(
                 'Nhận việc không thành công',
                 'error'
             );
@@ -464,7 +464,7 @@ async function claimDossier(taskId) {
 
         if (response.status !== 200) {
 
-            showToast(
+            showNewDossierToast(
                 'Nhận việc không thành công',
                 'error'
             );
@@ -492,7 +492,7 @@ async function claimDossier(taskId) {
                 error
             );
 
-            showToast(
+            showNewDossierToast(
                 'Nhận việc không thành công',
                 'error'
             );
@@ -509,7 +509,7 @@ async function claimDossier(taskId) {
 
             await loadUnassignedDossiers();
 
-            showToast(
+            showNewDossierToast(
                 'Nhận việc thành công',
                 'success'
             );
@@ -523,7 +523,7 @@ async function claimDossier(taskId) {
         // → lấy errorMsg từ backend
         // ==============================
 
-        showToast(
+        showNewDossierToast(
             data?.errorMsg ||
             'Nhận việc không thành công',
             'error'
@@ -536,14 +536,14 @@ async function claimDossier(taskId) {
             error
         );
 
-        showToast(
+        showNewDossierToast(
             'Nhận việc không thành công',
             'error'
         );
     }
 }
 
-function showToast(message, type = 'info') {
+function showNewDossierToast(message, type = 'info') {
     const toast = document.getElementById('toast');
     const toastMessage = document.getElementById('toastMessage');
 
@@ -582,11 +582,11 @@ function showToast(message, type = 'info') {
 }
 
 
-function updateDossierCount() {
+function updateNewDossierCount() {
 
     const countElement =
         document.getElementById(
-            'dossierCount'
+            'newDossierCount'
         );
 
     if (!countElement) {
@@ -598,11 +598,11 @@ function updateDossierCount() {
 }
 
 
-function renderDossierPagination() {
+function renderNewDossierPagination() {
 
     const pagination =
         document.getElementById(
-            'dossierPagination'
+            'dossierNewPagination'
         );
 
     if (!pagination) {
@@ -615,7 +615,7 @@ function renderDossierPagination() {
             newPageSizeDossier
         );
 
-    if (totalPages <= 1) {
+    if (totalPages < 1) {
 
         pagination.innerHTML = '';
 
@@ -629,7 +629,7 @@ function renderDossierPagination() {
             type="button"
             class="page-btn"
             ${newCurrentPageDossier === 1 ? 'disabled' : ''}
-            onclick="changeDossierPage(${newCurrentPageDossier - 1})">
+            onclick="changeNewDossierPage(${newCurrentPageDossier - 1})">
             ‹
         </button>
     `;
@@ -643,12 +643,11 @@ function renderDossierPagination() {
         html += `
             <button
                 type="button"
-                class="page-btn ${
-                    page === newCurrentPageDossier
-                        ? 'active'
-                        : ''
-                }"
-                onclick="changeDossierPage(${page})">
+                class="page-btn ${page === newCurrentPageDossier
+                ? 'active'
+                : ''
+            }"
+                onclick="changeNewDossierPage(${page})">
                 ${page}
             </button>
         `;
@@ -658,12 +657,11 @@ function renderDossierPagination() {
         <button
             type="button"
             class="page-btn"
-            ${
-                newCurrentPageDossier === totalPages
-                    ? 'disabled'
-                    : ''
-            }
-            onclick="changeDossierPage(${newCurrentPageDossier + 1})">
+            ${newCurrentPageDossier === totalPages
+            ? 'disabled'
+            : ''
+        }
+            onclick="changeNewDossierPage(${newCurrentPageDossier + 1})">
             ›
         </button>
     `;
@@ -672,7 +670,7 @@ function renderDossierPagination() {
 }
 
 
-function changeDossierPage(page) {
+function changeNewDossierPage(page) {
 
     const totalPages =
         Math.ceil(

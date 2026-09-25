@@ -1,16 +1,16 @@
-let inProgressDossiers = [];
+let rejectedDossiers = [];
 
-let inProgressCurrentPageDossier = 1;
+let rejectedCurrentPageDossier = 1;
 
-let inProgressPageSizeDossier = 5;
+let rejectedPageSizeDossier = 5;
 
 
-function loadInprogressDossiersPage() {
+function loadRejectedDossiersPage() {
 
     shell(
-        'processing-dossiers',
-        'Hồ sơ đang xử lý',
-        'Quản lý danh sách hồ sơ đang được xử lý'
+        'rejected-dossiers',
+        'Hồ sơ bị từ chối phê duyệt',
+        'Quản lý danh sách hồ sơ bị từ chối phê duyệt'
     );
 
     const pageContent = document.getElementById('page-content');
@@ -25,10 +25,10 @@ function loadInprogressDossiersPage() {
 
             <div class="card-header">
                 <div>
-                    <h3>Danh sách hồ sơ đang được xử lý</h3>
+                    <h3>Danh sách hồ sơ bị từ chối phê duyệt</h3>
                     <span>
                         Tổng số:
-                        <strong id="inProgressDossierCount">0</strong>
+                        <strong id="rejectedDossierCount">0</strong>
                         hồ sơ
                     </span>
                 </div>
@@ -36,7 +36,7 @@ function loadInprogressDossiersPage() {
                 <button
                     type="button"
                     class="btn-secondary"
-                    id="btnRefreshInProgressDossier">
+                    id="btnRefreshRejectedDossier">
                     ↻ Làm mới
                 </button>
             </div>
@@ -45,20 +45,20 @@ function loadInprogressDossiersPage() {
                 <table class="user-table">
 
                     <thead>
-    <tr>
-        <th>STT</th>
-        <th>ID</th>
-        <th>CIF</th>
-        <th>Loại giấy tờ</th>
-        <th>Số giấy tờ</th>
-        <th>Họ và tên</th>
-        <th>Mục đích vay</th>
-        <th>Thời hạn vay</th>
-        <th>Thao tác</th>
-    </tr>
-</thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>ID</th>
+                            <th>CIF</th>
+                            <th>Loại giấy tờ</th>
+                            <th>Số giấy tờ</th>
+                            <th>Họ và tên</th>
+                            <th>Mục đích vay</th>
+                            <th>Thời hạn vay</th>
+                            <th>Thao tác</th>
+                        </tr>
+                    </thead>
 
-                    <tbody id="dossierTableBody">
+                    <tbody id="rejectedDossierTableBody">
                         <tr>
                             <td colspan="9" class="loading-cell">
                                 Đang tải dữ liệu...
@@ -70,46 +70,45 @@ function loadInprogressDossiersPage() {
             </div>
 
             <div
-                id="dossierEmptyState"
+                id="rejectedDossierEmptyState"
                 class="empty-state"
                 style="display: none;">
-                Không có hồ sơ đang xử lý
+                Không có hồ sơ bị từ chối phê duyệt
             </div>
 
             <div
                 class="pagination"
-                id="dossierInProgressPagination">
+                id="rejectedDossierPagination">
             </div>
 
         </div>
     `;
 
-    registerInprogressDossierEvents();
+    registerRejectedDossierEvents();
 
-    loadInprogressDossiers();
+    loadRejectedDossiers();
 }
 
 
+function registerRejectedDossierEvents() {
 
-function registerInprogressDossierEvents() {
-
-    const btnRefreshInProgress = document.getElementById(
-        'btnRefreshInProgressDossier'
+    const btnRefresh = document.getElementById(
+        'btnRefreshRejectedDossier'
     );
 
-    if (btnRefreshInProgress) {
-        btnRefreshInProgress.addEventListener(
+    if (btnRefresh) {
+        btnRefresh.addEventListener(
             'click',
-            loadInprogressDossiersPage
+            loadRejectedDossiers
         );
     }
 }
 
 
-async function loadInprogressDossiers() {
+async function loadRejectedDossiers() {
 
     const tableBody = document.getElementById(
-        'dossierTableBody'
+        'rejectedDossierTableBody'
     );
 
     if (!tableBody) {
@@ -118,7 +117,7 @@ async function loadInprogressDossiers() {
 
     tableBody.innerHTML = `
         <tr>
-            <td colspan="8" class="loading-cell">
+            <td colspan="9" class="loading-cell">
                 Đang tải dữ liệu...
             </td>
         </tr>
@@ -126,17 +125,9 @@ async function loadInprogressDossiers() {
 
     try {
 
-        // const response = await fetch(
-        //     `${API_BASE_URL}/scoring/api/v1/scoring/IN_PROGRESS/applications`,
-        //     {
-        //         method: 'GET',
-        //         headers: {
-        //             'Content-Type': 'application/json'
-        //         }
-        //     }
-        // );
-
-        const userJson = localStorage.getItem('credit_scoring_user');
+        const userJson = localStorage.getItem(
+            'credit_scoring_user'
+        );
 
         if (!userJson) {
             throw new Error(
@@ -147,8 +138,9 @@ async function loadInprogressDossiers() {
         const user = JSON.parse(userJson);
 
         const userName = user?.userName;
+
+        // TODO: bỏ hard-code sau khi test xong
         // const roleGroup = user?.roleGroup;
-        //TODO: FIX CODE TO TEST
         const roleGroup = 'RB_RM';
 
         if (!userName || !roleGroup) {
@@ -156,14 +148,17 @@ async function loadInprogressDossiers() {
                 'Thông tin userName hoặc roleGroup không hợp lệ.'
             );
         }
-        // Request body
+
         const requestBody = {
             userName: userName,
             roleGroup: roleGroup,
-            status: 'IN_PROGRESS'
+            status: 'REJECTED'
         };
 
-        console.log('Call unassign tasks:', requestBody);
+        console.log(
+            'Call rejected dossiers:',
+            requestBody
+        );
 
         const response = await fetch(
             `${API_BASE_URL}/scoring/api/v1/scoring/applications/search`,
@@ -176,7 +171,8 @@ async function loadInprogressDossiers() {
             }
         );
 
-        console.log('call IN_PROGRESS')
+        console.log('Call REJECTED dossiers');
+
         const message = await response.text();
 
         if (!response.ok) {
@@ -212,62 +208,69 @@ async function loadInprogressDossiers() {
         }
 
         if (!message) {
-            inProgressDossiers = [];
+
+            rejectedDossiers = [];
+
         } else {
 
             const data = JSON.parse(message);
 
-            inProgressDossiers = Array.isArray(data)
+            rejectedDossiers = Array.isArray(data)
                 ? data
                 : [];
         }
 
-        inProgressCurrentPageDossier = 1;
+        rejectedCurrentPageDossier = 1;
 
-        renderDossiers();
+        renderRejectedDossiers();
 
     } catch (error) {
 
         console.error(
-            'Load unassigned inProgressDossiers error:',
+            'Load rejected dossiers error:',
             error
         );
 
-        inProgressDossiers = [];
+        rejectedDossiers = [];
 
         tableBody.innerHTML = `
             <tr>
-                <td colspan="8" class="error-cell">
+                <td colspan="9" class="error-cell">
                     ${escapeHtml(
-            error.message ||
-            'Không thể tải danh sách hồ sơ'
-        )}
+                        error.message ||
+                        'Không thể tải danh sách hồ sơ'
+                    )}
                 </td>
             </tr>
         `;
 
-        updateInProgressDossierCount();
+        updateRejectedDossierCount();
+
+        renderRejectedDossierPagination();
     }
 }
 
 
-function renderDossiers() {
+function renderRejectedDossiers() {
 
     const tableBody = document.getElementById(
-        'dossierTableBody'
+        'rejectedDossierTableBody'
     );
 
     const emptyState = document.getElementById(
-        'dossierEmptyState'
+        'rejectedDossierEmptyState'
     );
 
     if (!tableBody) {
         return;
     }
 
-    updateInProgressDossierCount();
+    updateRejectedDossierCount();
 
-    if (!inProgressDossiers || inProgressDossiers.length === 0) {
+    if (
+        !rejectedDossiers ||
+        rejectedDossiers.length === 0
+    ) {
 
         tableBody.innerHTML = '';
 
@@ -275,7 +278,7 @@ function renderDossiers() {
             emptyState.style.display = 'block';
         }
 
-        renderInProgressDossierPagination();
+        renderRejectedDossierPagination();
 
         return;
     }
@@ -285,15 +288,15 @@ function renderDossiers() {
     }
 
     const startIndex =
-        (inProgressCurrentPageDossier - 1) *
-        inProgressPageSizeDossier;
+        (rejectedCurrentPageDossier - 1) *
+        rejectedPageSizeDossier;
 
     const endIndex =
         startIndex +
-        inProgressPageSizeDossier;
+        rejectedPageSizeDossier;
 
     const pageDossiers =
-        inProgressDossiers.slice(
+        rejectedDossiers.slice(
             startIndex,
             endIndex
         );
@@ -308,63 +311,63 @@ function renderDossiers() {
                 return `
                     <tr>
 
-                        <td>${stt}</td>
-
                         <td>
-                            ${escapeHtml(
-                    dossier.id || ''
-                )}
+                            ${stt}
                         </td>
 
                         <td>
                             ${escapeHtml(
-                    dossier.cif || ''
-                )}
+                                dossier.id || ''
+                            )}
                         </td>
 
                         <td>
                             ${escapeHtml(
-                    dossier.legalDocType || ''
-                )}
+                                dossier.cif || ''
+                            )}
                         </td>
 
                         <td>
                             ${escapeHtml(
-                    dossier.legalDocNumber || ''
-                )}
+                                dossier.legalDocType || ''
+                            )}
                         </td>
 
                         <td>
                             ${escapeHtml(
-                    dossier.fullName || ''
-                )}
+                                dossier.legalDocNumber || ''
+                            )}
+                        </td>
+
+                        <td>
+                            ${escapeHtml(
+                                dossier.fullName || ''
+                            )}
                         </td>
 
                         <td>
                             ${formatLoanPurpose(
-                    dossier.loanPurpose
-                )}
+                                dossier.loanPurpose
+                            )}
                         </td>
 
                         <td>
                             ${escapeHtml(
-                    dossier.loanTerm
-                        ? dossier.loanTerm + ' tháng'
-                        : ''
-                )}
+                                dossier.loanTerm
+                                    ? dossier.loanTerm + ' tháng'
+                                    : ''
+                            )}
                         </td>
 
                         <td>
-                    
 
-
-<button
-    type="button"
-    class="btn-view-dossier"
-    title="Xem chi tiết"
-    onclick="viewInProgressDossier('${escapeJs(dossier.id)}')">
-    Xem chi tiết
-</button>
+                            <button
+                                type="button"
+                                class="btn-view-dossier"
+                                title="Xem chi tiết"
+                                onclick="viewRejectedDossier('${escapeJs(dossier.id)}')">
+                                Xem chi tiết
+                            </button>
 
                         </td>
 
@@ -374,30 +377,26 @@ function renderDossiers() {
             })
             .join('');
 
-    renderInProgressDossierPagination();
+    renderRejectedDossierPagination();
 }
 
-function viewInProgressDossier(applicationId) {
 
-    const dossier = inProgressDossiers.find(
+function viewRejectedDossier(applicationId) {
+
+    const dossier = rejectedDossiers.find(
         item => item.id === applicationId
     );
 
     if (!dossier) {
         console.error(
-            'Không tìm thấy hồ sơ:',
+            'Không tìm thấy hồ sơ bị từ chối phê duyệt:',
             applicationId
         );
         return;
     }
 
-    // if (!dossier.latestTaskId) {
-    //     alert('Hồ sơ chưa có task để xử lý.');
-    //     return;
-    // }
-
     console.log(
-        'Application ID:',
+        'Rejected Application ID:',
         dossier.id
     );
 
@@ -411,11 +410,12 @@ function viewInProgressDossier(applicationId) {
     );
 }
 
-function updateInProgressDossierCount() {
+
+function updateRejectedDossierCount() {
 
     const countElement =
         document.getElementById(
-            'inProgressDossierCount'
+            'rejectedDossierCount'
         );
 
     if (!countElement) {
@@ -423,15 +423,15 @@ function updateInProgressDossierCount() {
     }
 
     countElement.textContent =
-        inProgressDossiers.length;
+        rejectedDossiers.length;
 }
 
 
-function renderInProgressDossierPagination() {
+function renderRejectedDossierPagination() {
 
     const pagination =
         document.getElementById(
-            'dossierInProgressPagination'
+            'rejectedDossierPagination'
         );
 
     if (!pagination) {
@@ -440,8 +440,8 @@ function renderInProgressDossierPagination() {
 
     const totalPages =
         Math.ceil(
-            inProgressDossiers.length /
-            inProgressPageSizeDossier
+            rejectedDossiers.length /
+            rejectedPageSizeDossier
         );
 
     if (totalPages < 1) {
@@ -457,8 +457,12 @@ function renderInProgressDossierPagination() {
         <button
             type="button"
             class="page-btn"
-            ${inProgressCurrentPageDossier === 1 ? 'disabled' : ''}
-            onclick="changeInProgressDossierPage(${inProgressCurrentPageDossier - 1})">
+            ${
+                rejectedCurrentPageDossier === 1
+                    ? 'disabled'
+                    : ''
+            }
+            onclick="changeRejectedDossierPage(${rejectedCurrentPageDossier - 1})">
             ‹
         </button>
     `;
@@ -472,11 +476,12 @@ function renderInProgressDossierPagination() {
         html += `
             <button
                 type="button"
-                class="page-btn ${page === inProgressCurrentPageDossier
-                ? 'active'
-                : ''
-            }"
-                onclick="changeInProgressDossierPage(${page})">
+                class="page-btn ${
+                    page === rejectedCurrentPageDossier
+                        ? 'active'
+                        : ''
+                }"
+                onclick="changeRejectedDossierPage(${page})">
                 ${page}
             </button>
         `;
@@ -486,11 +491,12 @@ function renderInProgressDossierPagination() {
         <button
             type="button"
             class="page-btn"
-            ${inProgressCurrentPageDossier === totalPages
-            ? 'disabled'
-            : ''
-        }
-            onclick="changeInProgressDossierPage(${inProgressCurrentPageDossier + 1})">
+            ${
+                rejectedCurrentPageDossier === totalPages
+                    ? 'disabled'
+                    : ''
+            }
+            onclick="changeRejectedDossierPage(${rejectedCurrentPageDossier + 1})">
             ›
         </button>
     `;
@@ -499,12 +505,12 @@ function renderInProgressDossierPagination() {
 }
 
 
-function changeInProgressDossierPage(page) {
+function changeRejectedDossierPage(page) {
 
     const totalPages =
         Math.ceil(
-            inProgressDossiers.length /
-            inProgressPageSizeDossier
+            rejectedDossiers.length /
+            rejectedPageSizeDossier
         );
 
     if (
@@ -514,13 +520,13 @@ function changeInProgressDossierPage(page) {
         return;
     }
 
-    inProgressCurrentPageDossier = page;
+    rejectedCurrentPageDossier = page;
 
-    renderDossiers();
+    renderRejectedDossiers();
 }
 
 
-function formatLoanPurpose(value) {
+function formatRejectedLoanPurpose(value) {
 
     const purposeMap = {
         MUA_NHA: 'Mua nhà',

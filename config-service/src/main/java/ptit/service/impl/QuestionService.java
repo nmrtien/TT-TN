@@ -51,6 +51,7 @@ public class QuestionService implements IQuestion {
             return result;
         }
         question.setQuestionCode(questionSaved.getQuestionCode());
+        question.setModelCode(questionSaved.getModelCode());
         return saveQuestion(question);
     }
 

@@ -9,6 +9,8 @@ import java.util.Set;
 
 public interface CreditTaskRepository extends MongoRepository<CreditTask, String> {
 
+    List<CreditTask> findAllByApplicationId(String applicationId);
+
     List<CreditTask> findAllByApplicationIdIn(Set<String> applicationIds);
 
     List<CreditTask> findAllByRoleGroupAndAssigneeIsNull(RoleGroup roleGroup);

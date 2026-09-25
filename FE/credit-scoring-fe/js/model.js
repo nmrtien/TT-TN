@@ -216,7 +216,7 @@ function loadModelsPage() {
         <button
             type="button"
             class="modal-close"
-            id="btnCloseFormModal">
+            id="btnCloseModelFormModal">
 
             ×
 
@@ -344,8 +344,8 @@ function loadModelsPage() {
         Danh sách câu hỏi <span class="required">*</span>
     </label>
 
-    <div id="questionSelection" class="question-selection">
-        <div class="question-loading">
+    <div id="questionSelection" class="question-model-selection">
+        <div class="question-model-loading">
             Đang tải danh sách câu hỏi...
         </div>
     </div>
@@ -398,7 +398,7 @@ function loadModelsPage() {
             <button
                 type="button"
                 class="modal-close"
-                id="btnCloseDetailModal">
+                id="btnCloseModelDetailModal">
                 ×
             </button>
         </div>
@@ -462,8 +462,8 @@ function loadModelsPage() {
         Danh sách câu hỏi <span class="required">*</span>
     </label>
 
-    <div id="detailQuestionSelection" class="question-selection">
-        <div class="question-loading">
+    <div id="detailQuestionSelection" class="question-model-selection">
+        <div class="question-model-loading">
             Đang tải danh sách câu hỏi...
         </div>
     </div>
@@ -477,14 +477,14 @@ function loadModelsPage() {
 
             <button
                 type="button"
-                id="btnCloseDetail"
+                id="btnCloseModelDetail"
                 class="btn btn-secondary">
                 Đóng
             </button>
 
             <button
                 type="button"
-                id="btnSaveDetail"
+                id="btnSaveModelDetail"
                 class="btn btn-primary">
                 Lưu thay đổi
             </button>
@@ -507,7 +507,7 @@ function loadModelsPage() {
 
     `;
 
-    registerEvents();
+    registerModelEvents();
 
     loadModels();
 }
@@ -520,7 +520,7 @@ function renderDetailQuestionSelection(selectedQuestions) {
 
     if (!questionsForModel || questionsForModel.length === 0) {
         container.innerHTML = `
-            <div class="question-empty">
+            <div class="question-model-empty">
                 Chưa có câu hỏi nào
             </div>
         `;
@@ -539,21 +539,21 @@ function renderDetailQuestionSelection(selectedQuestions) {
         );
 
         return `
-            <label class="question-option">
+            <label class="question-model-option">
                 <input
                     type="checkbox"
-                    class="detail-question-checkbox"
+                    class="detail-question-model-checkbox"
                     value="${escapeHtml(question.id)}"
                     ${checked ? 'checked' : ''}
                 >
 
-                <div class="question-option-content">
-                    <div class="question-header">
-                        <span class="question-code">
+                <div class="question-model-option-content">
+                    <div class="question-model-header">
+                        <span class="question-model-code">
                             ${escapeHtml(question.questionCode || '')}
                         </span>
 
-                        <span class="question-name">
+                        <span class="question-model-name">
                             ${escapeHtml(question.questionName || '')}
                         </span>
                     </div>
@@ -567,7 +567,7 @@ function renderDetailQuestionSelection(selectedQuestions) {
 // DOM EVENTS
 // ===============================
 
-function registerEvents() {
+function registerModelEvents() {
 
     // ==========================================
     // NÚT TẠO mô hình
@@ -578,7 +578,7 @@ function registerEvents() {
     if (btnCreateModel) {
         btnCreateModel.addEventListener(
             'click',
-            openCreateModal
+            openCreateModelModal
         );
     }
 
@@ -592,7 +592,7 @@ function registerEvents() {
     if (ModelForm) {
         ModelForm.addEventListener(
             'submit',
-            handleFormSubmit
+            handleModelFormSubmit
         );
     }
 
@@ -600,13 +600,13 @@ function registerEvents() {
     // ==========================================
     // MODAL FORM - NÚT X
     // ==========================================
-    const btnCloseFormModal =
-        document.getElementById('btnCloseFormModal');
+    const btnCloseModelFormModal =
+        document.getElementById('btnCloseModelFormModal');
 
-    if (btnCloseFormModal) {
-        btnCloseFormModal.addEventListener(
+    if (btnCloseModelFormModal) {
+        btnCloseModelFormModal.addEventListener(
             'click',
-            closeFormModal
+            closeModelFormModal
         );
     }
 
@@ -620,7 +620,7 @@ function registerEvents() {
     if (btnCancelForm) {
         btnCancelForm.addEventListener(
             'click',
-            closeFormModal
+            closeModelFormModal
         );
     }
 
@@ -642,13 +642,13 @@ function registerEvents() {
     // ==========================================
     // MODAL DETAIL - NÚT X
     // ==========================================
-    const btnCloseDetailModal =
-        document.getElementById('btnCloseDetailModal');
+    const btnCloseModelDetailModal =
+        document.getElementById('btnCloseModelDetailModal');
 
-    if (btnCloseDetailModal) {
-        btnCloseDetailModal.addEventListener(
+    if (btnCloseModelDetailModal) {
+        btnCloseModelDetailModal.addEventListener(
             'click',
-            closeDetailModal
+            closeModelDetailModal
         );
     }
 
@@ -656,13 +656,13 @@ function registerEvents() {
     // ==========================================
     // MODAL DETAIL - NÚT ĐÓNG
     // ==========================================
-    const btnCloseDetail =
-        document.getElementById('btnCloseDetail');
+    const btnCloseModelDetail =
+        document.getElementById('btnCloseModelDetail');
 
-    if (btnCloseDetail) {
-        btnCloseDetail.addEventListener(
+    if (btnCloseModelDetail) {
+        btnCloseModelDetail.addEventListener(
             'click',
-            closeDetailModal
+            closeModelDetailModal
         );
     }
 
@@ -670,13 +670,13 @@ function registerEvents() {
     // ==========================================
     // MODAL DETAIL - NÚT CẬP NHẬT
     // ==========================================
-    const btnSaveDetail =
-    document.getElementById('btnSaveDetail');
+    const btnSaveModelDetail =
+    document.getElementById('btnSaveModelDetail');
 
-if (btnSaveDetail) {
-    btnSaveDetail.addEventListener(
+if (btnSaveModelDetail) {
+    btnSaveModelDetail.addEventListener(
         'click',
-        handleDetailSave
+        handleModelDetailSave
     );
 }
 
@@ -694,7 +694,7 @@ if (btnSaveDetail) {
             function (event) {
 
                 if (event.target === ModelFormModal) {
-                    closeFormModal();
+                    closeModelFormModal();
                 }
 
             }
@@ -715,7 +715,7 @@ if (btnSaveDetail) {
             function (event) {
 
                 if (event.target === ModelDetailModal) {
-                    closeDetailModal();
+                    closeModelDetailModal();
                 }
 
             }
@@ -748,14 +748,14 @@ if (btnSaveDetail) {
                 formModal &&
                 formModal.classList.contains('show')
             ) {
-                closeFormModal();
+                closeModelFormModal();
             }
 
             if (
                 detailModal &&
                 detailModal.classList.contains('show')
             ) {
-                closeDetailModal();
+                closeModelDetailModal();
             }
 
         }
@@ -763,7 +763,7 @@ if (btnSaveDetail) {
 }
 
 
-async function handleDetailSave() {
+async function handleModelDetailSave() {
     if (!selectedModel) return;
 
     const id = document.getElementById('detailId').value;
@@ -783,12 +783,12 @@ async function handleDetailSave() {
     const modelLevel = Number(modelLevelInput.value);
 
     if (!modelCode) {
-        showToast('Vui lòng nhập mã mô hình', 'error');
+        showModelToast('Vui lòng nhập mã mô hình', 'error');
         return;
     }
 
     if (!modelName) {
-        showToast('Vui lòng nhập tên mô hình', 'error');
+        showModelToast('Vui lòng nhập tên mô hình', 'error');
         return;
     }
 
@@ -797,7 +797,7 @@ async function handleDetailSave() {
         modelLevel < 1 ||
         modelLevel > 3
     ) {
-        showToast(
+        showModelToast(
             'Cấp mô hình phải là số nguyên từ 1 đến 3',
             'error'
         );
@@ -807,7 +807,7 @@ async function handleDetailSave() {
     const selectedQuestions = getSelectedDetailQuestions();
 
     if (selectedQuestions.length === 0) {
-        showToast(
+        showModelToast(
             'Vui lòng chọn ít nhất một câu hỏi',
             'error'
         );
@@ -815,12 +815,12 @@ async function handleDetailSave() {
     }
 
     try {
-        const btnSaveDetail =
-            document.getElementById('btnSaveDetail');
+        const btnSaveModelDetail =
+            document.getElementById('btnSaveModelDetail');
 
-        if (btnSaveDetail) {
-            btnSaveDetail.disabled = true;
-            btnSaveDetail.textContent = 'Đang lưu...';
+        if (btnSaveModelDetail) {
+            btnSaveModelDetail.disabled = true;
+            btnSaveModelDetail.textContent = 'Đang lưu...';
         }
 
         console.log('UPDATE DETAIL MODEL:', {
@@ -844,27 +844,27 @@ async function handleDetailSave() {
         selectedModel.modelLevel = modelLevel;
         selectedModel.questions = selectedQuestions;
 
-        closeDetailModal();
+        closeModelDetailModal();
 
         await loadModels();
 
-        showToast('Cập nhật mô hình thành công', 'success');
+        showModelToast('Cập nhật mô hình thành công', 'success');
 
     } catch (error) {
         console.error('Update Model error:', error);
 
-        showToast(
+        showModelToast(
             error.message || 'Cập nhật mô hình thất bại',
             'error'
         );
 
     } finally {
-        const btnSaveDetail =
-            document.getElementById('btnSaveDetail');
+        const btnSaveModelDetail =
+            document.getElementById('btnSaveModelDetail');
 
-        if (btnSaveDetail) {
-            btnSaveDetail.disabled = false;
-            btnSaveDetail.textContent = 'Lưu thay đổi';
+        if (btnSaveModelDetail) {
+            btnSaveModelDetail.disabled = false;
+            btnSaveModelDetail.textContent = 'Lưu thay đổi';
         }
     }
 }
@@ -921,7 +921,7 @@ try {
         `;
     }
 
-    showToast(
+    showModelToast(
         error.message || 'Có lỗi xảy ra khi tải danh sách mô hình',
         'error'
     );
@@ -1091,7 +1091,7 @@ renderModelDetail(Model);
                 error.message || 'Không thể tải thông tin mô hình';
         }
 
-        showToast(
+        showModelToast(
             error.message || 'Không thể tải thông tin mô hình',
             'error'
         );
@@ -1101,7 +1101,7 @@ renderModelDetail(Model);
 
 function getSelectedDetailQuestions() {
     const checkboxes = document.querySelectorAll(
-        '#detailQuestionSelection .detail-question-checkbox:checked'
+        '#detailQuestionSelection .detail-question-model-checkbox:checked'
     );
 
     return Array.from(checkboxes)
@@ -1150,7 +1150,7 @@ function renderModelDetail(Model) {
 // OPEN CREATE
 // ===============================
 
-function openCreateModal() {
+function openCreateModelModal() {
     formModeModel = 'create';
     selectedModel = null;
 
@@ -1202,7 +1202,7 @@ const Model = models.find(
 
 if (!Model) {
 
-    showToast(
+    showModelToast(
         'Không tìm thấy mô hình',
         'error'
     );
@@ -1210,11 +1210,11 @@ if (!Model) {
     return;
 }
 
-openUpdateModal(Model);
+openModelUpdateModal(Model);
 
 }
 
-function openUpdateModal(Model) {
+function openModelUpdateModal(Model) {
 formModeModel = 'update';
 selectedModel = Model;
 const modal = document.getElementById('ModelFormModal');
@@ -1244,16 +1244,16 @@ if (modelName) {
 // SUBMIT CREATE / UPDATE
 // ===============================
 
-async function handleFormSubmit(event) {
+async function handleModelFormSubmit(event) {
     event.preventDefault();
     const modelCode = document.getElementById('modelCode').value.trim();
     const modelName = document.getElementById('modelName').value.trim();
     if (!modelCode) {
-        showToast('Vui lòng nhập mã mô hình', 'error');
+        showModelToast('Vui lòng nhập mã mô hình', 'error');
         return;
     }
     if (!modelName) {
-        showToast('Vui lòng nhập tên mô hình', 'error');
+        showModelToast('Vui lòng nhập tên mô hình', 'error');
         return;
     }
     const modelLevelInput = document.getElementById('modelLevel');
@@ -1262,7 +1262,7 @@ async function handleFormSubmit(event) {
     console.log('modelLevel: '+modelLevel);
     console.log('Number.isInteger(modelLevel): '+Number.isInteger(modelLevel));
 if (!Number.isInteger(modelLevel) || modelLevel < 1 || modelLevel > 3) {
-    showToast('Cấp mô hình phải là số nguyên từ 1 đến 3', 'error');
+    showModelToast('Cấp mô hình phải là số nguyên từ 1 đến 3', 'error');
     return;
 }
     const submitButton =
@@ -1272,7 +1272,7 @@ if (!Number.isInteger(modelLevel) || modelLevel < 1 || modelLevel > 3) {
 
 console.log('selectedQuestions:', selectedQuestions);
 if (selectedQuestions.length === 0) {
-        showToast('Vui lòng chọn ít nhất một câu hỏi', 'error');
+        showModelToast('Vui lòng chọn ít nhất một câu hỏi', 'error');
         return;
     }
         setFormLoading(true);
@@ -1284,9 +1284,9 @@ if (selectedQuestions.length === 0) {
                 selectedQuestions
             );
             // 200 OK
-            closeFormModal();
+            closeModelFormModal();
             await loadModels();
-            showToast(
+            showModelToast(
                 'THÀNH CÔNG',
                 'success'
             );
@@ -1299,9 +1299,9 @@ if (selectedQuestions.length === 0) {
                 selectedQuestions
             );
             // 200 OK
-            closeFormModal();
+            closeModelFormModal();
             await loadModels();
-            showToast(
+            showModelToast(
                 'THÀNH CÔNG',
                 'success'
             );
@@ -1311,7 +1311,7 @@ if (selectedQuestions.length === 0) {
         console.error('Submit Model error:', error);
         // 400 / 500...
         // Giữ nguyên modal để user sửa dữ liệu
-        showToast(
+        showModelToast(
             error.message || 'Có lỗi xảy ra',
             'error'
         );
@@ -1401,7 +1401,7 @@ function openDetailModal() {
     }
 }
 
-function closeDetailModal() {
+function closeModelDetailModal() {
     const modal =
         document.getElementById('ModelDetailModal');
 
@@ -1413,7 +1413,7 @@ function closeDetailModal() {
     selectedModel = null;
 }
 
-function closeFormModal() {
+function closeModelFormModal() {
     const modal =
         document.getElementById('ModelFormModal');
 
@@ -1518,7 +1518,7 @@ try {
 // TOAST
 // ===============================
 
-function showToast(message, type = 'info') {
+function showModelToast(message, type = 'info') {
     const toast = document.getElementById('toast');
     const toastMessage = document.getElementById('toastMessage');
 
@@ -1561,7 +1561,7 @@ async function loadQuestionsForModel(apiUrl) {
 
     if (container) {
         container.innerHTML = `
-            <div class="question-loading">
+            <div class="question-model-loading">
                 Đang tải danh sách câu hỏi...
             </div>
         `;
@@ -1595,13 +1595,13 @@ async function loadQuestionsForModel(apiUrl) {
 
         if (container) {
             container.innerHTML = `
-                <div class="question-error">
+                <div class="question-model-error">
                     Không thể tải danh sách câu hỏi
                 </div>
             `;
         }
 
-        showToast(error.message || 'Không thể tải danh sách câu hỏi', 'error');
+        showModelToast(error.message || 'Không thể tải danh sách câu hỏi', 'error');
     }
 }
 
@@ -1613,7 +1613,7 @@ function renderQuestionSelection() {
 
     if (!questionsForModel || questionsForModel.length === 0) {
         container.innerHTML = `
-            <div class="question-empty">
+            <div class="question-model-empty">
                 Chưa có câu hỏi nào
             </div>
         `;
@@ -1628,21 +1628,21 @@ function renderQuestionSelection() {
         const checked = selectedQuestionIds.has(question.id);
 
         return `
-            <label class="question-option">
+            <label class="question-model-option">
     <input
         type="checkbox"
-        class="question-checkbox"
+        class="question-model-checkbox"
         value="${escapeHtml(question.id)}"
         ${checked ? 'checked' : ''}
     >
 
-    <div class="question-option-content">
-        <div class="question-header">
-            <span class="question-code">
+    <div class="question-model-option-content">
+        <div class="question-model-header">
+            <span class="question-model-code">
                 ${escapeHtml(question.questionCode || '')}
             </span>
 
-            <span class="question-name">
+            <span class="question-model-name">
                 ${escapeHtml(question.questionName || '')}
             </span>
         </div>
@@ -1655,7 +1655,7 @@ function renderQuestionSelection() {
 
 function getSelectedQuestions() {
     const checkboxes = document.querySelectorAll(
-        '#questionSelection .question-checkbox:checked'
+        '#questionSelection .question-model-checkbox:checked'
     );
 
     return Array.from(checkboxes)

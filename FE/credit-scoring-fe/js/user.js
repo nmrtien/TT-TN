@@ -216,7 +216,7 @@ function loadUsersPage() {
                     <button
                         type="button"
                         class="modal-close"
-                        id="btnCloseFormModal">
+                        id="btnCloseUserFormModal">
 
                         ×
 
@@ -534,7 +534,7 @@ function loadUsersPage() {
                     <button
                         type="button"
                         class="modal-close"
-                        id="btnCloseDetailModal">
+                        id="btnCloseUserDetailModal">
 
                         ×
 
@@ -732,7 +732,7 @@ function loadUsersPage() {
 
                     <button
                         type="button"
-                        id="btnCloseDetail"
+                        id="btnCloseUserDetail"
                         class="btn btn-secondary">
 
                         Đóng
@@ -742,7 +742,7 @@ function loadUsersPage() {
 
                     <button
                         type="button"
-                        id="btnSaveDetail"
+                        id="btnSaveUserDetail"
                         class="btn btn-primary">
 
                         Lưu thay đổi
@@ -770,7 +770,7 @@ function loadUsersPage() {
 
     `;
 
-    registerEvents();
+    registerUserEvents();
 
     loadUsers();
 }
@@ -780,7 +780,7 @@ function loadUsersPage() {
 // DOM EVENTS
 // ===============================
 
-function registerEvents() {
+function registerUserEvents() {
 
     // ==========================================
     // TẠO NGƯỜI DÙNG
@@ -792,7 +792,7 @@ function registerEvents() {
     if (btnCreateUser) {
         btnCreateUser.addEventListener(
             'click',
-            openCreateModal
+            openCreateUserModal
         );
     }
 
@@ -807,7 +807,7 @@ function registerEvents() {
     if (userForm) {
         userForm.addEventListener(
             'submit',
-            handleFormSubmit
+            handleUserFormSubmit
         );
     }
 
@@ -816,13 +816,13 @@ function registerEvents() {
     // ĐÓNG FORM - NÚT X
     // ==========================================
 
-    const btnCloseFormModal =
-        document.getElementById('btnCloseFormModal');
+    const btnCloseUserFormModal =
+        document.getElementById('btnCloseUserFormModal');
 
-    if (btnCloseFormModal) {
-        btnCloseFormModal.addEventListener(
+    if (btnCloseUserFormModal) {
+        btnCloseUserFormModal.addEventListener(
             'click',
-            closeFormModal
+            closeUserFormModal
         );
     }
 
@@ -837,7 +837,7 @@ function registerEvents() {
     if (btnCancelForm) {
         btnCancelForm.addEventListener(
             'click',
-            closeFormModal
+            closeUserFormModal
         );
     }
 
@@ -861,13 +861,13 @@ function registerEvents() {
     // DETAIL - NÚT X
     // ==========================================
 
-    const btnCloseDetailModal =
-        document.getElementById('btnCloseDetailModal');
+    const btnCloseUserDetailModal =
+        document.getElementById('btnCloseUserDetailModal');
 
-    if (btnCloseDetailModal) {
-        btnCloseDetailModal.addEventListener(
+    if (btnCloseUserDetailModal) {
+        btnCloseUserDetailModal.addEventListener(
             'click',
-            closeDetailModal
+            closeUserDetailModal
         );
     }
 
@@ -876,13 +876,13 @@ function registerEvents() {
     // DETAIL - NÚT ĐÓNG
     // ==========================================
 
-    const btnCloseDetail =
-        document.getElementById('btnCloseDetail');
+    const btnCloseUserDetail =
+        document.getElementById('btnCloseUserDetail');
 
-    if (btnCloseDetail) {
-        btnCloseDetail.addEventListener(
+    if (btnCloseUserDetail) {
+        btnCloseUserDetail.addEventListener(
             'click',
-            closeDetailModal
+            closeUserDetailModal
         );
     }
 
@@ -891,13 +891,13 @@ function registerEvents() {
     // DETAIL - LƯU THAY ĐỔI
     // ==========================================
 
-    const btnSaveDetail =
-        document.getElementById('btnSaveDetail');
+    const btnSaveUserDetail =
+        document.getElementById('btnSaveUserDetail');
 
-    if (btnSaveDetail) {
-        btnSaveDetail.addEventListener(
+    if (btnSaveUserDetail) {
+        btnSaveUserDetail.addEventListener(
             'click',
-            handleDetailSave
+            handleUserDetailSave
         );
     }
 
@@ -916,7 +916,7 @@ function registerEvents() {
             function (event) {
 
                 if (event.target === userFormModal) {
-                    closeFormModal();
+                    closeUserFormModal();
                 }
 
             }
@@ -939,7 +939,7 @@ function registerEvents() {
             function (event) {
 
                 if (event.target === userDetailModal) {
-                    closeDetailModal();
+                    closeUserDetailModal();
                 }
 
             }
@@ -972,7 +972,7 @@ function registerEvents() {
                 formModal &&
                 formModal.classList.contains('show')
             ) {
-                closeFormModal();
+                closeUserFormModal();
             }
 
 
@@ -980,7 +980,7 @@ function registerEvents() {
                 detailModal &&
                 detailModal.classList.contains('show')
             ) {
-                closeDetailModal();
+                closeUserDetailModal();
             }
 
         }
@@ -989,7 +989,7 @@ function registerEvents() {
 }
 
 
-async function handleDetailSave() {
+async function handleUserDetailSave() {
 
     if (!selectedUser) {
         return;
@@ -1035,7 +1035,7 @@ async function handleDetailSave() {
     // ===============================
 
     if (!userName) {
-        showToast(
+        showUserToast(
             'Vui lòng nhập tên đăng nhập',
             'error'
         );
@@ -1043,7 +1043,7 @@ async function handleDetailSave() {
     }
 
     if (!fullName) {
-        showToast(
+        showUserToast(
             'Vui lòng nhập họ và tên',
             'error'
         );
@@ -1051,7 +1051,7 @@ async function handleDetailSave() {
     }
 
     if (!email) {
-        showToast(
+        showUserToast(
             'Vui lòng nhập email',
             'error'
         );
@@ -1059,7 +1059,7 @@ async function handleDetailSave() {
     }
 
     if (!phone) {
-        showToast(
+        showUserToast(
             'Vui lòng nhập số điện thoại',
             'error'
         );
@@ -1067,7 +1067,7 @@ async function handleDetailSave() {
     }
 
     if (!birthday) {
-        showToast(
+        showUserToast(
             'Vui lòng nhập ngày sinh',
             'error'
         );
@@ -1075,7 +1075,7 @@ async function handleDetailSave() {
     }
 
     if (!position) {
-        showToast(
+        showUserToast(
             'Vui lòng nhập chức vụ',
             'error'
         );
@@ -1083,7 +1083,7 @@ async function handleDetailSave() {
     }
 
     if (!roleGroup) {
-        showToast(
+        showUserToast(
             'Vui lòng nhập nhóm quyền',
             'error'
         );
@@ -1095,14 +1095,14 @@ async function handleDetailSave() {
     // SAVE
     // ===============================
 
-    const btnSaveDetail =
-        document.getElementById('btnSaveDetail');
+    const btnSaveUserDetail =
+        document.getElementById('btnSaveUserDetail');
 
     try {
 
-        if (btnSaveDetail) {
-            btnSaveDetail.disabled = true;
-            btnSaveDetail.textContent = 'Đang lưu...';
+        if (btnSaveUserDetail) {
+            btnSaveUserDetail.disabled = true;
+            btnSaveUserDetail.textContent = 'Đang lưu...';
         }
 
         await updateUser({
@@ -1136,7 +1136,7 @@ async function handleDetailSave() {
         // ĐÓNG MODAL
         // ===============================
 
-        closeDetailModal();
+        closeUserDetailModal();
 
 
         // ===============================
@@ -1150,7 +1150,7 @@ async function handleDetailSave() {
         // THÔNG BÁO
         // ===============================
 
-        showToast(
+        showUserToast(
             'Cập nhật người dùng thành công',
             'success'
         );
@@ -1162,7 +1162,7 @@ async function handleDetailSave() {
             error
         );
 
-        showToast(
+        showUserToast(
             error.message ||
             'Cập nhật người dùng thất bại',
             'error'
@@ -1170,9 +1170,9 @@ async function handleDetailSave() {
 
     } finally {
 
-        if (btnSaveDetail) {
-            btnSaveDetail.disabled = false;
-            btnSaveDetail.textContent =
+        if (btnSaveUserDetail) {
+            btnSaveUserDetail.disabled = false;
+            btnSaveUserDetail.textContent =
                 'Lưu thay đổi';
         }
     }
@@ -1252,7 +1252,7 @@ async function loadUsers() {
             userCount.textContent = '0';
         }
 
-        showToast(
+        showUserToast(
             error.message ||
             'Có lỗi xảy ra khi tải danh sách người dùng',
             'error'
@@ -1501,7 +1501,7 @@ async function viewUser(id) {
             content.classList.add('hidden');
         }
 
-        showToast(
+        showUserToast(
             error.message ||
             'Không thể tải thông tin người dùng',
             'error'
@@ -1582,7 +1582,7 @@ function renderUserDetail(user) {
 // OPEN CREATE
 // ===============================
 
-function openCreateModal() {
+function openCreateUserModal() {
     const modal =
         document.getElementById('userFormModal');
 
@@ -1697,17 +1697,17 @@ function editUser(id) {
     );
 
     if (!user) {
-        showToast(
+        showUserToast(
             'Không tìm thấy người dùng',
             'error'
         );
         return;
     }
 
-    openUpdateModal(user);
+    openUserUpdateModal(user);
 }
 
-function openUpdateModal(user) {
+function openUserUpdateModal(user) {
     const modal =
         document.getElementById('userFormModal');
 
@@ -1807,7 +1807,7 @@ function openUpdateModal(user) {
 // SUBMIT CREATE / UPDATE
 // ===============================
 
-async function handleFormSubmit(event) {
+async function handleUserFormSubmit(event) {
     event.preventDefault();
 
     const id =
@@ -1839,7 +1839,7 @@ async function handleFormSubmit(event) {
         document.getElementById('status').value;
 
     if (!userName) {
-        showToast(
+        showUserToast(
             'Vui lòng nhập tên đăng nhập',
             'error'
         );
@@ -1848,7 +1848,7 @@ async function handleFormSubmit(event) {
 
 
     if (!fullName) {
-        showToast(
+        showUserToast(
             'Vui lòng nhập họ và tên',
             'error'
         );
@@ -1856,7 +1856,7 @@ async function handleFormSubmit(event) {
     }
 
     if (!email) {
-        showToast(
+        showUserToast(
             'Vui lòng nhập email',
             'error'
         );
@@ -1864,7 +1864,7 @@ async function handleFormSubmit(event) {
     }
 
     if (!phone) {
-        showToast(
+        showUserToast(
             'Vui lòng nhập số điện thoại',
             'error'
         );
@@ -1872,7 +1872,7 @@ async function handleFormSubmit(event) {
     }
 
     if (!birthday) {
-        showToast(
+        showUserToast(
             'Vui lòng nhập ngày sinh',
             'error'
         );
@@ -1880,7 +1880,7 @@ async function handleFormSubmit(event) {
     }
 
     if (!position) {
-        showToast(
+        showUserToast(
             'Vui lòng nhập chức vụ',
             'error'
         );
@@ -1888,7 +1888,7 @@ async function handleFormSubmit(event) {
     }
 
     if (!roleGroup) {
-        showToast(
+        showUserToast(
             'Vui lòng nhập nhóm quyền',
             'error'
         );
@@ -1922,7 +1922,7 @@ async function handleFormSubmit(event) {
         if (formModeUser === 'create') {
             await createUser(userData);
 
-            showToast(
+            showUserToast(
                 'Tạo người dùng thành công',
                 'success'
             );
@@ -1932,13 +1932,13 @@ async function handleFormSubmit(event) {
                 ...userData
             });
 
-            showToast(
+            showUserToast(
                 'Cập nhật người dùng thành công',
                 'success'
             );
         }
 
-        closeFormModal();
+        closeUserFormModal();
         await loadUsers();
 
     } catch (error) {
@@ -1947,7 +1947,7 @@ async function handleFormSubmit(event) {
             error
         );
 
-        showToast(
+        showUserToast(
             error.message ||
             'Lưu người dùng thất bại',
             'error'
@@ -2047,7 +2047,7 @@ function openDetailModal(user) {
     modal.classList.add('show');
 }
 
-function closeDetailModal() {
+function closeUserDetailModal() {
     const modal =
         document.getElementById('userDetailModal');
 
@@ -2059,7 +2059,7 @@ function closeDetailModal() {
     selectedUser = null;
 }
 
-function closeFormModal() {
+function closeUserFormModal() {
     const modal =
         document.getElementById('userFormModal');
 
@@ -2163,7 +2163,7 @@ try {
 // TOAST
 // ===============================
 
-function showToast(message, type = 'info') {
+function showUserToast(message, type = 'info') {
     const toast = document.getElementById('toast');
     const toastMessage = document.getElementById('toastMessage');
 

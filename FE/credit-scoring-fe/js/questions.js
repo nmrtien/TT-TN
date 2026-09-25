@@ -128,7 +128,7 @@ function loadQuestionsPage() {
         <button
             type="button"
             class="modal-close"
-            id="btnCloseFormModal">
+            id="btnCloseQuestionFormModal">
 
             ×
 
@@ -275,7 +275,7 @@ function loadQuestionsPage() {
             <button
                 type="button"
                 class="modal-close"
-                id="btnCloseDetailModal">
+                id="btnCloseQuestionDetailModal">
                 ×
             </button>
         </div>
@@ -322,14 +322,14 @@ function loadQuestionsPage() {
 
             <button
                 type="button"
-                id="btnCloseDetail"
+                id="btnCloseQuestionDetail"
                 class="btn btn-secondary">
                 Đóng
             </button>
 
             <button
                 type="button"
-                id="btnSaveDetail"
+                id="btnSaveQuestionDetail"
                 class="btn btn-primary">
                 Lưu thay đổi
             </button>
@@ -352,7 +352,7 @@ function loadQuestionsPage() {
 
     `;
 
-    registerEvents();
+    registerQuestionEvents();
 
     loadQuestions();
 }
@@ -362,7 +362,7 @@ function loadQuestionsPage() {
 // DOM EVENTS
 // ===============================
 
-function registerEvents() {
+function registerQuestionEvents() {
 
     // ==========================================
     // NÚT TẠO CÂU HỎI
@@ -373,7 +373,7 @@ function registerEvents() {
     if (btnCreateQuestion) {
         btnCreateQuestion.addEventListener(
             'click',
-            openCreateModal
+            openCreateQuestionModal
         );
     }
 
@@ -387,7 +387,7 @@ function registerEvents() {
     if (questionForm) {
         questionForm.addEventListener(
             'submit',
-            handleFormSubmit
+            handleQuestionFormSubmit
         );
     }
 
@@ -395,13 +395,13 @@ function registerEvents() {
     // ==========================================
     // MODAL FORM - NÚT X
     // ==========================================
-    const btnCloseFormModal =
-        document.getElementById('btnCloseFormModal');
+    const btnCloseQuestionFormModal =
+        document.getElementById('btnCloseQuestionFormModal');
 
-    if (btnCloseFormModal) {
-        btnCloseFormModal.addEventListener(
+    if (btnCloseQuestionFormModal) {
+        btnCloseQuestionFormModal.addEventListener(
             'click',
-            closeFormModal
+            closeQuestionFormModal
         );
     }
 
@@ -415,7 +415,7 @@ function registerEvents() {
     if (btnCancelForm) {
         btnCancelForm.addEventListener(
             'click',
-            closeFormModal
+            closeQuestionFormModal
         );
     }
 
@@ -437,13 +437,13 @@ function registerEvents() {
     // ==========================================
     // MODAL DETAIL - NÚT X
     // ==========================================
-    const btnCloseDetailModal =
-        document.getElementById('btnCloseDetailModal');
+    const btnCloseQuestionDetailModal =
+        document.getElementById('btnCloseQuestionDetailModal');
 
-    if (btnCloseDetailModal) {
-        btnCloseDetailModal.addEventListener(
+    if (btnCloseQuestionDetailModal) {
+        btnCloseQuestionDetailModal.addEventListener(
             'click',
-            closeDetailModal
+            closeQuestionDetailModal
         );
     }
 
@@ -451,13 +451,13 @@ function registerEvents() {
     // ==========================================
     // MODAL DETAIL - NÚT ĐÓNG
     // ==========================================
-    const btnCloseDetail =
-        document.getElementById('btnCloseDetail');
+    const btnCloseQuestionDetail =
+        document.getElementById('btnCloseQuestionDetail');
 
-    if (btnCloseDetail) {
-        btnCloseDetail.addEventListener(
+    if (btnCloseQuestionDetail) {
+        btnCloseQuestionDetail.addEventListener(
             'click',
-            closeDetailModal
+            closeQuestionDetailModal
         );
     }
 
@@ -465,13 +465,13 @@ function registerEvents() {
     // ==========================================
     // MODAL DETAIL - NÚT CẬP NHẬT
     // ==========================================
-    const btnSaveDetail =
-    document.getElementById('btnSaveDetail');
+    const btnSaveQuestionDetail =
+    document.getElementById('btnSaveQuestionDetail');
 
-if (btnSaveDetail) {
-    btnSaveDetail.addEventListener(
+if (btnSaveQuestionDetail) {
+    btnSaveQuestionDetail.addEventListener(
         'click',
-        handleDetailSave
+        handleQuestionDetailSave
     );
 }
 
@@ -489,7 +489,7 @@ if (btnSaveDetail) {
             function (event) {
 
                 if (event.target === questionFormModal) {
-                    closeFormModal();
+                    closeQuestionFormModal();
                 }
 
             }
@@ -510,7 +510,7 @@ if (btnSaveDetail) {
             function (event) {
 
                 if (event.target === questionDetailModal) {
-                    closeDetailModal();
+                    closeQuestionDetailModal();
                 }
 
             }
@@ -543,14 +543,14 @@ if (btnSaveDetail) {
                 formModal &&
                 formModal.classList.contains('show')
             ) {
-                closeFormModal();
+                closeQuestionFormModal();
             }
 
             if (
                 detailModal &&
                 detailModal.classList.contains('show')
             ) {
-                closeDetailModal();
+                closeQuestionDetailModal();
             }
 
         }
@@ -558,7 +558,7 @@ if (btnSaveDetail) {
 }
 
 
-async function handleDetailSave() {
+async function handleQuestionDetailSave() {
 
     if (!selectedQuestion) {
         return;
@@ -576,7 +576,7 @@ async function handleDetailSave() {
             .value.trim();
 
     if (!questionCode) {
-        showToast(
+        showQuestionToast(
             'Vui lòng nhập mã câu hỏi',
             'error'
         );
@@ -584,7 +584,7 @@ async function handleDetailSave() {
     }
 
     if (!questionName) {
-        showToast(
+        showQuestionToast(
             'Vui lòng nhập tên câu hỏi',
             'error'
         );
@@ -593,12 +593,12 @@ async function handleDetailSave() {
 
     try {
 
-        const btnSaveDetail =
-            document.getElementById('btnSaveDetail');
+        const btnSaveQuestionDetail =
+            document.getElementById('btnSaveQuestionDetail');
 
-        if (btnSaveDetail) {
-            btnSaveDetail.disabled = true;
-            btnSaveDetail.textContent = 'Đang lưu...';
+        if (btnSaveQuestionDetail) {
+            btnSaveQuestionDetail.disabled = true;
+            btnSaveQuestionDetail.textContent = 'Đang lưu...';
         }
 
         await updateQuestion(
@@ -615,13 +615,13 @@ async function handleDetailSave() {
             questionName;
 
         // Đóng modal
-        closeDetailModal();
+        closeQuestionDetailModal();
 
         // Load lại danh sách
         await loadQuestions();
 
         // Thông báo
-        showToast(
+        showQuestionToast(
             'Cập nhật câu hỏi thành công',
             'success'
         );
@@ -633,7 +633,7 @@ async function handleDetailSave() {
             error
         );
 
-        showToast(
+        showQuestionToast(
             error.message ||
             'Cập nhật câu hỏi thất bại',
             'error'
@@ -641,12 +641,12 @@ async function handleDetailSave() {
 
     } finally {
 
-        const btnSaveDetail =
-            document.getElementById('btnSaveDetail');
+        const btnSaveQuestionDetail =
+            document.getElementById('btnSaveQuestionDetail');
 
-        if (btnSaveDetail) {
-            btnSaveDetail.disabled = false;
-            btnSaveDetail.textContent =
+        if (btnSaveQuestionDetail) {
+            btnSaveQuestionDetail.disabled = false;
+            btnSaveQuestionDetail.textContent =
                 'Lưu thay đổi';
         }
     }
@@ -709,7 +709,7 @@ try {
         `;
     }
 
-    showToast(
+    showQuestionToast(
         error.message || 'Có lỗi xảy ra khi tải danh sách câu hỏi',
         'error'
     );
@@ -912,7 +912,7 @@ async function viewQuestion(id) {
                 error.message || 'Không thể tải thông tin câu hỏi';
         }
 
-        showToast(
+        showQuestionToast(
             error.message || 'Không thể tải thông tin câu hỏi',
             'error'
         );
@@ -953,7 +953,7 @@ function renderQuestionDetail(question) {
 // OPEN CREATE
 // ===============================
 
-function openCreateModal() {
+function openCreateQuestionModal() {
     formMode = 'create';
     selectedQuestion = null;
 
@@ -1012,7 +1012,7 @@ const question = questions.find(
 
 if (!question) {
 
-    showToast(
+    showQuestionToast(
         'Không tìm thấy câu hỏi',
         'error'
     );
@@ -1020,11 +1020,11 @@ if (!question) {
     return;
 }
 
-openUpdateModal(question);
+openQuestionUpdateModal(question);
 
 }
 
-function openUpdateModal(question) {
+function openQuestionUpdateModal(question) {
 formMode = 'update';
 selectedQuestion = question;
 const modal = document.getElementById('questionFormModal');
@@ -1054,16 +1054,16 @@ if (questionName) {
 // SUBMIT CREATE / UPDATE
 // ===============================
 
-async function handleFormSubmit(event) {
+async function handleQuestionFormSubmit(event) {
     event.preventDefault();
     const questionCode = document.getElementById('questionCode').value.trim();
     const questionName = document.getElementById('questionName').value.trim();
     if (!questionCode) {
-        showToast('Vui lòng nhập mã câu hỏi', 'error');
+        showQuestionToast('Vui lòng nhập mã câu hỏi', 'error');
         return;
     }
     if (!questionName) {
-        showToast('Vui lòng nhập tên câu hỏi', 'error');
+        showQuestionToast('Vui lòng nhập tên câu hỏi', 'error');
         return;
     }
     const submitButton =
@@ -1076,9 +1076,9 @@ async function handleFormSubmit(event) {
                 questionName
             );
             // 200 OK
-            closeFormModal();
+            closeQuestionFormModal();
             await loadQuestions();
-            showToast(
+            showQuestionToast(
                 'THÀNH CÔNG',
                 'success'
             );
@@ -1089,9 +1089,9 @@ async function handleFormSubmit(event) {
                 questionName
             );
             // 200 OK
-            closeFormModal();
+            closeQuestionFormModal();
             await loadQuestions();
-            showToast(
+            showQuestionToast(
                 'THÀNH CÔNG',
                 'success'
             );
@@ -1101,7 +1101,7 @@ async function handleFormSubmit(event) {
         console.error('Submit question error:', error);
         // 400 / 500...
         // Giữ nguyên modal để user sửa dữ liệu
-        showToast(
+        showQuestionToast(
             error.message || 'Có lỗi xảy ra',
             'error'
         );
@@ -1181,7 +1181,7 @@ function openDetailModal() {
     }
 }
 
-function closeDetailModal() {
+function closeQuestionDetailModal() {
     const modal =
         document.getElementById('questionDetailModal');
 
@@ -1193,7 +1193,7 @@ function closeDetailModal() {
     selectedQuestion = null;
 }
 
-function closeFormModal() {
+function closeQuestionFormModal() {
     const modal =
         document.getElementById('questionFormModal');
 
@@ -1298,7 +1298,7 @@ try {
 // TOAST
 // ===============================
 
-function showToast(message, type = 'info') {
+function showQuestionToast(message, type = 'info') {
     const toast = document.getElementById('toast');
     const toastMessage = document.getElementById('toastMessage');
 
@@ -1350,7 +1350,7 @@ function renderQuestionPagination() {
             questions.length / pageSizeQuestion
         );
 
-    if (totalPages <= 1) {
+    if (totalPages < 1) {
         paginationList.innerHTML = '';
         return;
     }

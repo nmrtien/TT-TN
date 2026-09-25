@@ -57,7 +57,7 @@ display: flex;
 flex-direction: column;
 }
 
-.question-option {
+.question-model-option {
     display: flex;
     align-items: flex-start;
     gap: 10px;
@@ -65,28 +65,29 @@ flex-direction: column;
     cursor: pointer;
 }
 
-.question-checkbox {
+.question-model-checkbox {
     margin-top: 3px;
     flex-shrink: 0;
 }
 
-.question-option-content {
+.question-model-option-content {
     flex: 1;
+    margin-top: 15px !important;
 }
 
-.question-header {
+.question-model-header {
     display: flex;
     align-items: baseline;
     gap: 12px;
 }
 
-.question-code {
+.question-model-code {
     font-weight: 600;
     min-width: 60px;
     flex-shrink: 0;
 }
 
-.question-name {
+.question-model-name {
     color: #374151;
 }
 

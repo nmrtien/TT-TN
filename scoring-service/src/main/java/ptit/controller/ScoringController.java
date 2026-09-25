@@ -18,7 +18,7 @@ public class ScoringController {
 
 
     @PostMapping
-    public ResponseEntity<Object> login(@RequestBody CreditApplication application) {
+    public ResponseEntity<Object> createApplication(@RequestBody CreditApplication application) {
         try {
             CreditTask response = scoringService.createApplication(application);
             return ResponseEntity.ok().body(response);
@@ -76,6 +76,17 @@ public class ScoringController {
     public ResponseEntity<Object> detailTask(@PathVariable String id) {
         try {
             CreditTask response = scoringService.getTask(id);
+            return ResponseEntity.ok().body(response);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error: " + e.getMessage());
+        }
+    }
+
+
+    @GetMapping("/applications")
+    public ResponseEntity<Object> getApplications() {
+        try {
+            List<CreditApplication> response = scoringService.getAllApplication();
             return ResponseEntity.ok().body(response);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Error: " + e.getMessage());

@@ -13,8 +13,6 @@ public class Email {
 
     private Set<String> to;
 
-    private Set<String> fullNames;
-
     private Set<String> cc;
 
 }

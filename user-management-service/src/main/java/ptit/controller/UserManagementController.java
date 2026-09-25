@@ -3,6 +3,7 @@ package ptit.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ptit.entity.Email;
 import ptit.entity.SystemUser;
 import ptit.service.ISystemUser;
 
@@ -63,6 +64,17 @@ public class UserManagementController {
     public ResponseEntity<Object> list() {
         try {
             List<SystemUser> response = systemUserService.list();
+            return ResponseEntity.ok().body(response);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error: " + e.getMessage());
+        }
+    }
+
+
+    @PostMapping("/detail")
+    public ResponseEntity<Object> getUsers(@RequestBody Email request) {
+        try {
+            List<SystemUser> response = systemUserService.getUsers(request.getTo());
             return ResponseEntity.ok().body(response);
         } catch (Exception e) {
             return ResponseEntity.internalServerError().body("Error: " + e.getMessage());

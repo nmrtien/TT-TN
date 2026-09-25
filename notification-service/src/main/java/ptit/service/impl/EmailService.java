@@ -27,9 +27,9 @@ public class EmailService implements IEmail {
     public void sendEmail(Email email) {
         try {
             if (email == null || !StringUtils.hasLength(email.getSubject()) || !StringUtils.hasLength(email.getContent())
-                    || CollectionUtils.isEmpty(email.getTo()) || CollectionUtils.isEmpty(email.getFullNames()))
+                    || CollectionUtils.isEmpty(email.getTo()))
                 return;
-            String greeting = "<p>Dear " + String.join(", ", email.getFullNames()) + ",</p>" ;
+            String greeting = "<p>Dear anh/chị,</p>" ;
             String signature = "<br>\n" +
                     "<br>\n" +
                     "\n" +
