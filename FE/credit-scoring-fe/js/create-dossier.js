@@ -362,12 +362,18 @@ function loadCreateDossierPage() {
 
 function registerCreateDossierEvents() {
 
+    // ===============================
+    // LÀM MỚI FORM
+    // ===============================
+
     document
         .getElementById('btnResetDossier')
         ?.addEventListener('click', function () {
 
             document
-                .querySelectorAll('.dossier-form input, .dossier-form select')
+                .querySelectorAll(
+                    '.dossier-form input, .dossier-form select'
+                )
                 .forEach(function (element) {
                     element.value = '';
                 });
@@ -375,120 +381,329 @@ function registerCreateDossierEvents() {
         });
 
 
+    // ===============================
+    // KHỞI TẠO HỒ SƠ
+    // ===============================
+
     document
         .getElementById('btnCreateDossier')
         ?.addEventListener('click', async function () {
 
             console.log('CLICK KHỞI TẠO HỒ SƠ');
 
+
+            // ===============================
+            // LẤY USER ĐĂNG NHẬP
+            // ===============================
+
+            let currentUser = {};
+
+            try {
+
+                currentUser = JSON.parse(
+                    localStorage.getItem('credit_scoring_user') || '{}'
+                );
+
+            } catch (error) {
+
+                console.error(
+                    'Không parse được thông tin user đăng nhập:',
+                    error
+                );
+
+            }
+
+
+            const createBy =
+                String(currentUser?.userName || '').trim();
+
+
+            // ===============================
+            // TẠO REQUEST
+            // ===============================
+
             const dossier = {
-                cif: document.getElementById('cif').value.trim(),
-                legalDocType: document.getElementById('legalDocType').value,
-                legalDocNumber: document.getElementById('legalDocNumber').value.trim(),
-                fullName: document.getElementById('fullName').value.trim(),
-                birthday: document.getElementById('birthday').value.trim(),
-                address: document.getElementById('address').value.trim(),
-                phone: document.getElementById('phone').value.trim(),
-                email: document.getElementById('email').value.trim(),
 
-                spouseCif: document.getElementById('spouseCif').value.trim(),
-                spouseLegalDocType: document.getElementById('spouseLegalDocType').value,
-                spouseLegalDocNumber: document.getElementById('spouseLegalDocNumber').value.trim(),
-                spouseFullName: document.getElementById('spouseFullName').value.trim(),
-                spousePhone: document.getElementById('spousePhone').value.trim(),
-                spouseEmail: document.getElementById('spouseEmail').value.trim(),
+                // Người khởi tạo hồ sơ
+                createBy: createBy,
 
-                loanPurpose: document.getElementById('loanPurpose').value,
-                loanTerm: document.getElementById('loanTerm').value
+                // ===============================
+                // THÔNG TIN KHÁCH HÀNG
+                // ===============================
+
+                cif: document
+                    .getElementById('cif')
+                    .value
+                    .trim(),
+
+                legalDocType: document
+                    .getElementById('legalDocType')
+                    .value,
+
+                legalDocNumber: document
+                    .getElementById('legalDocNumber')
+                    .value
+                    .trim(),
+
+                fullName: document
+                    .getElementById('fullName')
+                    .value
+                    .trim(),
+
+                birthday: document
+                    .getElementById('birthday')
+                    .value
+                    .trim(),
+
+                address: document
+                    .getElementById('address')
+                    .value
+                    .trim(),
+
+                phone: document
+                    .getElementById('phone')
+                    .value
+                    .trim(),
+
+                email: document
+                    .getElementById('email')
+                    .value
+                    .trim(),
+
+
+                // ===============================
+                // THÔNG TIN VỢ / CHỒNG
+                // ===============================
+
+                spouseCif: document
+                    .getElementById('spouseCif')
+                    .value
+                    .trim(),
+
+                spouseLegalDocType: document
+                    .getElementById('spouseLegalDocType')
+                    .value,
+
+                spouseLegalDocNumber: document
+                    .getElementById('spouseLegalDocNumber')
+                    .value
+                    .trim(),
+
+                spouseFullName: document
+                    .getElementById('spouseFullName')
+                    .value
+                    .trim(),
+
+                spousePhone: document
+                    .getElementById('spousePhone')
+                    .value
+                    .trim(),
+
+                spouseEmail: document
+                    .getElementById('spouseEmail')
+                    .value
+                    .trim(),
+
+
+                // ===============================
+                // THÔNG TIN KHOẢN VAY
+                // ===============================
+
+                loanPurpose: document
+                    .getElementById('loanPurpose')
+                    .value,
+
+                loanTerm: document
+                    .getElementById('loanTerm')
+                    .value
             };
 
+
+            console.log('USER ĐĂNG NHẬP:', currentUser);
+            console.log('CREATE BY:', dossier.createBy);
             console.log('DOSSIER:', dossier);
 
 
+            // ===============================
             // VALIDATE
-            if (!dossier.cif) {
-                console.log('VALIDATE CIF');
-                showCreateDossierToast('Vui lòng nhập CIF khách hàng', 'error');
+            // ===============================
+
+            if (!dossier.createBy) {
+
+                showCreateDossierToast(
+                    'Không xác định được người đăng nhập',
+                    'error'
+                );
+
                 return;
             }
+
+
+            if (!dossier.cif) {
+
+                console.log('VALIDATE CIF');
+
+                showCreateDossierToast(
+                    'Vui lòng nhập CIF khách hàng',
+                    'error'
+                );
+
+                return;
+            }
+
 
             if (!dossier.legalDocType) {
-                showCreateDossierToast('Vui lòng chọn loại giấy tờ', 'error');
+
+                showCreateDossierToast(
+                    'Vui lòng chọn loại giấy tờ',
+                    'error'
+                );
+
                 return;
             }
+
 
             if (!dossier.legalDocNumber) {
-                showCreateDossierToast('Vui lòng nhập số giấy tờ', 'error');
+
+                showCreateDossierToast(
+                    'Vui lòng nhập số giấy tờ',
+                    'error'
+                );
+
                 return;
             }
+
 
             if (!dossier.fullName) {
-                showCreateDossierToast('Vui lòng nhập họ và tên', 'error');
+
+                showCreateDossierToast(
+                    'Vui lòng nhập họ và tên',
+                    'error'
+                );
+
                 return;
             }
+
 
             if (!dossier.birthday) {
-                showCreateDossierToast('Vui lòng nhập ngày sinh', 'error');
+
+                showCreateDossierToast(
+                    'Vui lòng nhập ngày sinh',
+                    'error'
+                );
+
                 return;
             }
+
 
             if (!dossier.phone) {
-                showCreateDossierToast('Vui lòng nhập số điện thoại', 'error');
+
+                showCreateDossierToast(
+                    'Vui lòng nhập số điện thoại',
+                    'error'
+                );
+
                 return;
             }
+
 
             if (!dossier.address) {
-                showCreateDossierToast('Vui lòng nhập địa chỉ', 'error');
+
+                showCreateDossierToast(
+                    'Vui lòng nhập địa chỉ',
+                    'error'
+                );
+
                 return;
             }
+
 
             if (!dossier.loanPurpose) {
-                showCreateDossierToast('Vui lòng chọn mục đích vay', 'error');
+
+                showCreateDossierToast(
+                    'Vui lòng chọn mục đích vay',
+                    'error'
+                );
+
                 return;
             }
+
 
             if (!dossier.loanTerm) {
-                showCreateDossierToast('Vui lòng chọn thời hạn vay', 'error');
+
+                showCreateDossierToast(
+                    'Vui lòng chọn thời hạn vay',
+                    'error'
+                );
+
                 return;
             }
 
+
+            // ===============================
+            // SUBMIT
+            // ===============================
 
             const submitButton =
                 document.getElementById('btnCreateDossier');
 
+
             try {
 
                 if (submitButton) {
+
                     submitButton.disabled = true;
-                    submitButton.textContent = 'Đang khởi tạo...';
+
+                    submitButton.textContent =
+                        'Đang khởi tạo...';
+
                 }
 
-                const response = await createDossier(dossier);
 
-// HTTP 200 nhưng nghiệp vụ thất bại
-if (!response || response.id === null) {
+                const response =
+                    await createDossier(dossier);
 
-    showCreateDossierToast(
-        response?.errorMsg ||
-        'Khởi tạo hồ sơ thất bại',
-        'error'
-    );
 
-    return;
-}
+                // ===============================
+                // HTTP 200 NHƯNG NGHIỆP VỤ THẤT BẠI
+                // ===============================
 
-// Khởi tạo thành công
-showCreateDossierToast(
-    'Khởi tạo hồ sơ thành công',
-    'success'
-);
+                if (!response || response.id === null) {
 
-// Chỉ làm mới form khi thành công
-document
-    .querySelectorAll('.dossier-form input, .dossier-form select')
-    .forEach(function (element) {
-        element.value = '';
-    });
+                    showCreateDossierToast(
+                        response?.errorMsg ||
+                        'Khởi tạo hồ sơ thất bại',
+                        'error'
+                    );
+
+                    return;
+                }
+
+
+                // ===============================
+                // KHỞI TẠO THÀNH CÔNG
+                // ===============================
+
+                showCreateDossierToast(
+                    'Khởi tạo hồ sơ thành công',
+                    'success'
+                );
+
+
+                // ===============================
+                // RESET FORM
+                // ===============================
+
+                document
+                    .querySelectorAll(
+                        '.dossier-form input, .dossier-form select'
+                    )
+                    .forEach(function (element) {
+
+                        element.value = '';
+
+                    });
+
 
             } catch (error) {
 
@@ -497,17 +712,23 @@ document
                     error
                 );
 
+
                 showCreateDossierToast(
                     error.message ||
                     'Khởi tạo hồ sơ thất bại',
                     'error'
                 );
 
+
             } finally {
 
                 if (submitButton) {
+
                     submitButton.disabled = false;
-                    submitButton.textContent = 'Khởi tạo hồ sơ';
+
+                    submitButton.textContent =
+                        'Khởi tạo hồ sơ';
+
                 }
 
             }

@@ -172,6 +172,16 @@ async function loadDetailDossierPage(applicationId) {
                                 </span>
                             </div>
 
+                            <div class="task-info-item">
+        <span class="task-info-label">
+            Người khởi tạo hồ sơ
+        </span>
+
+        <span
+            class="task-info-value"
+            id="applicationCreatedBy">
+        </span>
+    </div>
 
                             <div
                                 class="status-badge"
@@ -1108,6 +1118,22 @@ function renderApplication() {
         assigneeElement.textContent =
             detailTask?.assignee || '-';
     }
+
+    // =========================
+// NGƯỜI KHỞI TẠO HỒ SƠ
+// Lấy từ application.createBy
+// =========================
+
+const applicationCreatedByElement =
+    document.getElementById(
+        'applicationCreatedBy'
+    );
+
+if (applicationCreatedByElement) {
+
+    applicationCreatedByElement.textContent =
+        detailApplication?.createBy || '-';
+}
 
 
     const statusElement =

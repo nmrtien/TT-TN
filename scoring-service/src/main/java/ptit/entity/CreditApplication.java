@@ -69,6 +69,9 @@ public class CreditApplication {
     @Field("update_time")
     private LocalDateTime updateTime;
 
+    @Field("create_by")
+    private String createBy;
+
     @Field("status")
     private CreditStatus status;
 

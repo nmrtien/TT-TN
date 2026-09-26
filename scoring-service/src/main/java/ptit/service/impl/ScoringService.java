@@ -47,17 +47,22 @@ public class ScoringService implements IScoring {
         String result = validateApplication(application);
         if (StringUtils.hasLength(result))
             return buildFailTask(result);
+        if (!StringUtils.hasLength(application.getCreateBy()))
+            return buildFailTask("KHÔNG THÀNH CÔNG. NGƯỜI KHỞI TẠO HỒ SƠ KHÔNG ĐƯỢC ĐỂ TRỐNG");
         List<CreditApplication> applications = applicationRepository
                 .findByLegalDocTypeAndLegalDocNumberAndStatus(application.getLegalDocType(),
                         application.getLegalDocNumber(), CreditStatus.IN_PROGRESS.name());
-        if (!CollectionUtils.isEmpty(applications)) {
-            result = "KHÔNG THÀNH CÔNG. ĐANG TỒN TẠI HỒ SƠ CỦA KHÁCH HÀNG CHƯA XỬ LÝ XONG, " +
-                    "VUI LÒNG HOÀN TẤT HOẶC ĐÓNG CÁC HỒ SƠ CŨ ĐỂ TIẾP TỤC";
-            return buildFailTask(result);
-        }
-        application.setStatus(CreditStatus.NEW);
+        if (!CollectionUtils.isEmpty(applications))
+            return buildFailTask("KHÔNG THÀNH CÔNG. ĐANG TỒN TẠI HỒ SƠ CỦA KHÁCH HÀNG CHƯA XỬ LÝ XONG, " +
+                    "VUI LÒNG HOÀN TẤT HOẶC ĐÓNG CÁC HỒ SƠ CŨ ĐỂ TIẾP TỤC");
+        application.setStatus(CreditStatus.IN_PROGRESS);
         CreditApplication applicationSaved = saveApplication(application);
-        return createNextTask(new CreditTask(), applicationSaved);
+        sendEmail(new HashSet<>(Collections.singleton(application.getCreateBy())),
+                "THÔNG BÁO KHỞI TẠO HỒ SƠ THÀNH CÔNG TẠI CREDIT SCORING PLATFORM",
+                "Bạn đã khởi tạo hồ sơ thành công với mã hồ sơ: "+application.getId()
+                        +". Thông tin khách hàng: "+application.getFullName()+", số Chứng từ pháp lý: "
+                        +application.getLegalDocNumber());
+        return createNextTask(new CreditTask(), applicationSaved, application.getCreateBy(), CreditStatus.IN_PROGRESS);
     }
 
 
@@ -202,7 +207,7 @@ public class ScoringService implements IScoring {
         }
         taskSaved.setApplication(applicationSaved);
         CreditTask taskAfterSaved = taskRepository.save(taskSaved);
-        createNextTask(taskSaved, application);
+        createNextTask(taskSaved, application, null, CreditStatus.NEW);
         return taskAfterSaved;
     }
 
@@ -227,7 +232,8 @@ public class ScoringService implements IScoring {
     }
 
 
-    private CreditTask createNextTask(CreditTask task, CreditApplication application) {
+    private CreditTask createNextTask(CreditTask task, CreditApplication application,
+                                      String assignee, CreditStatus status) {
         RoleGroup nextRoleGroup = task.getRoleGroup() == null ? RoleGroup.RB_RM
                 : RoleGroup.RB_RM == task.getRoleGroup() ? RoleGroup.RB_CA : RoleGroup.RB_AM;
         LocalDateTime now = LocalDateTime.now();
@@ -237,11 +243,11 @@ public class ScoringService implements IScoring {
         CreditTask newTask = new CreditTask();
         BeanUtils.copyProperties(task, newTask);
         newTask.setId(null);
-        newTask.setAssignee(null);
+        newTask.setAssignee(assignee);
         newTask.setApplicationId(application.getId());
         newTask.setRoleGroup(nextRoleGroup);
         newTask.setModels(models);
-        newTask.setStatus(CreditStatus.NEW);
+        newTask.setStatus(status);
         newTask.setCreateTime(now);
         newTask.setUpdateTime(now);
 

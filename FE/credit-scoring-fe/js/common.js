@@ -37,12 +37,19 @@ function shell(active, title, subtitle) {
             .toUpperCase();
 
 
-    // Chỉ RB_AM được sử dụng các chức năng bị giới hạn
-    const isRBAM = roleGroup === 'RB_AM';
+    // =========================================================
+    // PHÂN QUYỀN
+    // =========================================================
+
+    const isRBAM =
+        roleGroup === 'RB_AM';
+
+    const isRBRM =
+        roleGroup === 'RB_RM';
 
 
     // =========================================================
-    // CLICK CÁC MENU CẦN QUYỀN RB_AM
+    // CLICK CÁC MENU CẦN PHÂN QUYỀN
     // =========================================================
 
     function handleRestrictedClick(event) {
@@ -51,16 +58,8 @@ function shell(active, title, subtitle) {
         event.stopPropagation();
 
 
-        // Không phải RB_AM
-        if (!isRBAM) {
-
-            showPermissionToast();
-
-            return;
-        }
-
-
-        const target = event.currentTarget;
+        const target =
+            event.currentTarget;
 
         if (!target) {
             return;
@@ -70,6 +69,74 @@ function shell(active, title, subtitle) {
         const targetType =
             target.dataset.permissionTarget;
 
+
+        // =====================================================
+        // NGƯỜI DÙNG
+        // CHỈ RB_AM
+        // =====================================================
+
+        if (
+            targetType === 'users' &&
+            !isRBAM
+        ) {
+
+            showPermissionToast();
+
+            return;
+        }
+
+
+        // =====================================================
+        // KHỞI TẠO HỒ SƠ
+        // CHỈ RB_RM
+        // =====================================================
+
+        if (
+            targetType === 'create-dossier' &&
+            !isRBRM
+        ) {
+
+            showPermissionToast();
+
+            return;
+        }
+
+
+        // =====================================================
+        // CÂU HỎI
+        // CHỈ RB_AM
+        // =====================================================
+
+        if (
+            targetType === 'questions' &&
+            !isRBAM
+        ) {
+
+            showPermissionToast();
+
+            return;
+        }
+
+
+        // =====================================================
+        // MÔ HÌNH
+        // CHỈ RB_AM
+        // =====================================================
+
+        if (
+            targetType === 'models' &&
+            !isRBAM
+        ) {
+
+            showPermissionToast();
+
+            return;
+        }
+
+
+        // =====================================================
+        // ĐƯỢC PHÉP THỰC HIỆN
+        // =====================================================
 
         switch (targetType) {
 
@@ -215,7 +282,7 @@ function shell(active, title, subtitle) {
 
                     <!-- =================================================
                          KHỞI TẠO HỒ SƠ
-                         CHỈ RB_AM
+                         CHỈ RB_RM
                          ================================================= -->
 
                     <div
@@ -383,7 +450,7 @@ function shell(active, title, subtitle) {
             </div>
 
 
-<!-- =================================================
+            <!-- =================================================
                  NGƯỜI DÙNG
                  CHỈ RB_AM
                  ================================================= -->
@@ -648,7 +715,7 @@ function shell(active, title, subtitle) {
     // REGISTER RESTRICTED EVENTS
     // =========================================================
 
-    // Người dùng
+    // Người dùng - chỉ RB_AM
     document
         .getElementById('navUserManagement')
         ?.addEventListener(
@@ -657,7 +724,7 @@ function shell(active, title, subtitle) {
         );
 
 
-    // Khởi tạo Hồ sơ
+    // Khởi tạo Hồ sơ - chỉ RB_RM
     document
         .getElementById('navCreateDossier')
         ?.addEventListener(
@@ -666,7 +733,7 @@ function shell(active, title, subtitle) {
         );
 
 
-    // Câu hỏi
+    // Câu hỏi - chỉ RB_AM
     document
         .getElementById('navQuestions')
         ?.addEventListener(
@@ -675,7 +742,7 @@ function shell(active, title, subtitle) {
         );
 
 
-    // Mô hình
+    // Mô hình - chỉ RB_AM
     document
         .getElementById('navModels')
         ?.addEventListener(
