@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
+import ptit.constant.ActiveStatus;
 import ptit.entity.SystemUser;
 import ptit.proxy.NotificationClient;
 import ptit.repository.SystemUserRepository;
@@ -79,7 +80,8 @@ public class SystemUserService implements ISystemUser {
 
     @Override
     public SystemUser detail(String username, String password) {
-        return systemUserRepository.findByUserNameAndPassword(username, password).orElse(new SystemUser());
+        return systemUserRepository.findByUserNameAndPasswordAndStatus(username, password, ActiveStatus.A)
+                .orElse(new SystemUser());
     }
 
 
@@ -106,9 +108,6 @@ public class SystemUserService implements ISystemUser {
         String regex = "^[a-zA-Z0-9]{4,}$";
         if (!userName.matches(regex))
             return "KHÔNG THÀNH CÔNG. MÃ NGƯỜI DÙNG KHÔNG HỢP LỆ";
-        List<SystemUser> systemUsers = systemUserRepository.findAllByUserName(userName);
-        if (!CollectionUtils.isEmpty(systemUsers))
-            return "KHÔNG THÀNH CÔNG. MÃ NGƯỜI DÙNG ĐÃ TỒN TẠI";
         if (!StringUtils.hasLength(systemUser.getFullName()))
             return "KHÔNG THÀNH CÔNG. HỌ VÀ TÊN KHÔNG ĐƯỢC ĐỂ TRỐNG";
         if (!StringUtils.hasLength(systemUser.getPhone()))
