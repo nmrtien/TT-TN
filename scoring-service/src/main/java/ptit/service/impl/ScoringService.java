@@ -176,9 +176,11 @@ public class ScoringService implements IScoring {
         taskSaved.setComment(taskRequest.getComment());
         taskSaved.setModels(taskRequest.getModels());
         taskSaved.setStatus(CreditStatus.COMPLETED);
+        CreditApplication applicationSaved = application;
         if (RoleGroup.RB_AM == taskSaved.getRoleGroup() || CreditStatus.CLOSED == taskRequest.getCompleteType()) {
             application.setStatus(taskRequest.getCompleteType());
-            saveApplication(application);
+            applicationSaved = saveApplication(application);
+            taskSaved.setApplication(applicationSaved);
             CreditTask lastTask = taskRepository.save(taskSaved);
             String applicationStatus = CreditStatus.CLOSED == application.getStatus() ? "ĐÃ BỊ ĐÓNG với lý do: " + taskSaved.getComment()
                     : CreditStatus.APPROVED == application.getStatus() ? "ĐÃ ĐƯỢC PHÊ DUYỆT với nội dung: " + taskSaved.getComment()
@@ -196,8 +198,9 @@ public class ScoringService implements IScoring {
         }
         if (RoleGroup.RB_RM == taskSaved.getRoleGroup()) {
             application.setStatus(CreditStatus.IN_PROGRESS);
-            saveApplication(application);
+            applicationSaved = saveApplication(application);
         }
+        taskSaved.setApplication(applicationSaved);
         CreditTask taskAfterSaved = taskRepository.save(taskSaved);
         createNextTask(taskSaved, application);
         return taskAfterSaved;
@@ -205,10 +208,10 @@ public class ScoringService implements IScoring {
 
 
     @Override
-    public List<Model> getModels(Integer level) {
-        if (level == null)
+    public List<Model> getModels(String roleGroup) {
+        if (!StringUtils.hasLength(roleGroup))
             return Collections.emptyList();
-        return configClient.getModels(level);
+        return configClient.getModels(roleGroup);
     }
 
 
@@ -227,10 +230,9 @@ public class ScoringService implements IScoring {
     private CreditTask createNextTask(CreditTask task, CreditApplication application) {
         RoleGroup nextRoleGroup = task.getRoleGroup() == null ? RoleGroup.RB_RM
                 : RoleGroup.RB_RM == task.getRoleGroup() ? RoleGroup.RB_CA : RoleGroup.RB_AM;
-        int nextLevelTask = task.getRoleGroup() == null ? 1 : RoleGroup.RB_RM == task.getRoleGroup() ? 2 : 3;
         LocalDateTime now = LocalDateTime.now();
         List<Model> models = task.getModels() == null ? new ArrayList<>() : task.getModels();
-        List<Model> modelsNew = getModels(nextLevelTask);
+        List<Model> modelsNew = getModels(nextRoleGroup.name());
         models.addAll(modelsNew);
         CreditTask newTask = new CreditTask();
         BeanUtils.copyProperties(task, newTask);

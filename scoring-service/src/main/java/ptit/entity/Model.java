@@ -1,6 +1,7 @@
 package ptit.entity;
 
 import lombok.Data;
+import ptit.constant.RoleGroup;
 
 import java.util.List;
 
@@ -13,7 +14,7 @@ public class Model {
 
     private String modelName;
 
-    private Integer modelLevel;
+    private RoleGroup roleGroup;
 
     private List<Question> questions;
 }

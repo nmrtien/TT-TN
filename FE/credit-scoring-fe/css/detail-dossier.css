@@ -226,7 +226,7 @@
 }
 
 
-.model-level {
+.model-role-group {
     padding: 5px 10px;
 
     border-radius: 14px;
@@ -244,6 +244,68 @@
 /* =========================
    QUESTION TABLE
 ========================= */
+
+.question-answer-wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.question-answer {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 9px 12px;
+    border: 1px solid #d9dee7;
+    border-radius: 6px;
+    background: #fff;
+    color: #1f2937;
+    transition: all 0.2s ease;
+}
+
+.question-answer:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.08);
+}
+
+
+/* =========================
+   CÂU HỎI KHÔNG ĐƯỢC NHẬP
+   ========================= */
+
+.question-answer-readonly {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+    color: #6b7280;
+    cursor: not-allowed;
+    padding-right: 38px;
+}
+
+.question-answer-readonly::placeholder {
+    color: #9ca3af;
+}
+
+.question-answer-readonly:hover {
+    background: #eef0f3;
+    border-color: #c5cad3;
+}
+
+
+/* =========================
+   ICON KHÓA
+   ========================= */
+
+.question-readonly-icon {
+    position: absolute;
+    right: 11px;
+    top: 50%;
+    transform: translateY(-50%);
+
+    font-size: 14px;
+    line-height: 1;
+
+    opacity: 0.65;
+    pointer-events: none;
+}
 
 .question-table-wrapper {
     width: 100%;
@@ -836,18 +898,239 @@
    ACTION
 ========================= */
 
+/* =========================
+   TASK ACTIONS
+   ========================= */
+
 .detail-actions {
+    width: 100%;
     display: flex;
-
-    justify-content: space-between;
-
+    justify-content: flex-end;
     align-items: center;
-
     margin-top: 20px;
-
-    margin-bottom: 30px;
+    margin-bottom: 20px;
 }
 
+
+/* Nhóm button bên phải */
+
+.detail-action-right {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto;
+}
+
+
+/* Button action */
+
+.btn-task-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    min-width: 100px;
+    height: 40px;
+
+    padding: 0 18px;
+
+    border: none;
+    border-radius: 6px;
+
+    font-size: 14px;
+    font-weight: 500;
+
+    cursor: pointer;
+
+    transition:
+        background-color 0.2s ease,
+        box-shadow 0.2s ease,
+        opacity 0.2s ease;
+}
+
+
+/* Khi button bị disable */
+
+.btn-task-action:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+
+/* Hoàn thành */
+
+.btn-task-complete {
+    background: #2563eb;
+    color: #ffffff;
+}
+
+.btn-task-complete:hover:not(:disabled) {
+    background: #1d4ed8;
+}
+
+
+/* Đóng */
+
+.btn-task-close {
+    background: #dc2626;
+    color: #ffffff;
+}
+
+.btn-task-close:hover:not(:disabled) {
+    background: #b91c1c;
+}
+
+
+/* Phê duyệt */
+
+.btn-task-approve {
+    background: #16a34a;
+    color: #ffffff;
+}
+
+.btn-task-approve:hover:not(:disabled) {
+    background: #15803d;
+}
+
+
+/* Từ chối */
+
+.btn-task-reject {
+    background: #ea580c;
+    color: #ffffff;
+}
+
+.btn-task-reject:hover:not(:disabled) {
+    background: #c2410c;
+}
+
+/* =====================================================
+   APPROVED APPLICATION BANNER
+   ===================================================== */
+
+.approved-application-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 20px;
+    padding: 16px 18px;
+    border: 1px solid #bbf7d0;
+    border-radius: 8px;
+    background: #f0fdf4;
+}
+
+.approved-application-banner-icon {
+    flex: 0 0 28px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #16a34a;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.approved-application-banner-content {
+    flex: 1;
+}
+
+.approved-application-banner-title {
+    margin-bottom: 4px;
+    color: #166534;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.approved-application-banner-message {
+    color: #15803d;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.approved-application-reason {
+    display: flex;
+    gap: 6px;
+    margin-top: 6px;
+    color: #166534;
+}
+
+.approved-application-reason strong {
+    font-weight: 600;
+}
+
+.approved-application-reason span {
+    font-weight: 400;
+}
+
+
+/* =====================================================
+   REJECTED APPLICATION BANNER
+   ===================================================== */
+
+.rejected-application-banner {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    width: 100%;
+    box-sizing: border-box;
+    margin-bottom: 20px;
+    padding: 16px 18px;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    background: #fef2f2;
+}
+
+.rejected-application-banner-icon {
+    flex: 0 0 28px;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #dc2626;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.rejected-application-banner-content {
+    flex: 1;
+}
+
+.rejected-application-banner-title {
+    margin-bottom: 4px;
+    color: #991b1b;
+    font-size: 15px;
+    font-weight: 600;
+}
+
+.rejected-application-banner-message {
+    color: #b91c1c;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.rejected-application-reason {
+    display: flex;
+    gap: 6px;
+    margin-top: 6px;
+    color: #991b1b;
+}
+
+.rejected-application-reason strong {
+    font-weight: 600;
+}
+
+.rejected-application-reason span {
+    font-weight: 400;
+}
 
 .btn-secondary,
 .btn-primary {

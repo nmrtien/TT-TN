@@ -141,8 +141,8 @@ async function loadClosedDossiers() {
         const userName = user?.userName;
 
         // TODO: bỏ hard-code sau khi test xong
-        // const roleGroup = user?.roleGroup;
-        const roleGroup = 'RB_RM';
+        const roleGroup = user?.roleGroup;
+        // const roleGroup = 'RB_RM';
 
         if (!userName || !roleGroup) {
             throw new Error(

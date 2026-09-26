@@ -23,10 +23,10 @@ public class ConfigClient {
     private final ClientModelMapper clientModelMapper;
 
 
-    public List<Model> getModels(Integer level) {
+    public List<Model> getModels(String roleGroup) {
         // 1. Tạo request
         ModelRequest request = ModelRequest.newBuilder()
-                .setModelLevel(level != null ? level : 0)
+                .setRoleGroup(roleGroup)
                 .build();
 
         // 2. Gọi gRPC Server nhận ModelResponse

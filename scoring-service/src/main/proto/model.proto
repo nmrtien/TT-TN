@@ -8,7 +8,7 @@ service ModelService {
 }
 
 message ModelRequest {
-  int32 modelLevel = 4;
+  int32 roleGroup = 4;
 }
 
 // 1. Phản hồi trả về chứa một DANH SÁCH các Model
@@ -21,7 +21,7 @@ message ModelData {
   string id = 1;
   string model_code = 2; // Nên dùng snake_case trong proto, gRPC Java sẽ tự map thành camelCase
   string model_name = 3;
-  int32 model_level = 4; // Integer trong Java map thành int32 trong proto
+  string role_group = 4; // Integer trong Java map thành int32 trong proto
   repeated QuestionData questions = 5; // Danh sách Question
 }
 

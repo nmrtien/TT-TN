@@ -22,9 +22,9 @@ public class ModelGRPCService extends ModelServiceGrpc.ModelServiceImplBase {
 
     @Override
     public void getModels(ModelRequest request, StreamObserver<ModelResponse> responseObserver) {
-        Integer modelLevel = request.getModelLevel();
-        log.info("getModels with modelLevel: {}", modelLevel);
-        List<Model> models = modelService.list(modelLevel);
+        String roleGroup = request.getRoleGroup();
+        log.info("getModels with roleGroup: {}", roleGroup);
+        List<Model> models = modelService.list(roleGroup);
         ModelResponse response = ModelResponse.newBuilder()
                 .addAllModels(grpcModelMapper.toGrpcModelList(models))
                 .build();

@@ -761,10 +761,10 @@ function loadUsersPage() {
              ===================================================== -->
 
         <div
-            id="toast"
+            id="toastUser"
             class="toast hidden">
 
-            <span id="toastMessage"></span>
+            <span id="toastUserMessage"></span>
 
         </div>
 
@@ -2164,8 +2164,8 @@ try {
 // ===============================
 
 function showUserToast(message, type = 'info') {
-    const toast = document.getElementById('toast');
-    const toastMessage = document.getElementById('toastMessage');
+    const toast = document.getElementById('toastUser');
+    const toastUserMessage = document.getElementById('toastUserMessage');
 
     if (!toast) {
         return;
@@ -2177,8 +2177,8 @@ function showUserToast(message, type = 'info') {
     }
 
     // Set message
-    if (toastMessage) {
-        toastMessage.textContent = message;
+    if (toastUserMessage) {
+        toastUserMessage.textContent = message;
     } else {
         toast.textContent = message;
     }

@@ -94,7 +94,7 @@ public class QuestionService implements IQuestion {
 
     @Override
     public void updateQuestion(Set<String> questionIds, String modelCode) {
-        List<Question> questions = questionRepository.findAllByQuestionCode(modelCode);
+        List<Question> questions = questionRepository.findAllByModelCode(modelCode);
         if (!CollectionUtils.isEmpty(questions)) {
             Set<String> questionIdsSaved = questions.stream()
                     .map(Question::getId)

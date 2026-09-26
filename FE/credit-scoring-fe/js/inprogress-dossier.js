@@ -147,9 +147,9 @@ async function loadInprogressDossiers() {
         const user = JSON.parse(userJson);
 
         const userName = user?.userName;
-        // const roleGroup = user?.roleGroup;
+        const roleGroup = user?.roleGroup;
         //TODO: FIX CODE TO TEST
-        const roleGroup = 'RB_RM';
+        // const roleGroup = 'RB_RM';
 
         if (!userName || !roleGroup) {
             throw new Error(

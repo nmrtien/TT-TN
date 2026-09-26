@@ -79,8 +79,8 @@ public class ModelService implements IModel {
 
 
     @Override
-    public List<Model> list(Integer modelLevel) {
-        List<Model> models = modelRepository.findAllByModelLevel(modelLevel);
+    public List<Model> list(String roleGroup) {
+        List<Model> models = modelRepository.findAllByRoleGroup(roleGroup);
         if (CollectionUtils.isEmpty(models))
             return models;
         Set<String> modelCodes = models.stream()
@@ -119,10 +119,8 @@ public class ModelService implements IModel {
             return "KHÔNG THÀNH CÔNG. MÃ MÔ HÌNH KHÔNG ĐƯỢC ĐỂ TRỐNG";
         if (!StringUtils.hasLength(model.getModelName()))
             return "KHÔNG THÀNH CÔNG. TÊN MÔ HÌNH KHÔNG ĐƯỢC ĐỂ TRỐNG";
-        if (model.getModelLevel() == null)
-            return "KHÔNG THÀNH CÔNG. CẤP MÔ HÌNH KHÔNG ĐƯỢC ĐỂ TRỐNG";
-        if (model.getModelLevel() != 1 && model.getModelLevel() != 2 && model.getModelLevel() != 3)
-            return "KHÔNG THÀNH CÔNG. CẤP MÔ HÌNH PHẢI LÀ 1/2/3";
+        if (model.getRoleGroup() == null)
+            return "KHÔNG THÀNH CÔNG. NHÓM QUYỀN MÔ HÌNH KHÔNG ĐƯỢC ĐỂ TRỐNG";
         if (CollectionUtils.isEmpty(model.getQuestions()))
             return "KHÔNG THÀNH CÔNG. DANH SÁCH CÂU HỎI CỦA MÔ HÌNH KHÔNG ĐƯỢC ĐỂ TRỐNG";
         Set<String> questionIds = model.getQuestions().stream()

@@ -4,6 +4,7 @@ let detailApplication = null;
 
 let detailModels = [];
 
+let currentTaskAction = null;
 
 /**
  * Load màn hình chi tiết hồ sơ
@@ -50,30 +51,84 @@ async function loadDetailDossierPage(applicationId) {
             >
 
                 <!-- ========================= -->
-                <!-- CLOSED BANNER -->
-                <!-- ========================= -->
+<!-- CLOSED BANNER -->
+<!-- ========================= -->
 
-                <div
-                    id="closedApplicationBanner"
-                    class="closed-application-banner"
-                    style="display: none;"
-                >
-                    <div class="closed-application-banner-icon">
-                        !
-                    </div>
+<div
+    id="closedApplicationBanner"
+    class="closed-application-banner"
+    style="display: none;"
+>
+    <div class="closed-application-banner-icon">
+        !
+    </div>
 
-                    <div class="closed-application-banner-content">
-                        <div class="closed-application-banner-title">
-                            Hồ sơ đã đóng
-                        </div>
+    <div class="closed-application-banner-content">
+        <div class="closed-application-banner-title">
+            Hồ sơ đã đóng
+        </div>
 
-                        <div
-                            class="closed-application-banner-message"
-                            id="closedApplicationMessage">
-                            Hồ sơ này đã được đóng và không thể tiếp tục xử lý.
-                        </div>
-                    </div>
-                </div>
+        <div
+            class="closed-application-banner-message"
+            id="closedApplicationMessage">
+            Hồ sơ này đã được đóng và không thể tiếp tục xử lý.
+        </div>
+    </div>
+</div>
+
+
+<!-- ========================= -->
+<!-- APPROVED BANNER -->
+<!-- ========================= -->
+
+<div
+    id="approvedApplicationBanner"
+    class="approved-application-banner"
+    style="display: none;"
+>
+    <div class="approved-application-banner-icon">
+        ✓
+    </div>
+
+    <div class="approved-application-banner-content">
+        <div class="approved-application-banner-title">
+            Hồ sơ đã được phê duyệt
+        </div>
+
+        <div
+            class="approved-application-banner-message"
+            id="approvedApplicationMessage">
+            Hồ sơ này đã được phê duyệt.
+        </div>
+    </div>
+</div>
+
+
+<!-- ========================= -->
+<!-- REJECTED BANNER -->
+<!-- ========================= -->
+
+<div
+    id="rejectedApplicationBanner"
+    class="rejected-application-banner"
+    style="display: none;"
+>
+    <div class="rejected-application-banner-icon">
+        !
+    </div>
+
+    <div class="rejected-application-banner-content">
+        <div class="rejected-application-banner-title">
+            Hồ sơ đã bị từ chối
+        </div>
+
+        <div
+            class="rejected-application-banner-message"
+            id="rejectedApplicationMessage">
+            Hồ sơ này đã bị từ chối.
+        </div>
+    </div>
+</div>
 
 
                 <!-- ========================= -->
@@ -369,7 +424,7 @@ async function loadDetailDossierPage(applicationId) {
                             class="btn-task-action btn-task-close"
                             id="btnCloseDossier"
                             style="display: none;">
-                            Đóng
+                            Đóng hồ sơ
                         </button>
 
 
@@ -398,86 +453,95 @@ async function loadDetailDossierPage(applicationId) {
 
 
             <!-- ========================= -->
-            <!-- MODAL ĐÓNG HỒ SƠ -->
-            <!-- ========================= -->
+<!-- MODAL THAO TÁC TASK -->
+<!-- ========================= -->
 
-            <div
-                class="detail-modal-overlay"
-                id="closeDossierModal"
-                style="display: none;">
+<div
+    class="detail-modal-overlay"
+    id="taskActionModal"
+    style="display: none;">
 
-                <div class="detail-modal">
+    <div class="detail-modal">
 
-                    <div class="detail-modal-header">
+        <div class="detail-modal-header">
 
-                        <div>
-                            <h3>Đóng hồ sơ</h3>
+            <div>
 
-                            <span>
-                                Vui lòng nhập lý do đóng hồ sơ
-                            </span>
-                        </div>
+                <h3 id="taskActionModalTitle">
+                    Đóng hồ sơ
+                </h3>
 
-                        <button
-                            type="button"
-                            class="detail-modal-close"
-                            id="btnCloseDossierModal">
-                            ×
-                        </button>
+                <span id="taskActionModalSubtitle">
+                    Vui lòng nhập lý do đóng hồ sơ
+                </span>
 
-                    </div>
+            </div>
 
+            <button
+                type="button"
+                class="detail-modal-close"
+                id="btnCloseTaskActionModal">
+                ×
+            </button>
 
-                    <div class="detail-modal-body">
-
-                        <div class="form-group">
-
-                            <label for="closeDossierReason">
-                                Lý do đóng hồ sơ
-                                <span class="required">*</span>
-                            </label>
-
-                            <textarea
-                                id="closeDossierReason"
-                                class="detail-modal-textarea"
-                                rows="5"
-                                maxlength="1000"
-                                placeholder="Yêu cầu nhập lý do Đóng hồ sơ">
-                            </textarea>
-
-                            <div
-                                class="detail-modal-error"
-                                id="closeDossierReasonError"
-                                style="display: none;">
-                                Yêu cầu nhập lý do Đóng hồ sơ.
-                            </div>
-
-                        </div>
-
-                    </div>
+        </div>
 
 
-                    <div class="detail-modal-footer">
+        <div class="detail-modal-body">
 
-                        <button
-                            type="button"
-                            class="btn-secondary"
-                            id="btnCancelCloseDossier">
-                            Hủy
-                        </button>
+            <div class="form-group">
 
-                        <button
-                            type="button"
-                            class="btn-task-action btn-task-close"
-                            id="btnConfirmCloseDossier">
-                            Xác nhận đóng
-                        </button>
+                <label for="taskActionReason">
 
-                    </div>
+                    <span id="taskActionReasonLabel">
+                        Lý do đóng hồ sơ
+                    </span>
 
+                    <span class="required">*</span>
+
+                </label>
+
+                <textarea
+                    id="taskActionReason"
+                    class="detail-modal-textarea"
+                    rows="5"
+                    maxlength="1000"
+                    placeholder="Yêu cầu nhập lý do">
+                </textarea>
+
+                <div
+                    class="detail-modal-error"
+                    id="taskActionReasonError"
+                    style="display: none;">
+                    Vui lòng nhập lý do.
                 </div>
 
             </div>
+
+        </div>
+
+
+        <div class="detail-modal-footer">
+
+            <button
+                type="button"
+                class="btn-secondary"
+                id="btnCancelTaskAction">
+                Hủy
+            </button>
+
+            <button
+                type="button"
+                class="btn-task-action"
+                id="btnConfirmTaskAction">
+                Xác nhận
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
 
         </div>
     `;
@@ -511,23 +575,27 @@ async function loadDetailDossier(applicationId) {
         const user = JSON.parse(userJson);
 
         const userName = user?.userName;
-        // const roleGroup = user?.roleGroup;
-        //TODO: FIX CODE TO TEST
-        const roleGroup = 'RB_RM';
+        const roleGroup = user?.roleGroup;
+
+        // TODO: FIX CODE TO TEST
+        // const roleGroup = 'RB_RM';
 
         if (!userName || !roleGroup) {
             throw new Error(
                 'Thông tin userName hoặc roleGroup không hợp lệ.'
             );
         }
-        // Request body
+
         const requestBody = {
             applicationId: applicationId,
             userName: userName,
             roleGroup: roleGroup
         };
 
-        console.log('Call unassign tasks:', requestBody);
+        console.log(
+            'Call detail task:',
+            requestBody
+        );
 
         const response = await fetch(
             `${API_BASE_URL}/scoring/api/v1/scoring/tasks/detail`,
@@ -580,7 +648,28 @@ async function loadDetailDossier(applicationId) {
             );
         }
 
-        const data = JSON.parse(message);
+        let data;
+
+        try {
+
+            data = JSON.parse(message);
+
+        } catch (error) {
+
+            throw new Error(
+                'API trả về dữ liệu chi tiết hồ sơ không hợp lệ.'
+            );
+        }
+
+        if (!data) {
+            throw new Error(
+                'API không trả về dữ liệu chi tiết hồ sơ.'
+            );
+        }
+
+        // =====================================================
+        // Lưu dữ liệu detail
+        // =====================================================
 
         detailTask = data;
 
@@ -592,14 +681,39 @@ async function loadDetailDossier(applicationId) {
                 ? data.models
                 : [];
 
+        console.log(
+            'Detail task:',
+            detailTask
+        );
+
+        console.log(
+            'Detail application:',
+            detailApplication
+        );
+
+        console.log(
+            'Detail models:',
+            detailModels
+        );
+
+        // =====================================================
+        // Render dữ liệu
+        // =====================================================
+
         renderApplication();
+
         renderModels();
 
-        // Update action
+        // Update button theo task status + role
         updateDetailActionButtons();
 
-        // Nếu application đã CLOSED
-        checkClosedApplication();
+        // Check trạng thái cuối của hồ sơ:
+        // CLOSED / APPROVED / REJECTED
+        checkApplicationFinalStatus();
+
+        // =====================================================
+        // Hiển thị content
+        // =====================================================
 
         const loading =
             document.getElementById('detailLoading');
@@ -630,9 +744,9 @@ async function loadDetailDossier(applicationId) {
             loading.innerHTML = `
                 <div class="detail-error">
                     ${escapeHtml(
-                error.message ||
-                'Không thể tải thông tin hồ sơ'
-            )}
+                        error?.message ||
+                        'Không thể tải thông tin hồ sơ'
+                    )}
                 </div>
             `;
         }
@@ -657,60 +771,226 @@ function updateDetailActionButtons() {
     const btnReject =
         document.getElementById('btnRejectDossier');
 
+
     // Hide tất cả trước
-    if (btnComplete) btnComplete.style.display = 'none';
-    if (btnClose) btnClose.style.display = 'none';
-    if (btnApprove) btnApprove.style.display = 'none';
-    if (btnReject) btnReject.style.display = 'none';
+    if (btnComplete) {
+        btnComplete.style.display = 'none';
+    }
+
+    if (btnClose) {
+        btnClose.style.display = 'none';
+    }
+
+    if (btnApprove) {
+        btnApprove.style.display = 'none';
+    }
+
+    if (btnReject) {
+        btnReject.style.display = 'none';
+    }
+
 
     if (!detailTask) {
         return;
     }
 
-    // Nếu APPLICATION đã CLOSED thì không cho thao tác
-    if (getApplicationStatus() === 'CLOSED') {
+
+    // =====================================================
+    // APPLICATION FINAL STATUS
+    // =====================================================
+
+    const applicationStatus =
+        getApplicationStatus();
+
+    if (
+        applicationStatus === 'CLOSED' ||
+        applicationStatus === 'APPROVED' ||
+        applicationStatus === 'REJECTED'
+    ) {
         return;
     }
 
-    // Task phải đang IN_PROGRESS mới được thao tác
-    const taskStatus = String(
-        detailTask.status || ''
-    )
-        .trim()
-        .toUpperCase();
+
+    // =====================================================
+    // TASK STATUS
+    // =====================================================
+
+    const taskStatus =
+        String(detailTask.status || '')
+            .trim()
+            .toUpperCase();
 
     if (taskStatus !== 'IN_PROGRESS') {
         return;
     }
 
-    const user =
-        JSON.parse(
-            localStorage.getItem('credit_scoring_user') || '{}'
+
+    // =====================================================
+    // USER ROLE
+    // =====================================================
+
+    let user = {};
+
+    try {
+
+        user =
+            JSON.parse(
+                localStorage.getItem(
+                    'credit_scoring_user'
+                ) || '{}'
+            );
+
+    } catch (error) {
+
+        console.error(
+            'Không parse được credit_scoring_user:',
+            error
         );
 
-    // TODO: sau này lấy trực tiếp từ user
-    const roleGroup = 'RB_RM';
+        return;
+    }
 
-    if (roleGroup === 'RB_RM' || roleGroup === 'RB_CA') {
+
+    const roleGroup =
+        String(user?.roleGroup || '')
+            .trim()
+            .toUpperCase();
+
+
+    // =====================================================
+    // RB_RM / RB_CA
+    // =====================================================
+
+    if (
+        roleGroup === 'RB_RM' ||
+        roleGroup === 'RB_CA'
+    ) {
 
         if (btnComplete) {
-            btnComplete.style.display = 'inline-flex';
+            btnComplete.style.display =
+                'inline-flex';
         }
 
         if (btnClose) {
-            btnClose.style.display = 'inline-flex';
+            btnClose.style.display =
+                'inline-flex';
         }
 
-    } else if (roleGroup === 'RB_AM') {
+    }
+
+    // =====================================================
+    // RB_AM
+    // =====================================================
+
+    else if (roleGroup === 'RB_AM') {
 
         if (btnApprove) {
-            btnApprove.style.display = 'inline-flex';
+            btnApprove.style.display =
+                'inline-flex';
         }
 
         if (btnReject) {
-            btnReject.style.display = 'inline-flex';
+            btnReject.style.display =
+                'inline-flex';
         }
     }
+}
+
+function showApprovedApplicationBanner(reason) {
+
+    const banner =
+        document.getElementById(
+            'approvedApplicationBanner'
+        );
+
+    const message =
+        document.getElementById(
+            'approvedApplicationMessage'
+        );
+
+    if (!banner) {
+        return;
+    }
+
+    if (message) {
+
+        message.innerHTML = `
+            <div>
+                Hồ sơ này đã được phê duyệt và không thể tiếp tục xử lý.
+            </div>
+
+            <div class="approved-application-reason">
+                <strong>Ý kiến phê duyệt hồ sơ:</strong>
+                <span>
+                    ${escapeHtml(
+                        String(reason || '').trim() ||
+                        'Không có lý do phê duyệt hồ sơ.'
+                    )}
+                </span>
+            </div>
+        `;
+    }
+
+    banner.style.display = 'flex';
+}
+
+
+function showRejectedApplicationBanner(reason) {
+
+    const banner =
+        document.getElementById(
+            'rejectedApplicationBanner'
+        );
+
+    const message =
+        document.getElementById(
+            'rejectedApplicationMessage'
+        );
+
+    if (!banner) {
+        return;
+    }
+
+    if (message) {
+
+        message.innerHTML = `
+            <div>
+                Hồ sơ này đã bị từ chối và không thể tiếp tục xử lý.
+            </div>
+
+            <div class="rejected-application-reason">
+                <strong>Lý do từ chối hồ sơ:</strong>
+                <span>
+                    ${escapeHtml(
+                        String(reason || '').trim() ||
+                        'Không có lý do từ chối hồ sơ.'
+                    )}
+                </span>
+            </div>
+        `;
+    }
+
+    banner.style.display = 'flex';
+}
+
+
+function hideAllApplicationBanners() {
+
+    const bannerIds = [
+        'closedApplicationBanner',
+        'approvedApplicationBanner',
+        'rejectedApplicationBanner'
+    ];
+
+    bannerIds.forEach(id => {
+
+        const banner =
+            document.getElementById(id);
+
+        if (banner) {
+            banner.style.display = 'none';
+        }
+    });
 }
 
 
@@ -893,12 +1173,20 @@ function renderApplication() {
 /**
  * Render danh sách model và câu hỏi
  */
+/**
+ * Render danh sách model và câu hỏi
+ *
+ * Rule nhập câu trả lời:
+ * 1. Task phải IN_PROGRESS
+ * 2. Model phải có roleGroup
+ * 3. Model.roleGroup phải giống user.roleGroup
+ *
+ * Nếu không thỏa -> readonly
+ */
 function renderModels() {
 
     const container =
-        document.getElementById(
-            'modelsContainer'
-        );
+        document.getElementById('modelsContainer');
 
     if (!container) {
         return;
@@ -920,6 +1208,66 @@ function renderModels() {
         return;
     }
 
+    // =========================
+    // USER ĐĂNG NHẬP
+    // =========================
+
+    let currentUser = {};
+
+    try {
+
+        currentUser =
+            JSON.parse(
+                localStorage.getItem('credit_scoring_user') || '{}'
+            );
+
+    } catch (error) {
+
+        console.error(
+            'Không parse được credit_scoring_user:',
+            error
+        );
+
+        currentUser = {};
+    }
+
+    const userRoleGroup =
+        String(
+            currentUser?.roleGroup || ''
+        )
+            .trim()
+            .toUpperCase();
+
+
+    // =========================
+    // TASK STATUS
+    // =========================
+
+    const taskStatus =
+        String(
+            detailTask?.status || ''
+        )
+            .trim()
+            .toUpperCase();
+
+    const taskInProgress =
+        taskStatus === 'IN_PROGRESS';
+
+
+    console.log(
+        'Render Models - Task status:',
+        taskStatus
+    );
+
+    console.log(
+        'Render Models - User roleGroup:',
+        userRoleGroup
+    );
+
+
+    // =========================
+    // RENDER MODELS
+    // =========================
 
     container.innerHTML =
         detailModels
@@ -930,8 +1278,47 @@ function renderModels() {
                         ? model.questions
                         : [];
 
+
+                // =========================
+                // ROLE GROUP CỦA MODEL
+                // =========================
+
+                const modelRoleGroup =
+                    String(
+                        model?.roleGroup || ''
+                    )
+                        .trim()
+                        .toUpperCase();
+
+
+                // =========================
+                // CHECK QUYỀN NHẬP
+                // =========================
+
+                const canEditModel =
+                    taskInProgress &&
+                    !!modelRoleGroup &&
+                    !!userRoleGroup &&
+                    modelRoleGroup === userRoleGroup;
+
+
+                console.log(
+                    `Model ${model.modelCode || modelIndex + 1}:`,
+                    {
+                        modelRoleGroup,
+                        userRoleGroup,
+                        taskStatus,
+                        canEditModel
+                    }
+                );
+
+
                 return `
                     <div class="detail-card model-card">
+
+                        <!-- =========================
+                             MODEL HEADER
+                             ========================= -->
 
                         <div class="model-header">
 
@@ -939,32 +1326,35 @@ function renderModels() {
                                 <span class="model-index">
                                     Mô hình ${modelIndex + 1}
                                 </span>
-
-                                
                             </div>
 
-                            <span class="model-level">
+                            <span class="model-role-group">
                                 <h4>
                                     ${escapeHtml(
-                    model.modelCode || ''
-                )}
+                                        model.modelCode || ''
+                                    )}
                                     -
                                     ${escapeHtml(
-                    model.modelName || ''
-                )}
+                                        model.modelName || ''
+                                    )}
                                 </h4>
                             </span>
 
                         </div>
 
 
-                        ${questions.length === 0
-                        ? `
+                        <!-- =========================
+                             QUESTIONS
+                             ========================= -->
+
+                        ${
+                            questions.length === 0
+                                ? `
                                     <div class="empty-model">
                                         Mô hình chưa có câu hỏi
                                     </div>
                                   `
-                        : `
+                                : `
                                     <div class="question-table-wrapper">
 
                                         <table class="question-table">
@@ -981,57 +1371,107 @@ function renderModels() {
                                             <tbody>
 
                                                 ${questions
-                            .map(
-                                (
-                                    question,
-                                    questionIndex
-                                ) => `
+                                                    .map(
+                                                        (
+                                                            question,
+                                                            questionIndex
+                                                        ) => {
+
+                                                            const questionAnswer =
+                                                                question.questionAnswer || '';
+
+
+                                                            return `
                                                                 <tr>
 
+                                                                    <!-- STT -->
                                                                     <td>
-                                                                        ${questionIndex + 1
-                                    }
+                                                                        ${questionIndex + 1}
                                                                     </td>
 
+
+                                                                    <!-- MÃ CÂU HỎI -->
                                                                     <td>
                                                                         <span class="question-code">
                                                                             ${escapeHtml(
-                                        question.questionCode || ''
-                                    )}
+                                                                                question.questionCode || ''
+                                                                            )}
                                                                         </span>
                                                                     </td>
 
+
+                                                                    <!-- CÂU HỎI -->
                                                                     <td>
                                                                         <div class="question-name">
                                                                             ${escapeHtml(
-                                        question.questionName || ''
-                                    )}
+                                                                                question.questionName || ''
+                                                                            )}
                                                                         </div>
                                                                     </td>
 
+
+                                                                    <!-- CÂU TRẢ LỜI -->
                                                                     <td>
-                                                                        <input
-    type="text"
-    class="question-answer ${detailTask?.status === 'COMPLETED'
-                                        ? 'question-answer-readonly'
-                                        : ''
-                                    }"
-    data-question-id="${escapeHtml(
-                                        question.id || ''
-                                    )}"
-    value="${escapeHtml(
-                                        question.questionAnswer || ''
-                                    )}"
-    placeholder="Nhập câu trả lời"
-    ${detailTask?.status === 'COMPLETED' ? 'readonly' : ''}
->
+
+                                                                        <div
+                                                                            class="question-answer-wrapper"
+                                                                        >
+
+                                                                            <input
+                                                                                type="text"
+                                                                                class="question-answer ${
+                                                                                    canEditModel
+                                                                                        ? ''
+                                                                                        : 'question-answer-readonly'
+                                                                                }"
+                                                                                data-question-id="${escapeHtml(
+                                                                                    question.id || ''
+                                                                                )}"
+                                                                                data-model-role-group="${escapeHtml(
+                                                                                    modelRoleGroup
+                                                                                )}"
+                                                                                value="${escapeHtml(
+                                                                                    questionAnswer
+                                                                                )}"
+                                                                                placeholder="${
+                                                                                    canEditModel
+                                                                                        ? 'Nhập câu trả lời'
+                                                                                        : 'Không có quyền nhập'
+                                                                                }"
+                                                                                title="${
+                                                                                    canEditModel
+                                                                                        ? 'Nhập câu trả lời'
+                                                                                        : 'Bạn không có quyền nhập câu trả lời cho mô hình này'
+                                                                                }"
+                                                                                ${
+                                                                                    canEditModel
+                                                                                        ? ''
+                                                                                        : 'readonly'
+                                                                                }
+                                                                            >
+
+                                                                            ${
+                                                                                canEditModel
+                                                                                    ? ''
+                                                                                    : `
+                                                                                        <span
+                                                                                            class="question-readonly-icon"
+                                                                                            title="Không có quyền nhập"
+                                                                                        >
+                                                                                            🔒
+                                                                                        </span>
+                                                                                    `
+                                                                            }
+
+                                                                        </div>
+
                                                                     </td>
 
                                                                 </tr>
-                                                            `
-                            )
-                            .join('')
-                        }
+                                                            `;
+                                                        }
+                                                    )
+                                                    .join('')}
 
                                             </tbody>
 
@@ -1039,7 +1479,7 @@ function renderModels() {
 
                                     </div>
                                 `
-                    }
+                        }
 
                     </div>
                 `;
@@ -1069,32 +1509,26 @@ function registerDetailDossierEvents() {
     const btnRejectDossier =
         document.getElementById('btnRejectDossier');
 
-    const btnCloseDossierModal =
-        document.getElementById('btnCloseDossierModal');
 
-    const btnCancelCloseDossier =
-        document.getElementById('btnCancelCloseDossier');
+    // =========================
+    // MODAL TASK ACTION
+    // =========================
 
-    const btnConfirmCloseDossier =
-        document.getElementById('btnConfirmCloseDossier');
+    const btnCloseTaskActionModal =
+        document.getElementById('btnCloseTaskActionModal');
 
-    const closeDossierReason =
-        document.getElementById('closeDossierReason');
+    const btnCancelTaskAction =
+        document.getElementById('btnCancelTaskAction');
+
+    const btnConfirmTaskAction =
+        document.getElementById('btnConfirmTaskAction');
+
+    const taskActionReason =
+        document.getElementById('taskActionReason');
 
 
     // =========================
-    // Quay lại
-    // =========================
-
-    // btnBackDossier?.addEventListener('click', function () {
-
-    //     goToPage('inprogress-dossiers');
-
-    // });
-
-
-    // =========================
-    // Hoàn thành
+    // HOÀN THÀNH
     // =========================
 
     btnCompleteDossier?.addEventListener(
@@ -1108,86 +1542,94 @@ function registerDetailDossierEvents() {
 
 
     // =========================
-    // Đóng hồ sơ
+    // ĐÓNG
     // =========================
 
     btnCloseDossier?.addEventListener(
         'click',
         function () {
 
-            openCloseDossierModal();
+            openTaskActionModal('CLOSED');
 
         }
     );
 
 
     // =========================
-    // Phê duyệt
+    // PHÊ DUYỆT
     // =========================
 
     btnApproveDossier?.addEventListener(
         'click',
-        async function () {
+        function () {
 
-            await completeDossier('APPROVED');
+            openTaskActionModal('APPROVED');
 
         }
     );
 
 
     // =========================
-    // Từ chối
+    // TỪ CHỐI
     // =========================
 
     btnRejectDossier?.addEventListener(
         'click',
-        async function () {
+        function () {
 
-            await completeDossier('REJECTED');
+            openTaskActionModal('REJECTED');
 
         }
     );
 
 
     // =========================
-    // Modal đóng hồ sơ
+    // ĐÓNG MODAL
     // =========================
 
-    btnCloseDossierModal?.addEventListener(
+    btnCloseTaskActionModal?.addEventListener(
         'click',
         function () {
 
-            closeCloseDossierModal();
+            closeTaskActionModal();
 
         }
     );
 
 
-    btnCancelCloseDossier?.addEventListener(
+    // =========================
+    // HỦY
+    // =========================
+
+    btnCancelTaskAction?.addEventListener(
         'click',
         function () {
 
-            closeCloseDossierModal();
+            closeTaskActionModal();
 
         }
     );
 
 
-    btnConfirmCloseDossier?.addEventListener(
+    // =========================
+    // XÁC NHẬN
+    // =========================
+
+    btnConfirmTaskAction?.addEventListener(
         'click',
         async function () {
 
-            await confirmCloseDossier();
+            await confirmTaskAction();
 
         }
     );
 
 
     // =========================
-    // Ctrl + Enter để submit
+    // CTRL + ENTER
     // =========================
 
-    closeDossierReason?.addEventListener(
+    taskActionReason?.addEventListener(
         'keydown',
         async function (event) {
 
@@ -1198,50 +1640,161 @@ function registerDetailDossierEvents() {
 
                 event.preventDefault();
 
-                await confirmCloseDossier();
+                await confirmTaskAction();
+
             }
+
         }
     );
 
 
     // =========================
-    // Khi nhập lý do -> ẩn error
+    // NHẬP LÝ DO
     // =========================
 
-    closeDossierReason?.addEventListener(
+    taskActionReason?.addEventListener(
         'input',
         function () {
 
             const errorElement =
                 document.getElementById(
-                    'closeDossierReasonError'
+                    'taskActionReasonError'
                 );
 
             if (
                 errorElement &&
                 String(this.value || '').trim()
             ) {
+
                 errorElement.textContent = '';
-                errorElement.style.display = 'none';
+
+                errorElement.style.display =
+                    'none';
             }
+
         }
     );
 }
 
 
+/**
+ * Xác nhận thao tác CLOSED / APPROVED / REJECTED
+ */
+async function confirmTaskAction() {
 
-
-function openCloseDossierModal() {
-
-    const modal = document.getElementById('closeDossierModal');
-    const reasonInput = document.getElementById('closeDossierReason');
-    const errorElement = document.getElementById('closeDossierReasonError');
-
-    if (!modal) {
-        console.error('Không tìm thấy #closeDossierModal');
+    if (!currentTaskAction) {
+        console.error('Không xác định được task action.');
         return;
     }
 
+    const reasonInput = document.getElementById('taskActionReason');
+    const reasonError = document.getElementById('taskActionReasonError');
+
+    if (!reasonInput) {
+        console.error('Không tìm thấy #taskActionReason.');
+        return;
+    }
+
+    const reason = String(reasonInput.value || '').trim();
+
+    // Reset error
+    if (reasonError) {
+        reasonError.style.display = 'none';
+    }
+
+    // Bắt buộc nhập lý do
+    if (!reason) {
+
+        if (reasonError) {
+            reasonError.textContent =
+                'Vui lòng nhập lý do ' +
+                (
+                    currentTaskAction === 'CLOSED'
+                        ? 'Đóng hồ sơ.'
+                        : currentTaskAction === 'APPROVED'
+                            ? 'Phê duyệt hồ sơ.'
+                            : 'Từ chối hồ sơ.'
+                );
+
+            reasonError.style.display = 'block';
+        }
+
+        reasonInput.focus();
+        return;
+    }
+
+    if (!detailTask) {
+        console.error('Không có detailTask.');
+        alert('Không tìm thấy thông tin task.');
+        return;
+    }
+
+    // Gán lý do vào task để gửi xuống backend
+    detailTask.comment = reason;
+
+    console.log('Task action:', currentTaskAction);
+    console.log('Task comment:', detailTask.comment);
+
+    // Gọi API complete
+    const success = await completeDossier(currentTaskAction);
+
+    // Chỉ đóng modal khi API thành công
+    if (success) {
+        closeTaskActionModal();
+    }
+}
+
+
+function openTaskActionModal(action) {
+
+    const modal =
+        document.getElementById('taskActionModal');
+
+    const title =
+        document.getElementById(
+            'taskActionModalTitle'
+        );
+
+    const subtitle =
+        document.getElementById(
+            'taskActionModalSubtitle'
+        );
+
+    const reasonLabel =
+        document.getElementById(
+            'taskActionReasonLabel'
+        );
+
+    const reasonInput =
+        document.getElementById(
+            'taskActionReason'
+        );
+
+    const errorElement =
+        document.getElementById(
+            'taskActionReasonError'
+        );
+
+    const confirmButton =
+        document.getElementById(
+            'btnConfirmTaskAction'
+        );
+
+
+    if (!modal) {
+        console.error(
+            'Không tìm thấy #taskActionModal'
+        );
+
+        return;
+    }
+
+
+    // Lưu action hiện tại
+    currentTaskAction = action;
+
+
+    // Reset
     if (reasonInput) {
         reasonInput.value = '';
     }
@@ -1251,19 +1804,162 @@ function openCloseDossierModal() {
         errorElement.style.display = 'none';
     }
 
+
+    // =========================
+    // ĐÓNG
+    // =========================
+
+    if (action === 'CLOSED') {
+
+        if (title) {
+            title.textContent =
+                'Đóng hồ sơ';
+        }
+
+        if (subtitle) {
+            subtitle.textContent =
+                'Vui lòng nhập lý do đóng hồ sơ';
+        }
+
+        if (reasonLabel) {
+            reasonLabel.textContent =
+                'Lý do đóng hồ sơ';
+        }
+
+        if (reasonInput) {
+            reasonInput.placeholder =
+                'Yêu cầu nhập lý do Đóng hồ sơ';
+        }
+
+        if (errorElement) {
+            errorElement.textContent =
+                'Vui lòng nhập lý do Đóng hồ sơ.';
+        }
+
+        if (confirmButton) {
+            confirmButton.textContent =
+                'Xác nhận đóng';
+
+            confirmButton.className =
+                'btn-task-action btn-task-close';
+        }
+
+    }
+
+
+    // =========================
+    // PHÊ DUYỆT
+    // =========================
+
+    else if (action === 'APPROVED') {
+
+        if (title) {
+            title.textContent =
+                'Phê duyệt hồ sơ';
+        }
+
+        if (subtitle) {
+            subtitle.textContent =
+                'Vui lòng nhập lý do phê duyệt hồ sơ';
+        }
+
+        if (reasonLabel) {
+            reasonLabel.textContent =
+                'Lý do phê duyệt';
+        }
+
+        if (reasonInput) {
+            reasonInput.placeholder =
+                'Yêu cầu nhập lý do Phê duyệt hồ sơ';
+        }
+
+        if (errorElement) {
+            errorElement.textContent =
+                'Vui lòng nhập lý do Phê duyệt hồ sơ.';
+        }
+
+        if (confirmButton) {
+            confirmButton.textContent =
+                'Xác nhận phê duyệt';
+
+            confirmButton.className =
+                'btn-task-action btn-task-approve';
+        }
+
+    }
+
+
+    // =========================
+    // TỪ CHỐI
+    // =========================
+
+    else if (action === 'REJECTED') {
+
+        if (title) {
+            title.textContent =
+                'Từ chối hồ sơ';
+        }
+
+        if (subtitle) {
+            subtitle.textContent =
+                'Vui lòng nhập lý do từ chối hồ sơ';
+        }
+
+        if (reasonLabel) {
+            reasonLabel.textContent =
+                'Lý do từ chối';
+        }
+
+        if (reasonInput) {
+            reasonInput.placeholder =
+                'Yêu cầu nhập lý do Từ chối hồ sơ';
+        }
+
+        if (errorElement) {
+            errorElement.textContent =
+                'Vui lòng nhập lý do Từ chối hồ sơ.';
+        }
+
+        if (confirmButton) {
+            confirmButton.textContent =
+                'Xác nhận từ chối';
+
+            confirmButton.className =
+                'btn-task-action btn-task-reject';
+        }
+
+    }
+
+
+    // Hiển thị modal
     modal.style.display = 'flex';
 
+
+    // Focus textarea
     setTimeout(() => {
+
         reasonInput?.focus();
+
     }, 100);
 }
 
+function closeTaskActionModal() {
 
-function closeCloseDossierModal() {
+    const modal =
+        document.getElementById(
+            'taskActionModal'
+        );
 
-    const modal = document.getElementById('closeDossierModal');
-    const reasonInput = document.getElementById('closeDossierReason');
-    const errorElement = document.getElementById('closeDossierReasonError');
+    const reasonInput =
+        document.getElementById(
+            'taskActionReason'
+        );
+
+    const errorElement =
+        document.getElementById(
+            'taskActionReasonError'
+        );
+
 
     if (modal) {
         modal.style.display = 'none';
@@ -1277,69 +1973,158 @@ function closeCloseDossierModal() {
         errorElement.textContent = '';
         errorElement.style.display = 'none';
     }
+
+
+    currentTaskAction = null;
 }
 
 
-async function confirmCloseDossier() {
 
-    const reasonInput = document.getElementById('closeDossierReason');
-    const errorElement = document.getElementById('closeDossierReasonError');
+function closeTaskActionModal() {
 
-    if (!reasonInput) {
-        console.error('Không tìm thấy #closeDossierReason');
-        return;
+    const modal =
+        document.getElementById(
+            'taskActionModal'
+        );
+
+    const reasonInput =
+        document.getElementById(
+            'taskActionReason'
+        );
+
+    const errorElement =
+        document.getElementById(
+            'taskActionReasonError'
+        );
+
+
+    if (modal) {
+        modal.style.display = 'none';
     }
 
-    const reason = String(reasonInput.value || '').trim();
-
-    // Validate lý do
-    if (!reason) {
-
-        if (errorElement) {
-            errorElement.textContent =
-                'Vui lòng nhập lý do Đóng hồ sơ.';
-            errorElement.style.display = 'block';
-        }
-
-        reasonInput.focus();
-
-        return;
+    if (reasonInput) {
+        reasonInput.value = '';
     }
 
-    if (!detailTask) {
-        alert('Không tìm thấy thông tin task.');
-        return;
-    }
-
-    // Xóa error
     if (errorElement) {
         errorElement.textContent = '';
         errorElement.style.display = 'none';
     }
 
-    /*
-     * Quan trọng:
-     * Gán lý do trực tiếp vào detailTask
-     */
-    detailTask.comment = reason;
 
-    /*
-     * completeDossier() sẽ tiếp tục gán:
-     *
-     * detailTask.completeType = 'CLOSED';
-     *
-     * và gửi toàn bộ detailTask lên backend.
-     */
-    const success = await completeDossier('CLOSED');
-
-    /*
-     * Chỉ đóng modal khi API thành công.
-     * Nếu API lỗi thì giữ modal để user có thể sửa/thử lại.
-     */
-    if (success) {
-        closeCloseDossierModal();
-    }
+    currentTaskAction = null;
 }
+
+
+// function openCloseDossierModal() {
+
+//     const modal = document.getElementById('closeDossierModal');
+//     const reasonInput = document.getElementById('closeDossierReason');
+//     const errorElement = document.getElementById('closeDossierReasonError');
+
+//     if (!modal) {
+//         console.error('Không tìm thấy #closeDossierModal');
+//         return;
+//     }
+
+//     if (reasonInput) {
+//         reasonInput.value = '';
+//     }
+
+//     if (errorElement) {
+//         errorElement.textContent = '';
+//         errorElement.style.display = 'none';
+//     }
+
+//     modal.style.display = 'flex';
+
+//     setTimeout(() => {
+//         reasonInput?.focus();
+//     }, 100);
+// }
+
+
+// function closeCloseDossierModal() {
+
+//     const modal = document.getElementById('closeDossierModal');
+//     const reasonInput = document.getElementById('closeDossierReason');
+//     const errorElement = document.getElementById('closeDossierReasonError');
+
+//     if (modal) {
+//         modal.style.display = 'none';
+//     }
+
+//     if (reasonInput) {
+//         reasonInput.value = '';
+//     }
+
+//     if (errorElement) {
+//         errorElement.textContent = '';
+//         errorElement.style.display = 'none';
+//     }
+// }
+
+
+// async function confirmCloseDossier() {
+
+//     const reasonInput = document.getElementById('closeDossierReason');
+//     const errorElement = document.getElementById('closeDossierReasonError');
+
+//     if (!reasonInput) {
+//         console.error('Không tìm thấy #closeDossierReason');
+//         return;
+//     }
+
+//     const reason = String(reasonInput.value || '').trim();
+
+//     // Validate lý do
+//     if (!reason) {
+
+//         if (errorElement) {
+//             errorElement.textContent =
+//                 'Vui lòng nhập lý do Đóng hồ sơ.';
+//             errorElement.style.display = 'block';
+//         }
+
+//         reasonInput.focus();
+
+//         return;
+//     }
+
+//     if (!detailTask) {
+//         alert('Không tìm thấy thông tin task.');
+//         return;
+//     }
+
+//     // Xóa error
+//     if (errorElement) {
+//         errorElement.textContent = '';
+//         errorElement.style.display = 'none';
+//     }
+
+//     /*
+//      * Quan trọng:
+//      * Gán lý do trực tiếp vào detailTask
+//      */
+//     detailTask.comment = reason;
+
+//     /*
+//      * completeDossier() sẽ tiếp tục gán:
+//      *
+//      * detailTask.completeType = 'CLOSED';
+//      *
+//      * và gửi toàn bộ detailTask lên backend.
+//      */
+//     const success = await completeDossier('CLOSED');
+
+//     /*
+//      * Chỉ đóng modal khi API thành công.
+//      * Nếu API lỗi thì giữ modal để user có thể sửa/thử lại.
+//      */
+//     if (success) {
+//         closeCloseDossierModal();
+//     }
+// }
 
 function showClosedApplicationBanner(reason) {
 
@@ -1401,9 +2186,21 @@ function hideAllTaskActions() {
 
 
 
-function checkClosedApplication() {
+function checkApplicationFinalStatus() {
 
-    const status = getApplicationStatus();
+    if (!detailApplication) {
+        return false;
+    }
+
+    const status =
+        getApplicationStatus();
+
+    hideAllApplicationBanners();
+
+
+    // =====================================================
+    // CLOSED
+    // =====================================================
 
     if (status === 'CLOSED') {
 
@@ -1419,8 +2216,48 @@ function checkClosedApplication() {
         return true;
     }
 
+
+    // =====================================================
+    // APPROVED
+    // =====================================================
+
+    if (status === 'APPROVED') {
+
+        const reason =
+            detailApplication?.comment ||
+            detailTask?.comment ||
+            '';
+
+        showApprovedApplicationBanner(reason);
+
+        hideAllTaskActions();
+
+        return true;
+    }
+
+
+    // =====================================================
+    // REJECTED
+    // =====================================================
+
+    if (status === 'REJECTED') {
+
+        const reason =
+            detailApplication?.comment ||
+            detailTask?.comment ||
+            '';
+
+        showRejectedApplicationBanner(reason);
+
+        hideAllTaskActions();
+
+        return true;
+    }
+
+
     return false;
 }
+
 
 function getApplicationStatus() {
 
@@ -1439,25 +2276,73 @@ async function completeDossier(completeType) {
         return false;
     }
 
-    // Nếu là CLOSED thì bắt buộc phải có lý do
-    if (completeType === 'CLOSED') {
-        const reason = String(detailTask.comment || '').trim();
+    // =====================================================
+    // VALIDATE LÝ DO
+    // CLOSED / APPROVED / REJECTED đều bắt buộc có lý do
+    // =====================================================
+
+    const reasonRequiredMessages = {
+        CLOSED: 'Vui lòng nhập lý do Đóng hồ sơ.',
+        APPROVED: 'Vui lòng nhập lý do Phê duyệt hồ sơ.',
+        REJECTED: 'Vui lòng nhập lý do Từ chối hồ sơ.'
+    };
+
+    if (reasonRequiredMessages[completeType]) {
+
+        const reason =
+            String(detailTask.comment || '').trim();
 
         if (!reason) {
-            alert('Vui lòng nhập lý do Đóng hồ sơ.');
+
+            alert(
+                reasonRequiredMessages[completeType]
+            );
+
             return false;
         }
+
+        // Gửi comment đã trim
+        detailTask.comment = reason;
     }
 
-    // Thu thập câu trả lời mới nhất từ màn hình
+
+    // =====================================================
+    // THU THẬP CÂU TRẢ LỜI
+    // =====================================================
+
     collectQuestionAnswers();
 
-    // Gán completeType trực tiếp vào detailTask
+
+    // =====================================================
+    // GÁN COMPLETE TYPE
+    // =====================================================
+
     detailTask.completeType = completeType;
 
-    console.log('Complete task request:', detailTask);
 
-    // Disable toàn bộ action button
+    console.log(
+        '========== COMPLETE TASK REQUEST =========='
+    );
+
+    console.log(
+        'Complete type:',
+        completeType
+    );
+
+    console.log(
+        'Request:',
+        detailTask
+    );
+
+    console.log(
+        '==========================================='
+    );
+
+
+    // =====================================================
+    // DISABLE TOÀN BỘ ACTION BUTTON
+    // =====================================================
+
     const buttons = [
         document.getElementById('btnCompleteDossier'),
         document.getElementById('btnCloseDossier'),
@@ -1465,69 +2350,168 @@ async function completeDossier(completeType) {
         document.getElementById('btnRejectDossier')
     ];
 
-    buttons.forEach(btn => {
-        if (btn) {
-            btn.disabled = true;
+    buttons.forEach(button => {
+
+        if (button) {
+            button.disabled = true;
         }
+
     });
 
-    const completeButton = document.getElementById('btnCompleteDossier');
-    const closeButton = document.getElementById('btnCloseDossier');
-    const approveButton = document.getElementById('btnApproveDossier');
-    const rejectButton = document.getElementById('btnRejectDossier');
+
+    const completeButton =
+        document.getElementById(
+            'btnCompleteDossier'
+        );
+
+    const closeButton =
+        document.getElementById(
+            'btnCloseDossier'
+        );
+
+    const approveButton =
+        document.getElementById(
+            'btnApproveDossier'
+        );
+
+    const rejectButton =
+        document.getElementById(
+            'btnRejectDossier'
+        );
+
+
+    // =====================================================
+    // LƯU TEXT BAN ĐẦU
+    // =====================================================
 
     const oldTexts = {
-        complete: completeButton?.textContent,
-        close: closeButton?.textContent,
-        approve: approveButton?.textContent,
-        reject: rejectButton?.textContent
+
+        complete:
+            completeButton?.textContent,
+
+        close:
+            closeButton?.textContent,
+
+        approve:
+            approveButton?.textContent,
+
+        reject:
+            rejectButton?.textContent
+
     };
+
 
     try {
 
-        // Đổi text button theo loại action
-        if (completeType === 'COMPLETED' && completeButton) {
-            completeButton.textContent = 'Đang hoàn thành...';
+        // =================================================
+        // UPDATE BUTTON TEXT
+        // =================================================
+
+        if (
+            completeType === 'COMPLETED' &&
+            completeButton
+        ) {
+
+            completeButton.textContent =
+                'Đang hoàn thành...';
+
         }
 
-        if (completeType === 'CLOSED' && closeButton) {
-            closeButton.textContent = 'Đang đóng...';
+
+        if (
+            completeType === 'CLOSED' &&
+            closeButton
+        ) {
+
+            closeButton.textContent =
+                'Đang đóng...';
+
         }
 
-        if (completeType === 'APPROVED' && approveButton) {
-            approveButton.textContent = 'Đang phê duyệt...';
+
+        if (
+            completeType === 'APPROVED' &&
+            approveButton
+        ) {
+
+            approveButton.textContent =
+                'Đang phê duyệt...';
+
         }
 
-        if (completeType === 'REJECTED' && rejectButton) {
-            rejectButton.textContent = 'Đang từ chối...';
+
+        if (
+            completeType === 'REJECTED' &&
+            rejectButton
+        ) {
+
+            rejectButton.textContent =
+                'Đang từ chối...';
+
         }
+
+
+        // =================================================
+        // CALL API
+        // =================================================
 
         const response = await fetch(
             `${API_BASE_URL}/scoring/api/v1/scoring/tasks/complete`,
             {
                 method: 'POST',
+
                 headers: {
                     'Content-Type': 'application/json'
                 },
+
                 body: JSON.stringify(detailTask)
             }
         );
 
-        const responseText = await response.text();
 
-        console.log('Complete task response:', responseText);
+        const responseText =
+            await response.text();
+
+
+        console.log(
+            'Complete task HTTP status:',
+            response.status
+        );
+
+        console.log(
+            'Complete task response:',
+            responseText
+        );
+
+
+        // =================================================
+        // PARSE RESPONSE
+        // =================================================
 
         let responseData = null;
 
         if (responseText) {
+
             try {
-                responseData = JSON.parse(responseText);
-            } catch (e) {
-                console.error('Không parse được response JSON:', e);
+
+                responseData =
+                    JSON.parse(responseText);
+
+            } catch (error) {
+
+                console.error(
+                    'Không parse được response JSON:',
+                    error
+                );
+
             }
         }
 
-        // API trả lỗi
+
+        // =================================================
+        // HTTP ERROR
+        // =================================================
+
         if (!response.ok) {
 
             const errorMessage =
@@ -1540,17 +2524,37 @@ async function completeDossier(completeType) {
             throw new Error(errorMessage);
         }
 
-        // Backend trả HTTP 200 nhưng DTO lỗi
+
+        // =================================================
+        // EMPTY RESPONSE
+        // =================================================
+
         if (!responseData) {
-            throw new Error('API không trả về dữ liệu task.');
+
+            throw new Error(
+                'API không trả về dữ liệu task.'
+            );
         }
+
+
+        // =================================================
+        // BACKEND BUSINESS ERROR
+        // =================================================
 
         if (responseData.errorMsg) {
-            throw new Error(responseData.errorMsg);
+
+            throw new Error(
+                responseData.errorMsg
+            );
         }
 
-        // Cập nhật lại detailTask bằng response mới nhất
-        detailTask = responseData;
+
+        // =================================================
+        // UPDATE DATA
+        // =================================================
+
+        detailTask =
+            responseData;
 
         detailApplication =
             responseData.application ||
@@ -1561,88 +2565,178 @@ async function completeDossier(completeType) {
                 ? responseData.models
                 : detailModels;
 
-        console.log('detailTask sau khi complete:', detailTask);
-        console.log('detailApplication sau khi complete:', detailApplication);
 
-        // Nếu đóng hồ sơ
-        if (completeType === 'CLOSED') {
+        console.log(
+            'detailTask sau khi complete:',
+            detailTask
+        );
 
-            const reason =
-                detailTask?.comment ||
-                detailApplication?.comment ||
-                '';
+        console.log(
+            'detailApplication sau khi complete:',
+            detailApplication
+        );
 
-            showClosedApplicationBanner(reason);
-            hideAllTaskActions();
 
-            closeCloseDossierModal();
-        }
+        // =================================================
+        // RENDER LẠI UI
+        // =================================================
 
-        // Render lại giao diện
         renderApplication();
+
         renderModels();
+
         updateDetailActionButtons();
 
-        // Kiểm tra lại trạng thái hồ sơ
-        checkClosedApplication();
+        /*
+         * Quan trọng:
+         * checkApplicationFinalStatus() sẽ tự xử lý:
+         *
+         * CLOSED
+         * APPROVED
+         * REJECTED
+         *
+         * và tự hide action button.
+         */
+        checkApplicationFinalStatus();
 
-        alert(
-            completeType === 'COMPLETED'
-                ? 'Hoàn thành task thành công.'
-                : completeType === 'CLOSED'
-                    ? 'Đóng hồ sơ thành công.'
-                    : completeType === 'APPROVED'
-                        ? 'Phê duyệt hồ sơ thành công.'
-                        : completeType === 'REJECTED'
-                            ? 'Từ chối hồ sơ thành công.'
-                            : 'Thực hiện thành công.'
-        );
+
+        // =================================================
+        // SUCCESS MESSAGE
+        // =================================================
+
+        let successMessage =
+            'Thực hiện thành công.';
+
+        if (completeType === 'COMPLETED') {
+
+            successMessage =
+                'Hoàn thành task thành công.';
+
+        } else if (completeType === 'CLOSED') {
+
+            successMessage =
+                'Đóng hồ sơ thành công.';
+
+        } else if (completeType === 'APPROVED') {
+
+            successMessage =
+                'Phê duyệt hồ sơ thành công.';
+
+        } else if (completeType === 'REJECTED') {
+
+            successMessage =
+                'Từ chối hồ sơ thành công.';
+        }
+
+
+        alert(successMessage);
+
 
         return true;
 
+
     } catch (error) {
 
-        console.error('Lỗi complete task:', error);
+        console.error(
+            '========== COMPLETE TASK ERROR =========='
+        );
+
+        console.error(
+            'Error object:',
+            error
+        );
+
+        console.error(
+            'Error message:',
+            error?.message
+        );
+
+        console.error(
+            'Error stack:',
+            error?.stack
+        );
+
+        console.error(
+            'Complete type:',
+            completeType
+        );
+
+        console.error(
+            'Detail task:',
+            detailTask
+        );
+
+        console.error(
+            '=========================================='
+        );
+
 
         alert(
             error?.message ||
             'Không thể thực hiện thao tác.'
         );
 
+
         return false;
+
 
     } finally {
 
-        // Restore button
+        // =================================================
+        // RESTORE BUTTON
+        // =================================================
+
         if (completeButton) {
+
             completeButton.disabled = false;
+
             completeButton.textContent =
-                oldTexts.complete || 'Hoàn thành';
+                oldTexts.complete ||
+                'Hoàn thành';
         }
+
 
         if (closeButton) {
+
             closeButton.disabled = false;
+
             closeButton.textContent =
-                oldTexts.close || 'Đóng';
+                oldTexts.close ||
+                'Đóng';
         }
+
 
         if (approveButton) {
+
             approveButton.disabled = false;
+
             approveButton.textContent =
-                oldTexts.approve || 'Phê duyệt';
+                oldTexts.approve ||
+                'Phê duyệt';
         }
+
 
         if (rejectButton) {
+
             rejectButton.disabled = false;
+
             rejectButton.textContent =
-                oldTexts.reject || 'Từ chối';
+                oldTexts.reject ||
+                'Từ chối';
         }
 
-        // Nếu hồ sơ đã CLOSED thì vẫn phải hide action
-        checkClosedApplication();
+
+        /*
+         * Sau khi restore button,
+         * kiểm tra lại trạng thái cuối.
+         *
+         * Nếu CLOSED / APPROVED / REJECTED
+         * thì checkApplicationFinalStatus()
+         * sẽ hide chúng lại.
+         */
+        checkApplicationFinalStatus();
     }
 }
-
 /**
  * Thu thập câu trả lời
  */

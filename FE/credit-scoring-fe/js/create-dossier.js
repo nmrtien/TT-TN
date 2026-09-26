@@ -349,8 +349,8 @@ function loadCreateDossierPage() {
             </div>
 
 
-            <div id="toast" class="toast hidden">
-                <span id="toastMessage"></span>
+            <div id="toastCreateDossier" class="toast hidden">
+                <span id="toastCreateDossierMessage"></span>
             </div>
 
         </section>
@@ -513,6 +513,45 @@ document
             }
 
         });
+}
+
+
+function showCreateDossierToast(message, type = 'info') {
+    const toast = document.getElementById('toastCreateDossier');
+    const toastCreateDossierMessage = document.getElementById('toastCreateDossierMessage');
+
+    if (!toast) {
+        return;
+    }
+
+    // Clear timer cũ
+    if (window.toastTimeout) {
+        clearTimeout(window.toastTimeout);
+    }
+
+    // Set message
+    if (toastCreateDossierMessage) {
+        toastCreateDossierMessage.textContent = message;
+    } else {
+        toast.textContent = message;
+    }
+
+    // Reset class
+    toast.classList.remove('hidden');
+    toast.classList.remove('show');
+    toast.classList.remove('success');
+    toast.classList.remove('error');
+    toast.classList.remove('info');
+
+    // Show
+    toast.classList.add(type);
+    toast.classList.add('show');
+
+    // Tự đóng sau 5 giây
+    window.toastTimeout = setTimeout(function () {
+        toast.classList.remove('show');
+        toast.classList.add('hidden');
+    }, 5000);
 }
 
 // ===============================

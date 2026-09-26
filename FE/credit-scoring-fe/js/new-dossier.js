@@ -82,9 +82,9 @@ function loadUnassignedDossiersPage() {
             </div>
 
             <div
-    id="toast"
+    id="toastNewDossier"
     class="toast hidden">
-    <span id="toastMessage"></span>
+    <span id="toastNewDossierMessage"></span>
 </div>
 
         </div>
@@ -144,9 +144,9 @@ async function loadUnassignedDossiers() {
         const user = JSON.parse(userJson);
 
         const userName = user?.userName;
-        // const roleGroup = user?.roleGroup;
+        const roleGroup = user?.roleGroup;
         //TODO: FIX CODE TO TEST
-        const roleGroup = 'RB_RM';
+        // const roleGroup = 'RB_RM';
 
         if (!userName || !roleGroup) {
             throw new Error(
@@ -544,21 +544,22 @@ async function claimDossier(taskId) {
 }
 
 function showNewDossierToast(message, type = 'info') {
-    const toast = document.getElementById('toast');
-    const toastMessage = document.getElementById('toastMessage');
-
+    console.log('1')
+    const toast = document.getElementById('toastNewDossier');
+    const toastNewDossierMessage = document.getElementById('toastNewDossierMessage');
+console.log('2')
     if (!toast) {
         return;
     }
-
+console.log('3')
     // Clear timer cũ
     if (window.toastTimeout) {
         clearTimeout(window.toastTimeout);
     }
 
     // Set message
-    if (toastMessage) {
-        toastMessage.textContent = message;
+    if (toastNewDossierMessage) {
+        toastNewDossierMessage.textContent = message;
     } else {
         toast.textContent = message;
     }

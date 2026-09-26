@@ -3,7 +3,6 @@ package ptit.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import ptit.constant.CreditStatus;
 import ptit.entity.*;
 import ptit.service.IScoring;
 
@@ -104,5 +103,15 @@ public class ScoringController {
         }
     }
 
+
+    @GetMapping("/{roleGroup}/models")
+    public ResponseEntity<Object> models(@PathVariable String roleGroup) {
+        try {
+            List<Model> response = scoringService.getModels(roleGroup);
+            return ResponseEntity.ok().body(response);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error: " + e.getMessage());
+        }
+    }
 
 }

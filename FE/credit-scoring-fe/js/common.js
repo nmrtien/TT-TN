@@ -4,181 +4,791 @@ function goToPage(page) {
 }
 
 function shell(active, title, subtitle) {
+
+    // =========================================================
+    // LẤY USER ĐANG LOGIN
+    // =========================================================
+
+    const userData =
+        localStorage.getItem('credit_scoring_user');
+
+    let user = {};
+
+    try {
+
+        user = userData
+            ? JSON.parse(userData)
+            : {};
+
+    } catch (error) {
+
+        console.error(
+            'Không parse được credit_scoring_user:',
+            error
+        );
+
+        user = {};
+    }
+
+
+    const roleGroup =
+        String(user?.roleGroup || '')
+            .trim()
+            .toUpperCase();
+
+
+    // Chỉ RB_AM được sử dụng các chức năng bị giới hạn
+    const isRBAM = roleGroup === 'RB_AM';
+
+
+    // =========================================================
+    // CLICK CÁC MENU CẦN QUYỀN RB_AM
+    // =========================================================
+
+    function handleRestrictedClick(event) {
+
+        event.preventDefault();
+        event.stopPropagation();
+
+
+        // Không phải RB_AM
+        if (!isRBAM) {
+
+            showPermissionToast();
+
+            return;
+        }
+
+
+        const target = event.currentTarget;
+
+        if (!target) {
+            return;
+        }
+
+
+        const targetType =
+            target.dataset.permissionTarget;
+
+
+        switch (targetType) {
+
+            // -------------------------------------------------
+            // NGƯỜI DÙNG
+            // -------------------------------------------------
+
+            case 'users':
+
+                loadUsersPage();
+
+                break;
+
+
+            // -------------------------------------------------
+            // KHỞI TẠO HỒ SƠ
+            // -------------------------------------------------
+
+            case 'create-dossier':
+
+                loadCreateDossierPage();
+
+                break;
+
+
+            // -------------------------------------------------
+            // CÂU HỎI
+            // -------------------------------------------------
+
+            case 'questions':
+
+                loadQuestionsPage();
+
+                break;
+
+
+            // -------------------------------------------------
+            // MÔ HÌNH
+            // -------------------------------------------------
+
+            case 'models':
+
+                loadModelsPage();
+
+                break;
+
+
+            default:
+
+                console.warn(
+                    'Không xác định được permission target:',
+                    targetType
+                );
+
+                break;
+        }
+    }
+
+
+    // =========================================================
+    // RENDER SIDEBAR + MAIN
+    // =========================================================
+
     document.getElementById('app').innerHTML = `
+
         <aside class="sidebar">
-            <div class="brand">CREDIT SCORING</div>
 
-            <div class="nav-item ${active === 'dashboard' ? 'active' : ''}"
-                 onclick="location.href='../index.html'">
-                <span class="nav-icon">⌂</span>
-                <span>Tổng quan</span>
+            <div class="brand">
+                CREDIT SCORING
             </div>
 
-            <div class="nav-item ${active === 'users' ? 'active' : ''}" onclick="event.stopPropagation(); loadUsersPage()">
-    <span class="nav-icon">🪪</span>
-    <span>Người dùng</span>
-</div>
 
-            <!-- HỒ SƠ CHẤM ĐIỂM -->
-            <div class="nav-group ${['create-dossier', 'unassigned-dossiers', 'processing-dossiers', 'approved-dossiers', 'rejected-dossiers', 'closed-dossiers'].includes(active) ? 'open' : ''}">
+            <!-- =================================================
+                 TỔNG QUAN
+                 TẤT CẢ ROLE ĐỀU ĐƯỢC PHÉP
+                 ================================================= -->
 
-                <div class="nav-item nav-parent"
-                     onclick="toggleGroup(this)">
-                    <span class="nav-icon">▤</span>
-                    <span class="nav-text">Hồ sơ chấm điểm</span>
-                    <span class="nav-arrow">›</span>
+            <div
+                class="nav-item ${
+                    active === 'dashboard'
+                        ? 'active'
+                        : ''
+                }"
+                id="navDashboard"
+                onclick="
+                    event.stopPropagation();
+                    window.location.href='../index.html'
+                "
+            >
+
+                <span class="nav-icon">
+                    ⌂
+                </span>
+
+                <span>
+                    Tổng quan
+                </span>
+
+            </div>
+
+
+            <!-- =================================================
+                 HỒ SƠ CHẤM ĐIỂM
+                 ================================================= -->
+
+            <div
+                class="nav-group ${
+                    [
+                        'create-dossier',
+                        'unassigned-dossiers',
+                        'processing-dossiers',
+                        'approved-dossiers',
+                        'rejected-dossiers',
+                        'closed-dossiers'
+                    ].includes(active)
+                        ? 'open'
+                        : ''
+                }"
+            >
+
+                <div
+                    class="nav-item nav-parent"
+                    onclick="toggleGroup(this)"
+                >
+
+                    <span class="nav-icon">
+                        ▤
+                    </span>
+
+                    <span class="nav-text">
+                        Hồ sơ chấm điểm
+                    </span>
+
+                    <span class="nav-arrow">
+                        ›
+                    </span>
+
                 </div>
+
 
                 <div class="nav-children">
 
-                    <div class="nav-child ${active === 'create-dossier' ? 'active' : ''}"
-                         onclick="event.stopPropagation(); loadCreateDossierPage()">
-                        <span class="child-dot">•</span>
-                        <span>Khởi tạo Hồ sơ</span>
+
+                    <!-- =================================================
+                         KHỞI TẠO HỒ SƠ
+                         CHỈ RB_AM
+                         ================================================= -->
+
+                    <div
+                        class="nav-child ${
+                            active === 'create-dossier'
+                                ? 'active'
+                                : ''
+                        }"
+                        data-permission-target="create-dossier"
+                        id="navCreateDossier"
+                    >
+
+                        <span class="child-dot">
+                            •
+                        </span>
+
+                        <span>
+                            Khởi tạo Hồ sơ
+                        </span>
+
                     </div>
 
-                    <div class="nav-child ${active === 'unassigned-dossiers' ? 'active' : ''}"
-                         onclick="event.stopPropagation(); loadUnassignedDossiersPage()">
-                        <span class="child-dot">•</span>
-                        <span>Hồ sơ Chưa phân công</span>
+
+                    <!-- =================================================
+                         HỒ SƠ CHƯA PHÂN CÔNG
+                         TẤT CẢ ROLE
+                         ================================================= -->
+
+                    <div
+                        class="nav-child ${
+                            active === 'unassigned-dossiers'
+                                ? 'active'
+                                : ''
+                        }"
+                        onclick="
+                            event.stopPropagation();
+                            loadUnassignedDossiersPage()
+                        "
+                    >
+
+                        <span class="child-dot">
+                            •
+                        </span>
+
+                        <span>
+                            Hồ sơ Chưa phân công
+                        </span>
+
                     </div>
 
-                    <div class="nav-child ${active === 'processing-dossiers' ? 'active' : ''}"
-                         onclick="event.stopPropagation(); loadInprogressDossiersPage()">
-                        <span class="child-dot">•</span>
-                        <span>Hồ sơ Đang xử lý</span>
+
+                    <!-- =================================================
+                         HỒ SƠ ĐANG XỬ LÝ
+                         TẤT CẢ ROLE
+                         ================================================= -->
+
+                    <div
+                        class="nav-child ${
+                            active === 'processing-dossiers'
+                                ? 'active'
+                                : ''
+                        }"
+                        onclick="
+                            event.stopPropagation();
+                            loadInprogressDossiersPage()
+                        "
+                    >
+
+                        <span class="child-dot">
+                            •
+                        </span>
+
+                        <span>
+                            Hồ sơ Đang xử lý
+                        </span>
+
                     </div>
 
-                    <div class="nav-child ${active === 'approved-dossiers' ? 'active' : ''}"
-                         onclick="event.stopPropagation(); loadApprovedDossiersPage()">
-                        <span class="child-dot">•</span>
-                        <span>Hồ sơ Đã được duyệt</span>
+
+                    <!-- =================================================
+                         HỒ SƠ ĐÃ ĐƯỢC DUYỆT
+                         TẤT CẢ ROLE
+                         ================================================= -->
+
+                    <div
+                        class="nav-child ${
+                            active === 'approved-dossiers'
+                                ? 'active'
+                                : ''
+                        }"
+                        onclick="
+                            event.stopPropagation();
+                            loadApprovedDossiersPage()
+                        "
+                    >
+
+                        <span class="child-dot">
+                            •
+                        </span>
+
+                        <span>
+                            Hồ sơ Đã được duyệt
+                        </span>
+
                     </div>
 
-                    <div class="nav-child ${active === 'rejected-dossiers' ? 'active' : ''}"
-                         onclick="event.stopPropagation(); loadRejectedDossiersPage()">
-                        <span class="child-dot">•</span>
-                        <span>Hồ sơ Bị từ chối</span>
+
+                    <!-- =================================================
+                         HỒ SƠ BỊ TỪ CHỐI
+                         TẤT CẢ ROLE
+                         ================================================= -->
+
+                    <div
+                        class="nav-child ${
+                            active === 'rejected-dossiers'
+                                ? 'active'
+                                : ''
+                        }"
+                        onclick="
+                            event.stopPropagation();
+                            loadRejectedDossiersPage()
+                        "
+                    >
+
+                        <span class="child-dot">
+                            •
+                        </span>
+
+                        <span>
+                            Hồ sơ Bị từ chối
+                        </span>
+
                     </div>
 
-                    <div class="nav-child ${active === 'closed-dossiers' ? 'active' : ''}"
-                         onclick="event.stopPropagation(); loadClosedDossiersPage()">
-                        <span class="child-dot">•</span>
-                        <span>Hồ sơ Đã bị đóng</span>
+
+                    <!-- =================================================
+                         HỒ SƠ ĐÃ ĐÓNG
+                         TẤT CẢ ROLE
+                         ================================================= -->
+
+                    <div
+                        class="nav-child ${
+                            active === 'closed-dossiers'
+                                ? 'active'
+                                : ''
+                        }"
+                        onclick="
+                            event.stopPropagation();
+                            loadClosedDossiersPage()
+                        "
+                    >
+
+                        <span class="child-dot">
+                            •
+                        </span>
+
+                        <span>
+                            Hồ sơ Đã bị đóng
+                        </span>
+
                     </div>
 
                 </div>
+
             </div>
 
-                   
 
-            <!-- CẤU HÌNH HỆ THỐNG -->
-            <div class="nav-group ${active === 'questions' || active === 'models' ? 'open' : ''}">
+<!-- =================================================
+                 NGƯỜI DÙNG
+                 CHỈ RB_AM
+                 ================================================= -->
 
-                <div class="nav-item nav-parent"
-                     onclick="toggleGroup(this)">
-                    <span class="nav-icon">⚙</span>
-                    <span class="nav-text">Cấu hình hệ thống</span>
-                    <span class="nav-arrow">›</span>
+            <div
+                class="nav-item ${
+                    active === 'users'
+                        ? 'active'
+                        : ''
+                }"
+                data-permission-target="users"
+                id="navUserManagement"
+            >
+
+                <span class="nav-icon">
+                    🪪
+                </span>
+
+                <span>
+                    Người dùng
+                </span>
+
+            </div>
+
+
+            <!-- =================================================
+                 CẤU HÌNH HỆ THỐNG
+                 CHỈ RB_AM
+                 ================================================= -->
+
+            <div
+                class="nav-group ${
+                    active === 'questions' ||
+                    active === 'models'
+                        ? 'open'
+                        : ''
+                }"
+            >
+
+                <div
+                    class="nav-item nav-parent"
+                    onclick="toggleGroup(this)"
+                >
+
+                    <span class="nav-icon">
+                        ⚙
+                    </span>
+
+                    <span class="nav-text">
+                        Cấu hình hệ thống
+                    </span>
+
+                    <span class="nav-arrow">
+                        ›
+                    </span>
+
                 </div>
+
 
                 <div class="nav-children">
 
-                    <div class="nav-child ${active === 'questions' ? 'active' : ''}"
-     onclick="event.stopPropagation(); loadQuestionsPage()">
-    <span class="child-dot">•</span>
-    <span>Câu hỏi</span>
-</div>
 
-                    <div class="nav-child ${active === 'models' ? 'active' : ''}"
-                         onclick="event.stopPropagation(); loadModelsPage()">
-                        <span class="child-dot">•</span>
-                        <span>Mô hình</span>
+                    <!-- =================================================
+                         CÂU HỎI
+                         CHỈ RB_AM
+                         ================================================= -->
+
+                    <div
+                        class="nav-child ${
+                            active === 'questions'
+                                ? 'active'
+                                : ''
+                        }"
+                        data-permission-target="questions"
+                        id="navQuestions"
+                    >
+
+                        <span class="child-dot">
+                            •
+                        </span>
+
+                        <span>
+                            Câu hỏi
+                        </span>
+
+                    </div>
+
+
+                    <!-- =================================================
+                         MÔ HÌNH
+                         CHỈ RB_AM
+                         ================================================= -->
+
+                    <div
+                        class="nav-child ${
+                            active === 'models'
+                                ? 'active'
+                                : ''
+                        }"
+                        data-permission-target="models"
+                        id="navModels"
+                    >
+
+                        <span class="child-dot">
+                            •
+                        </span>
+
+                        <span>
+                            Mô hình
+                        </span>
+
                     </div>
 
                 </div>
+
             </div>
-
-     
-
 
         </aside>
+
+
+        <!-- =====================================================
+             MAIN
+             ===================================================== -->
 
         <main class="main">
 
             <header class="topbar">
 
-            
                 <div class="user">
-                    <span>🔔</span>
+
+                    <span>
+                        🔔
+                    </span>
+
 
                     <div class="avatar">
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-        <circle cx="12" cy="8" r="4"></circle>
-        <path d="M4 21c0-4 3.5-7 8-7s8 3 8 7"></path>
-    </svg>
-</div>
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                        >
+
+                            <circle
+                                cx="12"
+                                cy="8"
+                                r="4"
+                            ></circle>
+
+                            <path
+                                d="M4 21c0-4 3.5-7 8-7s8 3 8 7"
+                            ></path>
+
+                        </svg>
+
+                    </div>
+
 
                     <div>
-    <b id="userFullName"></b>
 
-    <small
-        id="userRoleGroup"
-        style="display:block;color:#71819a"
-    ></small>
-</div>
+                        <b id="userFullName"></b>
 
-<button
-    type="button"
-    id="logoutButton"
-    class="logout-button"
-    title="Đăng xuất"
-    aria-label="Đăng xuất"
->
-    <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M10 17l5-5-5-5"></path>
-        <path d="M15 12H3"></path>
-        <path d="M19 3h-6v2h6v14h-6v2h6c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2z"></path>
-    </svg>
-</button>
+                        <small
+                            id="userRoleGroup"
+                            style="
+                                display:block;
+                                color:#71819a
+                            "
+                        ></small>
+
+                    </div>
+
+
+                    <button
+                        type="button"
+                        id="logoutButton"
+                        class="logout-button"
+                        title="Đăng xuất"
+                        aria-label="Đăng xuất"
+                    >
+
+                        <svg
+                            viewBox="0 0 24 24"
+                            aria-hidden="true"
+                        >
+
+                            <path
+                                d="M10 17l5-5-5-5"
+                            ></path>
+
+                            <path
+                                d="M15 12H3"
+                            ></path>
+
+                            <path
+                                d="
+                                    M19 3h-6v2h6v14h-6v2h6
+                                    c1.1 0 2-.9 2-2V5
+                                    c0-1.1-.9-2-2-2z
+                                "
+                            ></path>
+
+                        </svg>
+
+                    </button>
+
                 </div>
 
             </header>
 
+
             <section class="content">
 
                 <div class="page-title">
+
                     <div>
+
                         <h1></h1>
+
                         <p></p>
+
                     </div>
+
                 </div>
 
-                <div id="page-content">
-                
-                </div>
 
+                <div id="page-content"></div>
 
             </section>
-
-            
 
         </main>
     `;
 
-    const userData = localStorage.getItem('credit_scoring_user');
 
-if (userData) {
-    const user = JSON.parse(userData);
+    // =========================================================
+    // HIỂN THỊ USER
+    // =========================================================
 
-    document.getElementById('userFullName').textContent = user.fullName;
-    document.getElementById('userRoleGroup').textContent = user.roleGroup;
+    const fullNameElement =
+        document.getElementById('userFullName');
+
+    const roleGroupElement =
+        document.getElementById('userRoleGroup');
+
+
+    if (fullNameElement) {
+
+        fullNameElement.textContent =
+            user?.fullName || '';
+
+    }
+
+
+    if (roleGroupElement) {
+
+        roleGroupElement.textContent =
+            user?.roleGroup || '';
+
+    }
+
+
+    // =========================================================
+    // REGISTER RESTRICTED EVENTS
+    // =========================================================
+
+    // Người dùng
+    document
+        .getElementById('navUserManagement')
+        ?.addEventListener(
+            'click',
+            handleRestrictedClick
+        );
+
+
+    // Khởi tạo Hồ sơ
+    document
+        .getElementById('navCreateDossier')
+        ?.addEventListener(
+            'click',
+            handleRestrictedClick
+        );
+
+
+    // Câu hỏi
+    document
+        .getElementById('navQuestions')
+        ?.addEventListener(
+            'click',
+            handleRestrictedClick
+        );
+
+
+    // Mô hình
+    document
+        .getElementById('navModels')
+        ?.addEventListener(
+            'click',
+            handleRestrictedClick
+        );
+
+
+    // =========================================================
+    // LOGOUT
+    // =========================================================
+
+    document
+        .getElementById('logoutButton')
+        ?.addEventListener(
+            'click',
+            function () {
+
+                localStorage.removeItem(
+                    'credit_scoring_user'
+                );
+
+                window.location.href =
+                    'login.html';
+
+            }
+        );
 }
 
-document.getElementById('logoutButton')?.addEventListener('click', function () {
-    localStorage.removeItem('credit_scoring_user');
-    window.location.href = 'login.html';
-});
+
+function isRoleAllowed(requiredRole) {
+
+    try {
+
+        const userData =
+            localStorage.getItem('credit_scoring_user');
+
+        if (!userData) {
+            return false;
+        }
+
+        const user = JSON.parse(userData);
+
+        const roleGroup =
+            String(user?.roleGroup || '')
+                .trim()
+                .toUpperCase();
+
+        return roleGroup === requiredRole;
+
+    } catch (error) {
+
+        console.error(
+            'Không đọc được thông tin user:',
+            error
+        );
+
+        return false;
+    }
+}
+
+
+function showPermissionToast() {
+
+    const existingToast =
+        document.getElementById('permissionToast');
+
+    if (existingToast) {
+        existingToast.remove();
+    }
+
+
+    const toast =
+        document.createElement('div');
+
+    toast.id = 'permissionToast';
+
+    toast.className =
+        'permission-toast';
+
+
+    toast.innerHTML = `
+        <span class="permission-toast-icon">
+            !
+        </span>
+
+        <span>
+            Bạn không được cấp quyền để sử dụng các chức năng này
+        </span>
+    `;
+
+
+    document.body.appendChild(toast);
+
+
+    requestAnimationFrame(() => {
+
+        toast.classList.add('show');
+
+    });
+
+
+    setTimeout(() => {
+
+        toast.classList.remove('show');
+
+        setTimeout(() => {
+
+            toast.remove();
+
+        }, 300);
+
+    }, 3000);
 }
 
 

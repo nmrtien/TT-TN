@@ -1,6 +1,5 @@
 package ptit.service;
 
-import ptit.constant.CreditStatus;
 import ptit.entity.*;
 
 import java.util.List;
@@ -23,7 +22,7 @@ public interface IScoring {
 
     CreditTask completeTask(CreditTask task);
 
-    List<Model> getModels(Integer level);
+    List<Model> getModels(String roleGroup);
 
     List<CreditApplication> getAllApplication();
 

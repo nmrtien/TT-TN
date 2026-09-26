@@ -4,6 +4,7 @@ import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+import ptit.constant.RoleGroup;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -21,8 +22,8 @@ public class Model {
     @Field("model_name")
     private String modelName;
 
-    @Field("model_level")
-    private Integer modelLevel;
+    @Field("role_group")
+    private RoleGroup roleGroup;
 
     private List<Question> questions;
 }

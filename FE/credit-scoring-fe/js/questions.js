@@ -343,10 +343,10 @@ function loadQuestionsPage() {
      ========================================================= -->
 
 <div
-    id="toast"
+    id="toastQuestion"
     class="toast hidden">
 
-<span id="toastMessage"></span>
+<span id="toastQuestionMessage"></span>
 
 </div>
 
@@ -1299,8 +1299,8 @@ try {
 // ===============================
 
 function showQuestionToast(message, type = 'info') {
-    const toast = document.getElementById('toast');
-    const toastMessage = document.getElementById('toastMessage');
+    const toast = document.getElementById('toastQuestion');
+    const toastQuestionMessage = document.getElementById('toastQuestionMessage');
 
     if (!toast) {
         return;
@@ -1312,8 +1312,8 @@ function showQuestionToast(message, type = 'info') {
     }
 
     // Set message
-    if (toastMessage) {
-        toastMessage.textContent = message;
+    if (toastQuestionMessage) {
+        toastQuestionMessage.textContent = message;
     } else {
         toast.textContent = message;
     }
